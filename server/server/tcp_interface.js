@@ -1,6 +1,8 @@
 var net = Meteor.npmRequire('net');
 var frame = Meteor.npmRequire('frame-stream');
 
+var allSockets = [];
+
 // Handle listening to port
 var TCPListener = function(){
   this.server = net.Server();
@@ -9,11 +11,11 @@ var TCPListener = function(){
 
 _.extend(TCPListener.prototype,{
   start(){
-    console.log("starting tcp server...");
+    console.log("Starting tcp server on port "+Settings.tcp_listen_port+"...");
     this.server.listen(Settings.tcp_listen_port);
   },
   onConnect(socket){
-    console.log("incoming connection...");
+    console.log("Incoming connection...");
     new SocketHandler(socket);
   }
 });
@@ -23,10 +25,15 @@ var SocketHandler = function(socket){
   this.socket = socket;
   this.socket.on('close', this.onClose);
   this.socket.on('error', this.onError);
+  this.socket.on('data', function(data){
+    console.log("data received "+data.toString());
+  });
   this.framed = this.socket.pipe(frame.decode());
   this.framed.on('data',this.onMessage);
   this.outMessage = frame.encode();
   this.outMessage.pipe(this.socket);
+
+  allSockets.push(this);
 }
 
 _.extend(SocketHandler.prototype,{
@@ -35,6 +42,8 @@ _.extend(SocketHandler.prototype,{
     Items.insert({text: message.toString()});
   }),
   onClose(){
+    var idx = allSockets.indexOf(this);
+    allSockets.splice(idx, 1);
     console.log("connection closed");
   },
   onError(){
@@ -49,3 +58,13 @@ Meteor.startup(function(){
   var listener = new TCPListener();
   listener.start();
 });
+
+Meteor.methods({
+  sendPing(){
+    console.log("Ping called");
+    allSockets.forEach(function(socket){
+      console.log("Sending to a port ");
+      socket.sendMessage('ping');
+    });
+  }
+})

@@ -52,13 +52,13 @@
 
 /**
  * @mainpage WiFlyHQ WiFly RN-XV Arduino library
- * 
+ *
  * This library provides functions for setting up and managing the WiFly module,
  * sending UDP packets, opening TCP connections and sending and receiving data
  * over the TCP connection.
- * 
+ *
  * @author Harlequin-Tech
- */ 
+ */
 
 /**
  * @file WiFlyHQ.h
@@ -118,7 +118,7 @@ typedef const char PROGMEM prog_char;
 
 #define WIFLY_DEFAULT_TIMEOUT		500	/* 500 milliseconds */
 
-#define WIFLY_MODE_WPA			0	
+#define WIFLY_MODE_WPA			0
 #define WIFLY_MODE_WEP			1
 
 class WFDebug : public Stream {
@@ -140,12 +140,12 @@ private:
 class WiFly : public Stream {
 public:
     WiFly();
-    
+
     boolean begin(Stream *serialdev, Stream *debugPrint = NULL);
-    
+
     char *getSSID(char *buf, int size);
     uint8_t getJoin();
-    char *getDeviceID(char *buf, int size);    
+    char *getDeviceID(char *buf, int size);
     char *getIP(char *buf, int size);
     uint16_t getPort();
     char *getNetmask(char *buf, int size);
@@ -225,9 +225,9 @@ public:
     boolean disableUdpAutoPair();
 
     boolean setIOFunc(const uint8_t func);
-    
+
     boolean sleep(uint16_t seconds = 0);
-    
+
     boolean time();
     char *getTime(char *buf, int size);
     uint32_t getUptime();
@@ -239,7 +239,7 @@ public:
 
     boolean enableDHCP();
     boolean disableDHCP();
-    
+
     boolean createAdhocNetwork(const char *ssid, uint8_t channel);
     boolean join(const char *ssid, uint16_t timeout=20000);
     boolean join(uint16_t timeout=20000);
@@ -267,7 +267,7 @@ public:
     boolean openComplete();
     boolean isConnected();
     boolean isInCommandMode();
-    
+
     virtual size_t write(uint8_t byte);
     virtual int read();
     virtual int available();
@@ -286,7 +286,7 @@ public:
 
     int getFreeMemory();
     void terminal();
-  
+
     using Print::write;
 
     void dbgBegin(int size=256);
@@ -318,6 +318,9 @@ public:
 	const char *password,
 	const char *filename);
 
+    boolean setopt(const prog_char *cmd, const char *buf=NULL, const __FlashStringHelper *buf_P=NULL, bool spacesub=false);
+    boolean setopt(const prog_char *opt, const uint32_t value, uint8_t base=DEC);
+
   private:
     void init(void);
 
@@ -347,8 +350,6 @@ public:
     boolean finishCommand();
     char *getopt(int opt, char *buf, int size);
     uint32_t getopt(int opt, uint8_t base=DEC);
-    boolean setopt(const prog_char *cmd, const char *buf=NULL, const __FlashStringHelper *buf_P=NULL, bool spacesub=false);
-    boolean setopt(const prog_char *opt, const uint32_t value, uint8_t base=DEC);
     boolean getres(char *buf, int size);
 
     boolean checkStream(const prog_char *str, boolean peeked);
@@ -380,7 +381,7 @@ public:
     } status;
 
     Stream *serial;	/* Serial interface to WiFly */
-    
+
     WFDebug debug;	/* Internal debug channel. */
 
     char replaceChar;	/* The space replacement character */

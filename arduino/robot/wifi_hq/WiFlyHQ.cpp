@@ -79,10 +79,10 @@ extern void *__brkval;
 /* Work around a bug with PROGMEM and PSTR where the compiler always
  * generates warnings.
  */
-#undef PROGMEM 
-#define PROGMEM __attribute__(( section(".progmem.data") )) 
-#undef PSTR 
-#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
+#undef PROGMEM
+#define PROGMEM __attribute__(( section(".progmem.data") ))
+#undef PSTR
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
 
 /* Request and response strings in PROGMEM */
 const prog_char req_GetIP[] PROGMEM = "get ip\r";
@@ -447,7 +447,7 @@ size_t WiFly::write(uint8_t byte)
     return serial->write(byte);
 }
 
-/* Read-ahead for checking for TCP stream close 
+/* Read-ahead for checking for TCP stream close
  * A circular buffer is used to keep read-ahead bytes and
  * feed them back to the user.
  */
@@ -459,7 +459,7 @@ static uint8_t peekCount = 0;	/* Number of characters in peek buffer */
 /**
  * Return the next byte that a read() would return, but leave the
  * byte in the receive buffer.
- * @returns the next byte that would be read 
+ * @returns the next byte that would be read
  * @retval -1 - no data in receive buffer
  */
 int WiFly::peek()
@@ -479,7 +479,7 @@ int WiFly::peek()
  * @retval false - state change not matched
  * @note A side effect of this function is that it will store
  *       the unmatched string in the read-ahead peek buffer since
- *       it has to read the characters from the WiFly to check for 
+ *       it has to read the characters from the WiFly to check for
  *       the match.  The peek buffer is used to feed those characters
  *       to the user ahead of reading any more characters from the WiFly.
  */
@@ -661,7 +661,7 @@ void WiFly::flush()
 {
    serial->flush();
 }
-  
+
 
 /** Hex dump a string */
 void WiFly::dump(const char *str)
@@ -735,6 +735,8 @@ void WiFly::dbgDump()
     if (dbgInd > 0) {
 	debug.println(F("debug dump"));
 	for (ind=0; ind<dbgInd; ind++) {
+    debug.print(dbgBuf[ind]);
+    /*
 	    debug.print(ind);
 	    debug.print(F(": "));
 	    debug.print(dbgBuf[ind],HEX);
@@ -743,6 +745,7 @@ void WiFly::dbgDump()
 		debug.print(dbgBuf[ind]);
 	    }
 	    debug.println();
+      */
 	}
     }
     free(dbgBuf);
@@ -1229,7 +1232,7 @@ boolean WiFly::startCommand()
 	    return false;
 	}
 	/* If we're already in command mode, then we don't exit it in finishCommand().
-	 * This is an optimisation to avoid switching in and out of command mode 
+	 * This is an optimisation to avoid switching in and out of command mode
 	 * when using several commands to implement another command.
 	 */
     } else {
@@ -1492,7 +1495,7 @@ uint32_t WiFly::getRTC()
 }
 
 /**
- * Do a DNS lookup to find the ip address of the specified hostname 
+ * Do a DNS lookup to find the ip address of the specified hostname
  * @param hostname - host to lookup
  * @param buf - buffer to return the ip address in
  * @param size - size of the buffer
@@ -1559,7 +1562,7 @@ int8_t WiFly::getDHCPMode()
     } else {
 	mode = -1;	// unknown
     }
-    
+
     return mode;
 }
 
@@ -1647,7 +1650,7 @@ boolean WiFly::getres(char *buf, int size)
     return false;
 }
 
-/** 
+/**
  * Set an option to an unsigned integer value
  * @param opt the set command to use (in Flash)
  * @param value the value to set
@@ -1668,7 +1671,7 @@ boolean WiFly::setopt(const prog_char *opt, const uint32_t value, uint8_t base)
  * @param cmd the set command to use (string in Flash)
  * @param buf the value to set the option to (string in RAM). Set to NULL if not used.
  * @param buf_p the value to set the option to (string in Flash). Set to NULL if not used.
- * @param spacesub set to true to have spaces replaced with the 
+ * @param spacesub set to true to have spaces replaced with the
  *        current replacement character
  * @returns true on success, false on failure
  */
@@ -1796,7 +1799,7 @@ bool WiFly::setJoin(uint8_t join)
     return setopt(PSTR("set wlan join"), join);
 }
 
-/** 
+/**
  * Set the WiFly's IP address.
  * @param buf IPv4 address in a null-terminated string.
  *            e.g "192.168.1.10"
@@ -1808,7 +1811,7 @@ boolean WiFly::setIP(const char *buf)
     return setopt(PSTR("set ip address"), buf);
 }
 
-/** 
+/**
  * Set the WiFly's IP address.
  * @param buf IPv4 address in a null-terminated flash string.
  *            e.g F("192.168.1.10")
@@ -2104,7 +2107,7 @@ boolean WiFly::setKey(const char *buf)
 
 /**
  * Set WPA passphrase.
- * Spaces are automatically replaced with the current space substitution 
+ * Spaces are automatically replaced with the current space substitution
  * character ('$' is the default).
  * @Note: If your passphrase contains a '$' then use setSpaceReplace() to
  *        change the replacement character to something you're not using.
@@ -2157,7 +2160,7 @@ const static struct {
 /**
  * Set WiFi data rate
  * @param rate the data rate to set in bits per second.
- *             valid values are 1000000, 2000000, 5500000, 
+ *             valid values are 1000000, 2000000, 5500000,
  *             6000000, 9000000, 11000000, 12000000, 18000000,
  *             24000000, 36000000, 48000000, 54000000.
  * @returns true on success, false on failure.
@@ -2283,7 +2286,7 @@ boolean WiFly::join(const char *ssid, uint16_t timeout)
     send_P(PSTR("\r"));
 
     res = multiMatch_P(joinResult,2,timeout);
-    flushRx(100);
+    //flushRx(100);
     if (res == 1) {
         status.assoc = 1;
 	if (dhcp) {
@@ -2530,7 +2533,7 @@ boolean WiFly::createAdhocNetwork(const char *ssid, uint8_t channel)
  *               for the hostname.
  * @param port - the TCP port to connect to
  * @param block - true = wait for the connection to complete
- *                false = start the connection and return. Use openComplete() 
+ *                false = start the connection and return. Use openComplete()
  *                        to determine the result.
  * @retval true - success, the connection is open
  * @retval false - failed, or connection already in progress
@@ -2622,7 +2625,7 @@ boolean WiFly::open(const char *addr, uint16_t port, boolean block)
  * @param addr - the IP address to connect to
  * @param port - the TCP port to connect to
  * @param block - true = wait for the connection to complete
- *                false = start the connection and return. Use openComplete() 
+ *                false = start the connection and return. Use openComplete()
  *                        to determine the result.
  * @retval true - success, the connection is open
  * @retval false - failed, or connection already in progress
@@ -2722,7 +2725,7 @@ boolean WiFly::sendto(
  * Send binary data as a UDP packet to a host.
  * @param data - pointer to an array of data to send
  * @param size - then number of bytes of data to send
- * @param host - the IP or hostname to send the packet to. If this is a hostname 
+ * @param host - the IP or hostname to send the packet to. If this is a hostname
  *               then a DNS lookup will be performed to find the IP address.
  * @param port - the UDP port to send the packet to
  * @retval true - packet send successfully
@@ -2752,7 +2755,7 @@ boolean WiFly::sendto(const uint8_t *data, uint16_t size, IPAddress host, uint16
 /**
  * Send a string as a UDP packet to a host.
  * @param data - the null terminated string to send
- * @param host - the IP or hostname to send the packet to. If this is a hostname 
+ * @param host - the IP or hostname to send the packet to. If this is a hostname
  *               then a DNS lookup will be performed to find the IP address.
  * @param port - the UDP port to send the packet to
  * @retval true - packet send successfully
@@ -2779,7 +2782,7 @@ boolean WiFly::sendto(const char *data, IPAddress host, uint16_t port)
 /**
  * Send a string as a UDP packet to a host.
  * @param data - the null terminated flash string to send
- * @param host - the IP or hostname to send the packet to. If this is a hostname 
+ * @param host - the IP or hostname to send the packet to. If this is a hostname
  *               then a DNS lookup will be performed to find the IP address.
  * @param port - the UDP port to send the packet to
  * @retval true - packet send successfully

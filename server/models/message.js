@@ -1,4 +1,4 @@
-Message = new Mongo.Collection("items")
+Message = new Mongo.Collection("messages")
 
 if(Meteor.isServer){
   Meteor.publish("messages", function(){

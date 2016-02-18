@@ -10,10 +10,14 @@ ItemList = React.createClass({
     console.log("Clicked");
     Meteor.call("addItem","Lalalal");
   },
+  sendPing(){
+    Meteor.call("sendPing");
+  },
   render(){
     return <div>
-        {this.data.items.map(function(item){ return <ItemView item={item} />; })}
+        <a onClick={this.sendPing}>Ping</a>
         <a onClick={this.addItem}>Click to add</a>
+        {this.data.items.map(function(item){ return <ItemView item={item} />; })}
       </div>;
   }
 });
