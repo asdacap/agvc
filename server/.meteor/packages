@@ -22,3 +22,5 @@ meteorhacks:npm
 
 
 npm-container
+materialize:materialize
+zimme:collection-timestampable

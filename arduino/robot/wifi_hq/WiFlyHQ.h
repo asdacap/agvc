@@ -321,7 +321,6 @@ public:
     boolean setopt(const prog_char *cmd, const char *buf=NULL, const __FlashStringHelper *buf_P=NULL, bool spacesub=false);
     boolean setopt(const prog_char *opt, const uint32_t value, uint8_t base=DEC);
 
-  private:
     void init(void);
 
     void dump(const char *str);

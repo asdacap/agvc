@@ -1,3 +1,6 @@
+
+// Plans for TCP is scrapped in favour of websocket
+
 var net = Meteor.npmRequire('net');
 var frame = Meteor.npmRequire('frame-stream');
 
@@ -39,7 +42,7 @@ var SocketHandler = function(socket){
 _.extend(SocketHandler.prototype,{
   onMessage: Meteor.bindEnvironment(function(message){
     console.log("new message "+message);
-    Items.insert({text: message.toString()});
+    Models.insert({text: message.toString()});
   }),
   onClose(){
     var idx = allSockets.indexOf(this);
