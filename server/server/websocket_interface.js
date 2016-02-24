@@ -32,6 +32,7 @@ server.on('upgrade', function(request, socket, body){
     if(!websocket.isWebSocket(request)){
       return;
     }
+    console.log("New Websocket connection");
 
     var driver = websocket.http(request);
     socket.pipe(driver.io).pipe(socket);
@@ -48,6 +49,7 @@ server.on('upgrade', function(request, socket, body){
 // Where application logic resides
 var handleWebsocketConnection = Meteor.bindEnvironment(function(driver){
   driver.messages.on('data',Meteor.bindEnvironment(function(data){
+    console.log("Got data "+data);
     MessageLogs.insert({ text: data });
   }));
 });

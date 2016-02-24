@@ -63,6 +63,7 @@ bool WebSocketClient::analyzeRequest() {
 
 #ifdef DEBUGGING
     Serial.println(F("Sending websocket upgrade headers"));
+    Serial.println("Key is "+key);
 #endif
 
     socket_client->print(F("GET "));
@@ -88,8 +89,14 @@ bool WebSocketClient::analyzeRequest() {
 
     while (socket_client->connected() && !socket_client->available()) {
         delay(100);
-        Serial.println("Waiting...");
+#ifdef DEBUGGING
+        Serial.println(F("Waiting websocket respond..."));
+#endif
     }
+
+#ifdef DEBUGGING
+    Serial.println(F("Respond received"));
+#endif
 
     // TODO: More robust string extraction
     while ((bite = socket_client->read()) != -1) {
@@ -100,9 +107,9 @@ bool WebSocketClient::analyzeRequest() {
 #ifdef DEBUGGING
             Serial.print("Got Header: " + temp);
 #endif
-            if (!foundupgrade && temp.startsWith("Upgrade: websocket")) {
+            if (!foundupgrade && (temp.startsWith("Upgrade: websocket") || temp.startsWith("upgrade: websocket"))) {
                 foundupgrade = true;
-            } else if (temp.startsWith("Sec-WebSocket-Accept: ")) {
+            } else if (temp.startsWith("sec-websocket-accept: ") || temp.startsWith("Sec-WebSocket-Accept: ")) {
                 serverKey = temp.substring(22,temp.length() - 2); // Don't save last CR+LF
             }
             temp = "";

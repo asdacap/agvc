@@ -13,6 +13,7 @@ class ConnectionManager : public SocketInterface {
     char serverHost[30];
     long lastTCPConnectAttempt = -1;
     bool ledON = true;
+    bool wasConnected = false;
     SerialType *serial;
     WiFly wifly;
     WebSocketClient webSocketClient;

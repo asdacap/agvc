@@ -23,7 +23,7 @@ void setup() {
   Serial.println(F("Setup done"));
 }
 
-int prevButton = LOW;
+int prevButton = HIGH;
 
 void checkButton(){
   int buttonVal = digitalRead(BUTTON);
@@ -33,8 +33,8 @@ void checkButton(){
   prevButton = buttonVal;
 }
 
+int mCount = 0;
 void loop() {
-  Serial.println(F("Loop"));
   Serial.flush();
   checkButton();
   cManager.loop();

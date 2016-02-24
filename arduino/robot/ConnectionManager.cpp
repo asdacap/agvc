@@ -66,26 +66,32 @@ void ConnectionManager::tcpSetup(){
 
 // Run each loop to check tcp connectivity stuff.
 void ConnectionManager::loopTCPConnectivityCheck(){
-  if (wifly.status.assoc && !wifly.isConnected()) {
-    if (lastTCPConnectAttempt < 0) {
-      tcpSetup();
-    }
+  //if (wifly.status.assoc && !wifly.isConnected()) {
+  //  if (lastTCPConnectAttempt < 0) {
+  //    tcpSetup();
+  //  }
 
-    if (wifly.connecting) {
-      if (wifly.openComplete()) {
-        Serial.println(F("Open complete"));
-        lastTCPConnectAttempt = -1;
-        if (wifly.isConnected()) {
-          onTCPConnected();
-        }
-      } else {
-        Serial.println(F("Open not complete"));
-      }
-    }
+  //  if (wifly.connecting) {
+  //    if (wifly.openComplete()) {
+  //      Serial.println(F("Open complete"));
+  //      lastTCPConnectAttempt = -1;
+  //      if (wifly.isConnected()) {
+  //        onTCPConnected();
+  //      }
+  //    } else {
+  //      Serial.println(F("Open not complete"));
+  //    }
+  //  }
+  //}
+
+  if(!wasConnected && connected()){
+    onTCPConnected();
   }
+  wasConnected = connected();
 }
 
 void ConnectionManager::onTCPConnected(){
+  Serial.println("onTCPConnected");
   webSocketClient.path = "/robot_websocket";
   webSocketClient.host = serverHost;
   if (webSocketClient.handshake(*this)) {
@@ -113,12 +119,12 @@ void ConnectionManager::loop(){
   if (loopcount != ccount) {
     loopcount = ccount;
     // WARNING: This will block
-    if (!wifly.isAssociated()) {
-      Serial.println(F("Not associated"));
-      wifiSetup();
-    } else {
-      Serial.println(F("Associated"));
-    }
+    //if (!wifly.isAssociated()) {
+    //  Serial.println(F("Not associated"));
+    //  wifiSetup();
+    //} else {
+    //  Serial.println(F("Associated"));
+    //}
 
     loopTCPConnectivityCheck();
   }

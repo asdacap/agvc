@@ -8,9 +8,9 @@ String WIFI_PASSPHRASE = "hgMTc01e";
 //String WIFI_PASSPHRASE = "mypassqwer";
 
 String SERVER_IP = "10.42.0.2";
-String SERVER_PORT = "10000";
+String SERVER_PORT = "3000";
 
-long TCP_CONNECT_DELAY = 5; // Delay between tcp connection attempt.
+String TCP_CONNECT_DELAY = "1"; // Delay between tcp connection attempt.
 
 int LED = 4;
 int LED2 = 6;
@@ -38,7 +38,7 @@ void setup(){
   sendAndPrintResult("set wlan phrase " + WIFI_PASSPHRASE);
   sendAndPrintResult("set wlan auth 4");
   sendAndPrintResult("set wlan join 1");
-  sendAndPrintResult("set sys autoconn 5");
+  sendAndPrintResult("set sys autoconn "+TCP_CONNECT_DELAY);
   sendAndPrintResult("set ip host " + SERVER_IP);
   sendAndPrintResult("set ip remote " + SERVER_PORT);
   sendAndPrintResult("save");
