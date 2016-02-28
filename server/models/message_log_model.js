@@ -2,6 +2,15 @@
 MessageLogs = new Mongo.Collection("messages");
 MessageLogs.attachBehaviour("timestampable");
 
+var MessageLogSchema = new SimpleSchema({
+  text: {
+    type: String,
+    optional: false
+  }
+})
+
+MessageLogs.attachSchema(MessageLogSchema);
+
 Meteor.methods({
   addMessageLog(text){
     console.log("adding "+text);
