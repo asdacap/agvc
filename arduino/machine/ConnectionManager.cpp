@@ -92,7 +92,7 @@ void ConnectionManager::loopTCPConnectivityCheck(){
 
 void ConnectionManager::onTCPConnected(){
   Serial.println("onTCPConnected");
-  webSocketClient.path = "/robot_websocket";
+  webSocketClient.path = "/machine_websocket";
   webSocketClient.host = serverHost;
   if (webSocketClient.handshake(*this)) {
     Serial.println(F("Handshake successful"));

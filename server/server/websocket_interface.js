@@ -20,7 +20,7 @@ wsServer.on('request', function(request){
 
 var websocket = Meteor.npmRequire('websocket-driver');
 
-var ROBOT_WEBSOCKET_PATH = '/robot_websocket'
+var ROBOT_WEBSOCKET_PATH = '/machine_websocket'
 
 // Override default upgrade handler. If path is ROBOT_WEBSOCKET_PATH, then
 // Initiate handling. If not, then call the old handler

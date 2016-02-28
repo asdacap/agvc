@@ -2,7 +2,7 @@
 App = React.createClass({
   render() {
     return <div>
-        <RobotList />
+        <MachineList />
         <MessageList />
       </div>;
   }
