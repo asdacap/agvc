@@ -44,18 +44,11 @@ Meteor.methods({
     }
     var machine = Machines.findOne({machineId: machineId});
 
-    if(machine === undefined){
-      console.log("Machine not found. machineId: "+machineId);
-      return;
-    }
-
-    machine.commandQueue.push({
+    Machines.update(machine._id, { $push: { commandQueue: {
       command: command,
       droppable: droppable,
       createdAt: new Date()
-    });
-
-    Machines.update(machine._id, machine);
+    } } } );
   }
 });
 

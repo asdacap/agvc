@@ -17,6 +17,7 @@ MessageList = React.createClass({
   },
   render(){
     return <div>
+        <hr />
         <h2>Message Lists</h2>
         <a onClick={this.sendPing} className="btn waves-effect waves-light">Ping</a>&nbsp;
         <a onClick={this.clearMessageLog} className="btn waves-effect waves-light">Clear</a>&nbsp;
