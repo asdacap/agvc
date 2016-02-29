@@ -22,8 +22,9 @@ meteorhacks:npm
 
 
 npm-container
-materialize:materialize
 zimme:collection-timestampable
 aldeed:collection2
 reactive-var
 fortawesome:fontawesome
+izzilab:material-ui
+fourseven:scss

@@ -1,4 +1,21 @@
 
+var {
+  Dialog,
+  Card,
+  CardText,
+  CardHeader,
+  CardActions,
+  CardTitle,
+  FlatButton,
+  Table,
+  TableHeader,
+  TableRow,
+  TableBody,
+  TableRowColumn,
+  FloatingActionButton
+ } = MUI;
+
+ var ContentAdd = MUI.Libs.SvgIcons.ContentAdd;
 
 MachineList = React.createClass({
   mixins: [ReactMeteorData],
@@ -18,12 +35,13 @@ MachineList = React.createClass({
   },
   render(){
     return <div className="machine-lists">
-      <hr />
       <h2>Machine Lists</h2>
-      <ul className="row">
+      <div class="machines">
         { this.data.machines.map(function(item){ return <MachineListItem machine={item} key={item._id}/>; }) }
-      </ul>
-      { this.data.openForm ? <MachineForm toggleForm={this.toggleForm} /> : <a className="btn" onClick={this.toggleForm}><i className="fa fa-plus" /></a> }
+      </div>
+      { this.data.openForm ? <MachineForm toggleForm={this.toggleForm} /> : <FloatingActionButton onClick={this.toggleForm}>
+        <ContentAdd />
+      </FloatingActionButton> }
     </div>;
   }
 });
@@ -33,31 +51,30 @@ MachineListItem = React.createClass({
     Meteor.call("sendCommand", this.props.machine.machineId, "ping");
   },
   render(){
-    return <li className="col s4 m3 l2">
-      <div className="card">
-        <div className="card-content">
-          <span className="card-title machineId">{this.props.machine.machineId}</span>
-          {
-            this.props.machine.online ? <span className="label success">Online</span> : <span className="label success">Offline</span>
-          }
-          <p>
-            <p>Command Queue: </p>
-            <ul className="collection">
-              { this.props.machine.commandQueue.map(function(command){
-                return <li className="collection-item">{command.command}</li>;
+    return <Card style={ { width: "300px", display: "inline-block", marginRight: "1em" } }>
+      <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"}/>
+      <CardText>
+        Command Queue:
+        <Table selectable={false} height="200px">
+          <TableBody displayRowCheckbox={false}>
+            { this.props.machine.commandQueue.map(function(command){
+              return <TableRow>
+                <TableRowColumn>{command.command}</TableRowColumn>
+              </TableRow>;
               }) }
-            </ul>
-          </p>
-          <a className="btn" onClick={this.ping}>Ping</a>
-        </div>
-      </div>
-    </li>;
+          </TableBody>
+        </Table>
+      </CardText>
+      <CardActions>
+        <FlatButton label="Ping" onClick={this.ping}/>
+      </CardActions>
+    </Card>;
   }
 });
 
 MachineForm = React.createClass({
-  componentDidMount(){
-    $(React.findDOMNode(this.refs.modal)).openModal();
+  getInitialState(){
+    return { open: true };
   },
   addMachine(e){
     e.preventDefault();
@@ -70,20 +87,25 @@ MachineForm = React.createClass({
     this.close();
   },
   close(){
-    $(React.findDOMNode(this.refs.modal)).closeModal({
-      complete: this.props.toggleForm
+    var that = this;
+    this.setState({open: false}, function(){
+      setTimeout(function(){
+        that.props.toggleForm();
+      },500);
     });
   },
   render(){
-    return <div className="modal" ref="modal">
-      <div className="modal-content">
-        <h3>Machine FOrm</h3>
-        <form onSubmit={this.addMachine}>
-          <input type="text" ref="machineIdInput" placeholder="Type new machine id" />
-          <button className="btn">Save</button>
-          <a className="btn" onClick={this.close}>Close</a>
-        </form>
-      </div>
-    </div>;
+    return <Dialog
+          title="Machine Form"
+          open={this.state.open}
+          onRequestClose={this.props.toggleForm}
+        >
+      <h3>Machine FOrm</h3>
+      <form onSubmit={this.addMachine}>
+        <input type="text" ref="machineIdInput" placeholder="Type new machine id" />
+        <button className="btn">Save</button>
+        <a className="btn" onClick={this.close}>Close</a>
+      </form>
+    </Dialog>;
   }
 });

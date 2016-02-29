@@ -1,9 +1,10 @@
+var AppCanvas = MUI.AppCanvas;
 
 App = React.createClass({
   render() {
-    return <div>
+    return <AppCanvas>
         <MachineList />
         <MessageList />
-      </div>;
+      </AppCanvas>;
   }
 });

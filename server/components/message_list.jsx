@@ -1,3 +1,12 @@
+var {
+  FlatButton,
+  Table,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableBody,
+  TableRowColumn
+} = MUI;
 
 MessageList = React.createClass({
   mixins: [ReactMeteorData],
@@ -16,31 +25,29 @@ MessageList = React.createClass({
     return <div>
         <hr />
         <h2>Message Lists</h2>
-        <a onClick={this.clearMessageLog} className="btn waves-effect waves-light">Clear</a>&nbsp;
-        <a onClick={this.addMessageLog} className="btn waves-effect waves-light">Click to add</a>&nbsp;
-        <ul className="collection">
-          {this.data.messages.map(function(message){ return <MessageView message={message} key={message._id}/>; })}
-        </ul>
+        <FlatButton onClick={this.clearMessageLog} label="Clear" />&nbsp;
+        <FlatButton onClick={this.addMessageLog} label="Click to add" />&nbsp;
+        <Table height="300px">
+          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+            <TableRow>
+              <TableHeaderColumn>Message</TableHeaderColumn>
+              <TableHeaderColumn>Created At</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody displayRowCheckbox={false}>
+            {this.data.messages.map(function(message){
+               return <TableRow key={message.id}>
+                 <TableRowColumn>
+                   {message.text}
+                 </TableRowColumn>
+                 <TableRowColumn>
+                   {message.createdAt.toString()}
+                 </TableRowColumn>
+               </TableRow>;
+             })}
+          </TableBody>
+        </Table>
       </div>;
-  }
-});
-
-MessageView = React.createClass({
-  remove(){
-    Meteor.call("removeMessageLog", this.props.message._id);
-  },
-  createdAtString(){
-    var date = this.props.message.createdAt;
-    if(date === undefined){
-      return "(undefined)";
-    }
-    return date.toString();
-  },
-  render(){
-    return <li onClick={this.remove} className="collection-item">
-      {this.props.message.fromMachineId !== undefined ? this.props.message.fromMachineId+": " : ""}{this.props.message.text}
-      <small className="right">{this.createdAtString()}</small>
-    </li>;
   }
 });
 
