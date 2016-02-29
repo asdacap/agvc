@@ -12,14 +12,10 @@ MessageList = React.createClass({
   clearMessageLog(){
     Meteor.call("clearMessageLog");
   },
-  sendPing(){
-    Meteor.call("sendPing");
-  },
   render(){
     return <div>
         <hr />
         <h2>Message Lists</h2>
-        <a onClick={this.sendPing} className="btn waves-effect waves-light">Ping</a>&nbsp;
         <a onClick={this.clearMessageLog} className="btn waves-effect waves-light">Clear</a>&nbsp;
         <a onClick={this.addMessageLog} className="btn waves-effect waves-light">Click to add</a>&nbsp;
         <ul className="collection">
@@ -42,7 +38,7 @@ MessageView = React.createClass({
   },
   render(){
     return <li onClick={this.remove} className="collection-item">
-      {this.props.message.text}
+      {this.props.message.fromMachineId !== undefined ? this.props.message.fromMachineId+": " : ""}{this.props.message.text}
       <small className="right">{this.createdAtString()}</small>
     </li>;
   }

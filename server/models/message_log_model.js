@@ -6,6 +6,10 @@ var MessageLogSchema = new SimpleSchema({
   text: {
     type: String,
     optional: false
+  },
+  fromMachineId: {
+    type: String,
+    optional: true
   }
 })
 

@@ -3,7 +3,9 @@ var WebSocketClient = require('websocket').client;
 var client = new WebSocketClient();
 
 client.on('connect', function(connection){
-  console.log("Connextion established");
+  console.log("Connection established");
+
+  connection.send("machineId:m1")
 
   var num = 0;
   setInterval(function(){

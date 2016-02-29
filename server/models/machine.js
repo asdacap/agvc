@@ -8,7 +8,8 @@ var MachineCommandSchema = new SimpleSchema({
     optional: false
   },
   droppable: {
-    type: Boolean
+    type: Boolean,
+    optional: true
   },
   createdAt: {
     type: Date,
@@ -22,6 +23,18 @@ var MachineSchema = new SimpleSchema({
     optional: false,
     index: true,
     unique: true
+  },
+  online: {
+    type: Boolean,
+    optional: true
+  },
+  onlineOnServer: {
+    type: Number,
+    optional: true
+  },
+  onlineAt: {
+    type: Date,
+    optional: true
   },
   commandQueue: {
     type: [MachineCommandSchema]
@@ -57,3 +70,24 @@ if(Meteor.isServer){
     return Machines.find({});
   });
 }
+
+_.extend(Machines, {
+  markOnline(query){
+    this.update(query, {
+      $set: {
+        online: true,
+        onlineOnServer: process.pid,
+        onlineAt: new Date()
+      }
+    });
+  },
+  markOffline(query){
+    this.update(query, {
+      $set: {
+        online: false,
+        onlineOnServer: process.pid,
+        onlineAt: new Date()
+      }
+    });
+  }
+});

@@ -37,6 +37,9 @@ MachineListItem = React.createClass({
       <div className="card">
         <div className="card-content">
           <span className="card-title machineId">{this.props.machine.machineId}</span>
+          {
+            this.props.machine.online ? <span className="label success">Online</span> : <span className="label success">Offline</span>
+          }
           <p>
             <p>Command Queue: </p>
             <ul className="collection">
