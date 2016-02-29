@@ -56,6 +56,9 @@ MachineListItem = React.createClass({
 });
 
 MachineForm = React.createClass({
+  componentDidMount(){
+    $(React.findDOMNode(this.refs.modal)).openModal();
+  },
   addMachine(e){
     e.preventDefault();
 
@@ -63,16 +66,22 @@ MachineForm = React.createClass({
     Meteor.call("addMachine",{
       machineId: machineId
     });
-    this.props.toggleForm();
+
+    this.close();
+  },
+  close(){
+    $(React.findDOMNode(this.refs.modal)).closeModal({
+      complete: this.props.toggleForm
+    });
   },
   render(){
-    return <div className="row">
-      <div className="col s4">
+    return <div className="modal" ref="modal">
+      <div className="modal-content">
         <h3>Machine FOrm</h3>
         <form onSubmit={this.addMachine}>
           <input type="text" ref="machineIdInput" placeholder="Type new machine id" />
           <button className="btn">Save</button>
-          <a className="btn" onClick={this.props.toggleForm}>Close</a>
+          <a className="btn" onClick={this.close}>Close</a>
         </form>
       </div>
     </div>;
