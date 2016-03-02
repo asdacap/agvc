@@ -12,10 +12,19 @@ var {
   TableRow,
   TableBody,
   TableRowColumn,
+  TextField,
   FloatingActionButton
- } = MUI;
+} = MUI;
 
- var ContentAdd = MUI.Libs.SvgIcons.ContentAdd;
+var ContentAdd = MUI.Libs.SvgIcons.ContentAdd;
+
+var styles = {
+  AddMachineFloatingButton: {
+    position: "absolute",
+    right: "0",
+    bottom: "0"
+  }
+}
 
 MachineList = React.createClass({
   mixins: [ReactMeteorData],
@@ -35,49 +44,30 @@ MachineList = React.createClass({
   },
   render(){
     return <div className="machine-lists">
-      <h2>Machine Lists</h2>
-      <div class="machines">
-        { this.data.machines.map(function(item){ return <MachineListItem machine={item} key={item._id}/>; }) }
+      <div style={ { position: "relative" } }>
+        <h2>Machine Lists</h2>
+        <div class="machines">
+          { this.data.machines.map(function(item){ return <MachineListItem machine={item} key={item._id}/>; }) }
+        </div>
+        <FloatingActionButton onClick={this.toggleForm} style={styles.AddMachineFloatingButton}>
+          <ContentAdd />
+        </FloatingActionButton>
       </div>
-      { this.data.openForm ? <MachineForm toggleForm={this.toggleForm} /> : <FloatingActionButton onClick={this.toggleForm}>
-        <ContentAdd />
-      </FloatingActionButton> }
+      <CreateMachineForm open={this.data.openForm} toggleForm={this.toggleForm}></CreateMachineForm>
     </div>;
   }
 });
 
-MachineListItem = React.createClass({
-  ping(){
-    Meteor.call("sendCommand", this.props.machine.machineId, "ping");
-  },
-  render(){
-    return <Card style={ { width: "300px", display: "inline-block", marginRight: "1em" } }>
-      <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"}/>
-      <CardText>
-        Command Queue:
-        <Table selectable={false} height="200px">
-          <TableBody displayRowCheckbox={false}>
-            { this.props.machine.commandQueue.map(function(command){
-              return <TableRow>
-                <TableRowColumn>{command.command}</TableRowColumn>
-              </TableRow>;
-              }) }
-          </TableBody>
-        </Table>
-      </CardText>
-      <CardActions>
-        <FlatButton label="Ping" onClick={this.ping}/>
-      </CardActions>
-    </Card>;
-  }
-});
-
-MachineForm = React.createClass({
+CreateMachineForm = React.createClass({
   getInitialState(){
-    return { open: true };
+    return {
+      machineId: ""
+    };
   },
   addMachine(e){
     e.preventDefault();
+
+    if(!this.checkValid()) return;
 
     var machineId = React.findDOMNode(this.refs.machineIdInput).value.trim();
     Meteor.call("addMachine",{
@@ -86,26 +76,45 @@ MachineForm = React.createClass({
 
     this.close();
   },
-  close(){
-    var that = this;
-    this.setState({open: false}, function(){
-      setTimeout(function(){
-        that.props.toggleForm();
-      },500);
-    });
+  onMachineIdChange(e){
+    this.setState({ machineId: e.target.value }, this.checkValid);
+  },
+  checkValid(){
+    this.setState({ machineIdErrorText: ""});
+
+    var valid = true;
+    if(this.state.machineId.trim() === ""){
+      this.setState({ machineIdErrorText: "machineId must be specified"});
+      valid = false;
+    }
+
+    return valid;
   },
   render(){
+
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onClick={this.props.toggleForm}
+        />,
+      <FlatButton
+        label="Submit"
+        primary={true}
+        onClick={this.addMachine}
+        />
+    ];
+
     return <Dialog
-          title="Machine Form"
-          open={this.state.open}
+          title="Add Machine"
+          open={this.props.openForm}
           onRequestClose={this.props.toggleForm}
+          actions={actions}
+          open={this.props.open}
         >
-      <h3>Machine FOrm</h3>
-      <form onSubmit={this.addMachine}>
-        <input type="text" ref="machineIdInput" placeholder="Type new machine id" />
-        <button className="btn">Save</button>
-        <a className="btn" onClick={this.close}>Close</a>
-      </form>
-    </Dialog>;
+        <form onSubmit={this.addMachine}>
+          <TextField value={this.state.machineId} onChange={this.onMachineIdChange} errorText={this.state.machineIdErrorText} floatingLabelText="Machine ID"/>
+        </form>
+      </Dialog>
   }
 });
