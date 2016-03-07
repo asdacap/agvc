@@ -16,8 +16,22 @@ var {
 } = MUI;
 
 MachineListItem = React.createClass({
+  getInitialState(){
+    return {
+      openForm: false
+    };
+  },
   ping(){
     Meteor.call("sendCommand", this.props.machine.machineId, "ping");
+  },
+  delete(){
+    Meteor.call("deleteMachine", this.props.machine.machineId);
+  },
+  edit(){
+    this.setState({ openForm: true });
+  },
+  closeEdit(){
+    this.setState({ openForm: false });
   },
   render(){
     return <Card style={ { width: "300px", display: "inline-block", marginRight: "1em" } }>
@@ -33,9 +47,12 @@ MachineListItem = React.createClass({
               }) }
           </TableBody>
         </Table>
+        <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </CardText>
       <CardActions>
         <FlatButton label="Ping" onClick={this.ping}/>
+        <FlatButton label="Delete" onClick={this.delete}/>
+        <FlatButton label="Edit" onClick={this.edit}/>
       </CardActions>
     </Card>;
   }

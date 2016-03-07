@@ -51,6 +51,12 @@ Meteor.methods({
 
     Machines.insert(props);
   },
+  deleteMachine(machineId){
+    Machines.remove({machineId: machineId});
+  },
+  editMachine(machine){
+    Machines.update(machine._id, { $set: machine } );
+  },
   sendCommand(machineId, command, droppable){
     if(droppable === undefined){
       droppable = false;
