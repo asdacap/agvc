@@ -5,7 +5,7 @@
 #include "ConnectionManager.h"
 
 //SoftwareSerial wifiSerial(8,9);
-HardwareSerial wifiSerial = Serial3;
+HardwareSerial &wifiSerial = Serial3;
 //ConnectionManager<SoftwareSerial> cManager;
 ConnectionManager<HardwareSerial> cManager;
 
@@ -42,8 +42,8 @@ void loop() {
     mCount = nmCount;
   }
 
-  checkButton();
+  //checkButton();
   cManager.loop();
 
-  digitalWrite(LED, (millis()/100)%2 ? HIGH : LOW);
+  digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
 }

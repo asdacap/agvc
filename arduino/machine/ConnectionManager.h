@@ -9,10 +9,11 @@ class ConnectionManager : public SocketInterface {
 
   public:
 
-    char serverHost[30];
+    char serverHost[50];
     long lastTCPConnectAttempt = -1;
     bool ledON = true;
     bool wasConnected = false;
+    bool handshaking = false;
     SerialType *serial;
     WiFly wifly;
     WebSocketClient webSocketClient;
@@ -20,7 +21,6 @@ class ConnectionManager : public SocketInterface {
 
     void setup(SerialType *serial);
     void loopTCPConnectivityCheck();
-    void onTCPConnected();
     void onWebSocketConnected();
     void listenReceive();
     void loop();

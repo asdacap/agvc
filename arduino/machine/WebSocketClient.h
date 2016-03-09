@@ -87,7 +87,13 @@ public:
 
     // Handle connection requests to validate and process/refuse
     // connections.
-    bool handshake(SocketInterface &client);
+    // On non blocking mode, return 0 means socket is not connected
+    // return 1 means, it is awaiting respond,
+    // return 2 means, websocket established,
+    // return -1 means, handshake failed
+    int handshake(SocketInterface &client, bool block = true);
+    bool checkHandshakeRequest();
+    bool isHandshaking();
 
     // Get data off of the stream
     bool getData(String& data, uint8_t *opcode = NULL);
@@ -103,12 +109,15 @@ public:
 private:
     SocketInterface *socket_client;
     unsigned long _startMillis;
+    unsigned long handshakeStartMillis = -1;
 
     const char *socket_urlPrefix;
 
+    bool completeAnalyzeRequest();
+
     // Discovers if the client's header is requesting an upgrade to a
     // websocket connection.
-    bool analyzeRequest();
+    bool analyzeRequest(bool block = true);
 
     bool handleStream(String& data, uint8_t *opcode);
 
@@ -119,6 +128,8 @@ private:
 
     void sendEncodedData(char *str, uint8_t opcode);
     void sendEncodedData(String str, uint8_t opcode);
+
+    String handshakeKey;
 };
 
 

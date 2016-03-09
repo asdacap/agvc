@@ -114,6 +114,7 @@ _.extend(WebSocketConnectionHandler.prototype, {
   onClose(){
     console.log("Closing connection");
     if(this.machineObj !== undefined){
+      this.queueHandler.stop();
       Machines.markOffline(this.machineObj._id);
       machinesConnection[this.machineObj.machineId] = undefined;
     }

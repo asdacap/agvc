@@ -10,13 +10,13 @@ String WIFI_PASSPHRASE = "hgMTc01e";
 String SERVER_IP = "10.42.0.2";
 String SERVER_PORT = "3000";
 
-String TCP_CONNECT_DELAY = "1"; // Delay between tcp connection attempt.
+String TCP_CONNECT_DELAY = "5"; // Delay between tcp connection attempt.
 
 int LED = 4;
 int LED2 = 6;
 int BUTTON = 3;
 
-AltSoftSerial wifiSerial;
+HardwareSerial &wifiSerial = Serial3;
 
 void setup(){
   pinMode(LED, OUTPUT);

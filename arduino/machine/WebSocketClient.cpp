@@ -6,48 +6,83 @@
 #include "./sha1.h"
 #include "Base64.h"
 
+#define DEBUGGING
 
-bool WebSocketClient::handshake(SocketInterface &client) {
+
+int WebSocketClient::handshake(SocketInterface &client, bool block) {
 
     socket_client = &client;
 
-    // If there is a connected client->
-    if (socket_client->connected()) {
-        // Check request and look for websocket handshake
+    if(block){
+        // If there is a connected client->
+        if (socket_client->connected()) {
+            // Check request and look for websocket handshake
 #ifdef DEBUGGING
-            Serial.println(F("Client connected"));
+                Serial.println(F("Client connected"));
 #endif
-        if (analyzeRequest()) {
+            if (analyzeRequest(block)) {
 #ifdef DEBUGGING
-                Serial.println(F("Websocket established"));
+                    Serial.println(F("Websocket established"));
 #endif
 
-                return true;
+                    return true;
 
+            } else {
+                // Might just need to break until out of socket_client loop.
+#ifdef DEBUGGING
+                Serial.println(F("Invalid handshake"));
+#endif
+                disconnectStream();
+
+                return false;
+            }
         } else {
-            // Might just need to break until out of socket_client loop.
-#ifdef DEBUGGING
-            Serial.println(F("Invalid handshake"));
-#endif
-            disconnectStream();
-
             return false;
         }
-    } else {
-        return false;
+    }else{
+
+        if(handshakeStartMillis == -1){
+            if(socket_client->connected()){
+                handshakeStartMillis = millis();
+                analyzeRequest(false);
+                return 1;
+            }else{
+                return 0;
+            }
+        }else{
+            if(socket_client->connected()){
+                if(millis() - handshakeStartMillis > 5000){
+                    handshakeStartMillis = -1;
+                    return -1;
+                }else{
+                    if(socket_client->available()){
+                        if(completeAnalyzeRequest()){
+                            return 2;
+                        }else{
+                            return -2;
+                        }
+                        handshakeStartMillis = -1;
+                    }else{
+                        return 1;
+                    }
+                }
+            }else{
+                // Disconnected sometime from starts of handshake
+                handshakeStartMillis = -1;
+                return -3;
+            }
+        }
+
     }
 }
 
-bool WebSocketClient::analyzeRequest() {
+bool WebSocketClient::analyzeRequest(bool block) {
     String temp;
 
-    int bite;
-    bool foundupgrade = false;
     unsigned long intkey[2];
-    String serverKey;
     char keyStart[17];
     char b64Key[25];
-    String key = "------------------------";
+    handshakeKey = "------------------------";
 
     randomSeed(analogRead(0));
 
@@ -58,12 +93,12 @@ bool WebSocketClient::analyzeRequest() {
     base64_encode(b64Key, keyStart, 16);
 
     for (int i=0; i<24; ++i) {
-        key[i] = b64Key[i];
+        handshakeKey[i] = b64Key[i];
     }
 
 #ifdef DEBUGGING
     Serial.println(F("Sending websocket upgrade headers"));
-    Serial.println("Key is "+key);
+    Serial.println("Key is "+handshakeKey);
 #endif
 
     socket_client->print(F("GET "));
@@ -75,7 +110,7 @@ bool WebSocketClient::analyzeRequest() {
     socket_client->print(host);
     socket_client->print(CRLF);
     socket_client->print(F("Sec-WebSocket-Key: "));
-    socket_client->print(key);
+    socket_client->print(handshakeKey);
     socket_client->print(CRLF);
     socket_client->print(F("Sec-WebSocket-Protocol: "));
     socket_client->print(protocol);
@@ -83,16 +118,30 @@ bool WebSocketClient::analyzeRequest() {
     socket_client->print(F("Sec-WebSocket-Version: 13\r\n"));
     socket_client->print(CRLF);
 
+    if(block){
+        while (socket_client->connected() && !socket_client->available()) {
+            delay(100);
+    #ifdef DEBUGGING
+            Serial.println(F("Waiting websocket respond..."));
+    #endif
+        }
+
+        return completeAnalyzeRequest();
+    }else{
+        return true;
+    }
+}
+
+bool WebSocketClient::completeAnalyzeRequest(){
 #ifdef DEBUGGING
     Serial.println(F("Analyzing response headers"));
 #endif
 
-    while (socket_client->connected() && !socket_client->available()) {
-        delay(100);
-#ifdef DEBUGGING
-        Serial.println(F("Waiting websocket respond..."));
-#endif
-    }
+    String temp;
+
+    int bite;
+    bool foundupgrade = false;
+    String serverKey;
 
 #ifdef DEBUGGING
     Serial.println(F("Respond received"));
@@ -116,17 +165,21 @@ bool WebSocketClient::analyzeRequest() {
         }
 
         if (!socket_client->available()) {
-          delay(20);
+          delay(50);
         }
     }
 
-    key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+#ifdef DEBUGGING
+    Serial.print(F("Server key is "));
+    Serial.println(serverKey);
+#endif
+    handshakeKey += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     uint8_t *hash;
     char result[21];
     char b64Result[30];
 
     Sha1.init();
-    Sha1.print(key);
+    Sha1.print(handshakeKey);
     hash = Sha1.result();
 
     for (int i=0; i<20; ++i) {
@@ -138,7 +191,7 @@ bool WebSocketClient::analyzeRequest() {
 
     // if the keys match, good to go
     return serverKey.equals(String(b64Result));
-}
+};
 
 
 bool WebSocketClient::handleStream(String& data, uint8_t *opcode) {
