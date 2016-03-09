@@ -14,7 +14,7 @@ String TCP_CONNECT_DELAY = "1"; // Delay between tcp connection attempt.
 
 int LED = 4;
 int LED2 = 6;
-int BUTTON = 5;
+int BUTTON = 3;
 
 AltSoftSerial wifiSerial;
 

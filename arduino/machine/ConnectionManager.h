@@ -3,9 +3,8 @@
 #include "wifi_hq/WiFlyHQ.h"
 #include "altsoftserial/AltSoftSerial.h"
 
-typedef AltSoftSerial SerialType;
-
 // For namespace
+template <class SerialType>
 class ConnectionManager : public SocketInterface {
 
   public:
@@ -20,10 +19,9 @@ class ConnectionManager : public SocketInterface {
     int loopcount = 0;
 
     void setup(SerialType *serial);
-    void wifiSetup();
-    void tcpSetup();
     void loopTCPConnectivityCheck();
     void onTCPConnected();
+    void onWebSocketConnected();
     void listenReceive();
     void loop();
     void sendData(String data){ webSocketClient.sendData(data); }
@@ -40,3 +38,5 @@ class ConnectionManager : public SocketInterface {
     virtual void flush() { serial->flush(); }
 
 };
+
+#include "ConnectionManagerImpl.h"

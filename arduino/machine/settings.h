@@ -18,4 +18,5 @@
   extern int LED;
   extern int LED2;
   extern int BUTTON;
+  extern String MACHINE_ID;
 #endif

@@ -5,9 +5,9 @@
 #include "ConnectionManager.h"
 
 //SoftwareSerial wifiSerial(8,9);
-AltSoftSerial wifiSerial;
+HardwareSerial wifiSerial = Serial3;
 //ConnectionManager<SoftwareSerial> cManager;
-ConnectionManager cManager;
+ConnectionManager<HardwareSerial> cManager;
 
 void setup() {
   Serial.begin(9600);
@@ -18,6 +18,7 @@ void setup() {
   }
   pinMode(LED, OUTPUT);
   pinMode(LED2, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
 
   cManager.setup(&wifiSerial);
   Serial.println(F("Setup done"));
@@ -35,7 +36,12 @@ void checkButton(){
 
 int mCount = 0;
 void loop() {
-  Serial.flush();
+  int nmCount = millis()/1000;
+  if(nmCount != mCount){
+    Serial.println(F("Looping"));
+    mCount = nmCount;
+  }
+
   checkButton();
   cManager.loop();
 
