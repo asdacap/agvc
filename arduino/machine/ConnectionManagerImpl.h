@@ -17,7 +17,8 @@ void ConnectionManager<SerialType>::setup(SerialType *serial){
 template <class SerialType>
 void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
 
-  // Async handshake. Not working for some reason.
+  // Async handshake. Not working for some reason. Not enough buffer it seems.
+  /*
   if(!wasConnected && connected()){
     Serial.println(F("Starting handshake"));
     webSocketClient.handshake(*this, false);
@@ -34,11 +35,12 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
       Serial.println(F("Handshake successful"));
       onWebSocketConnected();
       handshaking = false;
+      webSocketAvailable = true;
     }
   }
+  */
 
   // Sync handshake. May cause delay.
-  /*
   if(!wasConnected && connected()){
     Serial.println(F("Starting handshake"));
     if(webSocketClient.handshake(*this, true)){
@@ -48,9 +50,11 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
       Serial.println(F("Handshake failed"));
     }
   }
-  */
 
   wasConnected = connected();
+  if(!wasConnected){
+    webSocketAvailable = false;
+  }
 }
 
 template <class SerialType>
@@ -60,6 +64,7 @@ void ConnectionManager<SerialType>::onWebSocketConnected(){
 
 template <class SerialType>
 void ConnectionManager<SerialType>::listenReceive(){
+  if(!webSocketAvailable) return;
   String data;
   if (webSocketClient.getData(data)) {
     if (data.length() > 0) {
@@ -75,6 +80,6 @@ void ConnectionManager<SerialType>::loop(){
   int ccount = millis()/500;
 
   loopTCPConnectivityCheck();
-  //listenReceive();
+  listenReceive();
   digitalWrite(LED2, ledON ? HIGH : LOW);
 }

@@ -79,6 +79,9 @@ _.extend(WebSocketConnectionHandler.prototype, {
       this.queueHandler = Machines.find({ machineId: machineId }).observe({
         changed: Meteor.bindEnvironment(this.onMachineChanged)
       });
+
+      // Send previous command.
+      this.onMachineChanged(this.machineObj);
     }
   },
   onMachineChanged(newDocument, oldDocument){

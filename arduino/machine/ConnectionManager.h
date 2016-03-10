@@ -14,6 +14,7 @@ class ConnectionManager : public SocketInterface {
     bool ledON = true;
     bool wasConnected = false;
     bool handshaking = false;
+    bool webSocketAvailable = false;
     SerialType *serial;
     WiFly wifly;
     WebSocketClient webSocketClient;
@@ -24,7 +25,10 @@ class ConnectionManager : public SocketInterface {
     void onWebSocketConnected();
     void listenReceive();
     void loop();
-    void sendData(String data){ webSocketClient.sendData(data); }
+    void sendData(String data){
+      if(!webSocketAvailable) return;
+      webSocketClient.sendData(data);
+    }
 
     // Things to actually implement
     virtual bool connected(){ return wifly.isConnected(); }

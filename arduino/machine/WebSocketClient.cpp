@@ -189,6 +189,11 @@ bool WebSocketClient::completeAnalyzeRequest(){
 
     base64_encode(b64Result, result, 20);
 
+#ifdef DEBUGGING
+    Serial.print(F("b64Result is "));
+    Serial.println(String(b64Result));
+#endif
+
     // if the keys match, good to go
     return serverKey.equals(String(b64Result));
 };
