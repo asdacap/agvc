@@ -18,7 +18,6 @@ template <class SerialType>
 void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
 
   // Async handshake. Not working for some reason.
-  /*
   if(!wasConnected && connected()){
     Serial.println(F("Starting handshake"));
     webSocketClient.handshake(*this, false);
@@ -37,9 +36,9 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
       handshaking = false;
     }
   }
-  */
 
   // Sync handshake. May cause delay.
+  /*
   if(!wasConnected && connected()){
     Serial.println(F("Starting handshake"));
     if(webSocketClient.handshake(*this, true)){
@@ -49,6 +48,7 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
       Serial.println(F("Handshake failed"));
     }
   }
+  */
 
   wasConnected = connected();
 }
@@ -74,11 +74,7 @@ void ConnectionManager<SerialType>::loop(){
 
   int ccount = millis()/500;
 
-  if (loopcount != ccount) {
-    loopcount = ccount;
-    loopTCPConnectivityCheck();
-  }
-
+  loopTCPConnectivityCheck();
   //listenReceive();
   digitalWrite(LED2, ledON ? HIGH : LOW);
 }
