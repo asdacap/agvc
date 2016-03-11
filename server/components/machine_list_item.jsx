@@ -65,6 +65,7 @@ MachineListItem = React.createClass({
         <FlatButton label="Ping" onClick={this.ping}/>
         <FlatButton label="Delete" onClick={this.delete}/>
         <FlatButton label="Edit" onClick={this.edit}/>
+        <FlatButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})}/>
       </CardActions>
     </Card>;
   }

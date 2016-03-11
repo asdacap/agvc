@@ -75,6 +75,9 @@ if(Meteor.isServer){
   Meteor.publish("machines", function(){
     return Machines.find({});
   });
+  Meteor.publish("machine", function(machineId){
+    return Machines.find({ machineId });
+  });
 }
 
 _.extend(Machines, {
