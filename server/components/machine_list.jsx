@@ -20,9 +20,12 @@ var ContentAdd = MUI.Libs.SvgIcons.ContentAdd;
 
 var styles = {
   AddMachineFloatingButton: {
-    position: "absolute",
-    right: "0",
-    bottom: "0"
+    position: "fixed",
+    right: "10px",
+    bottom: "10px"
+  },
+  MachineListBox: {
+    padding: "10px"
   }
 }
 
@@ -44,8 +47,7 @@ MachineList = React.createClass({
   },
   render(){
     return <div className="machine-lists">
-      <div style={ { position: "relative" } }>
-        <h2>Machine Lists</h2>
+      <div style={styles.MachineListBox}>
         <div class="machines">
           { this.data.machines.map(function(item){ return <MachineListItem machine={item} key={item._id}/>; }) }
         </div>

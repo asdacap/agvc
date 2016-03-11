@@ -15,6 +15,18 @@ var {
   FloatingActionButton
 } = MUI;
 
+var styles = {
+  MachineListItem: {
+    width: "300px",
+    display: "inline-block",
+    marginRight: "20px",
+    marginBottom: "20px"
+  },
+  Table: {
+    height: "200px"
+  }
+};
+
 MachineListItem = React.createClass({
   getInitialState(){
     return {
@@ -34,11 +46,11 @@ MachineListItem = React.createClass({
     this.setState({ openForm: false });
   },
   render(){
-    return <Card style={ { width: "300px", display: "inline-block", marginRight: "1em" } }>
+    return <Card style={styles.MachineListItem}>
       <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"}/>
       <CardText>
         Command Queue:
-        <Table selectable={false} height="200px">
+        <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { this.props.machine.commandQueue.map(function(command){
               return <TableRow>
