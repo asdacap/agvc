@@ -3,6 +3,7 @@
 #include "wifi_hq/WiFlyHQ.h"
 #include "altsoftserial/AltSoftSerial.h"
 #include "ConnectionManager.h"
+#include "wiflyConfigurator.h"
 
 //SoftwareSerial wifiSerial(8,9);
 HardwareSerial &wifiSerial = Serial3;
@@ -18,7 +19,13 @@ void setup() {
   }
   pinMode(LED, OUTPUT);
   pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
   pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(CONNECT_INPUT, INPUT);
+  digitalWrite(CONNECT_INPUT, LOW);
+
+  configureWifly(wifiSerial);
 
   cManager.setup(&wifiSerial);
   Serial.println(F("Setup done"));
@@ -46,4 +53,5 @@ void loop() {
   cManager.loop();
 
   digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
+  digitalWrite(LED2, digitalRead(CONNECT_INPUT));
 }

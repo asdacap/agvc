@@ -10,7 +10,7 @@ void ConnectionManager<SerialType>::setup(SerialType *serial){
   Serial.println(F("Done"));
 
   webSocketClient.path = "/machine_websocket";
-  webSocketClient.host = serverHost;
+  webSocketClient.host = "127.0.0.1";
 }
 
 // Run each loop to check tcp connectivity stuff.
@@ -46,8 +46,10 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
     if(webSocketClient.handshake(*this, true)){
       Serial.println(F("Handshake successful"));
       onWebSocketConnected();
+      webSocketAvailable = true;
     }else{
       Serial.println(F("Handshake failed"));
+      webSocketAvailable = false;
     }
   }
 
@@ -75,11 +77,25 @@ void ConnectionManager<SerialType>::listenReceive(){
 }
 
 template <class SerialType>
+void ConnectionManager<SerialType>::slowLoop(){
+  /*
+  if(!wifly.isConnected()){
+    wifly.open(SERVER_IP.c_str(), 8080, true);
+  }
+  */
+}
+
+template <class SerialType>
 void ConnectionManager<SerialType>::loop(){
-
-  int ccount = millis()/500;
-
   loopTCPConnectivityCheck();
   listenReceive();
   digitalWrite(LED2, ledON ? HIGH : LOW);
+
+  static int mCount = 0;
+  int nmCount = millis()/1000;
+  if(mCount != nmCount){
+    slowLoop();
+    mCount = nmCount;
+  }
+
 }

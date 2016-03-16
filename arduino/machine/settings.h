@@ -10,13 +10,16 @@
   extern String WIFI_PASSPHRASE;
   //String WIFI_SSID = "asdacap";
   //String WIFI_PASSPHRASE = "mypassqwer";
-  extern char SERVER_IP[];
-  extern int SERVER_PORT;
+  extern String SERVER_IP;
+  extern String SERVER_PORT;
   extern const int BUFFER_SIZE;
-  extern long TCP_CONNECT_DELAY; // Delay between tcp connection attempt.
+  extern String TCP_CONNECT_DELAY; // Delay between tcp connection attempt.
 
   extern int LED;
   extern int LED2;
+  extern int LED3;
+  extern int LED4;
   extern int BUTTON;
+  extern int CONNECT_INPUT;
   extern String MACHINE_ID;
 #endif

@@ -25,6 +25,7 @@ class ConnectionManager : public SocketInterface {
     void onWebSocketConnected();
     void listenReceive();
     void loop();
+    void slowLoop();
     void sendData(String data){
       if(!webSocketAvailable) return;
       webSocketClient.sendData(data);

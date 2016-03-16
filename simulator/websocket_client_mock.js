@@ -5,7 +5,7 @@ var client = new WebSocketClient();
 client.on('connect', function(connection){
   console.log("Connection established");
 
-  connection.send("machineId:m1")
+  connection.send("machineId:ABC")
 
   var num = 0;
   setInterval(function(){
@@ -20,4 +20,4 @@ client.on('connectFailed', function(error){
 });
 
 console.log("connecting");
-client.connect('ws://127.0.0.1:3000/machine_websocket', null);
+client.connect('ws://127.0.0.1:8080/machine_websocket', null);
