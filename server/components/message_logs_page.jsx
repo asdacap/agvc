@@ -40,7 +40,7 @@ MessageLogPage = React.createClass({
             <AppBar title="Message Logs" onLeftIconButtonTouchTap={this.toggleNav} style={styles.AppBar}/>
             <FlatButton onClick={this.clearMessageLog} label="Clear" />&nbsp;
             <FlatButton onClick={this.addMessageLog} label="Click to add" />&nbsp;
-            <Table height="300px">
+            <Table>
               <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                 <TableRow>
                   <TableHeaderColumn>Message</TableHeaderColumn>
