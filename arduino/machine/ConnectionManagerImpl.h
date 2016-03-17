@@ -8,67 +8,29 @@ void ConnectionManager<SerialType>::setup(SerialType *serial){
   Serial.println(F("Begin"));
   wifly.begin(serial, &Serial);
   Serial.println(F("Done"));
-
-  webSocketClient.path = "/machine_websocket";
-  webSocketClient.host = "127.0.0.1";
 }
 
 // Run each loop to check tcp connectivity stuff.
 template <class SerialType>
 void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
-
-  // Async handshake. Not working for some reason. Not enough buffer it seems.
-  /*
   if(!wasConnected && connected()){
-    Serial.println(F("Starting handshake"));
-    webSocketClient.handshake(*this, false);
-    handshaking = true;
+    onTCPConnected();
   }
-  if(handshaking){
-    int resp = webSocketClient.handshake(*this, false);
-    Serial.print(F("Respond is : "));
-    Serial.println(resp);
-    if(resp < 0){
-      Serial.println(F("Error completing websocket handshake"));
-      handshaking = false;
-    }else if(resp == 2){
-      Serial.println(F("Handshake successful"));
-      onWebSocketConnected();
-      handshaking = false;
-      webSocketAvailable = true;
-    }
-  }
-  */
-
-  // Sync handshake. May cause delay.
-  if(!wasConnected && connected()){
-    Serial.println(F("Starting handshake"));
-    if(webSocketClient.handshake(*this, true)){
-      Serial.println(F("Handshake successful"));
-      onWebSocketConnected();
-      webSocketAvailable = true;
-    }else{
-      Serial.println(F("Handshake failed"));
-      webSocketAvailable = false;
-    }
-  }
-
   wasConnected = connected();
-  if(!wasConnected){
-    webSocketAvailable = false;
-  }
 }
 
 template <class SerialType>
-void ConnectionManager<SerialType>::onWebSocketConnected(){
-  webSocketClient.sendData("machineId:"+MACHINE_ID);
+void ConnectionManager<SerialType>::onTCPConnected(){
+  Serial.println(F("Sending registration..."));
+  wifly.print(F("machineId:"));
+  wifly.println(MACHINE_ID);
 }
 
 template <class SerialType>
 void ConnectionManager<SerialType>::listenReceive(){
-  if(!webSocketAvailable) return;
-  String data;
-  if (webSocketClient.getData(data)) {
+  if(!connected()) return;
+  if(wifly.available()) {
+    String data = wifly.readStringUntil('\n');
     if (data.length() > 0) {
       Serial.print(F("Receive data: "));
       Serial.println(data);

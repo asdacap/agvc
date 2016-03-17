@@ -131,6 +131,7 @@ var handleWebsocketConnection = Meteor.bindEnvironment(function(driver, socket){
 
 var running = Meteor.npmRequire('is-running')
 
+/*
 Meteor.setInterval(function(){
   // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
   // Also cleanup machine whose pid is not running.
@@ -151,3 +152,5 @@ WebApp.connectHandlers.use(function(req,res,next){
   console.log("New connection");
   next();
 });
+
+*/

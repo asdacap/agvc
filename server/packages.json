@@ -1,5 +1,5 @@
 {
   "websocket-driver": "0.6.4",
-  "frame-stream": "1.1.1",
+  "split": "1.0.0",
   "is-running": "2.0.0"
 }

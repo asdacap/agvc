@@ -1,11 +1,10 @@
-#include "WebSocketClient.h"
 #include "settings.h"
 #include "wifi_hq/WiFlyHQ.h"
 #include "altsoftserial/AltSoftSerial.h"
 
 // For namespace
 template <class SerialType>
-class ConnectionManager : public SocketInterface {
+class ConnectionManager{
 
   public:
 
@@ -17,18 +16,20 @@ class ConnectionManager : public SocketInterface {
     bool webSocketAvailable = false;
     SerialType *serial;
     WiFly wifly;
-    WebSocketClient webSocketClient;
     int loopcount = 0;
 
     void setup(SerialType *serial);
     void loopTCPConnectivityCheck();
-    void onWebSocketConnected();
+    void onTCPConnected();
     void listenReceive();
     void loop();
     void slowLoop();
     void sendData(String data){
-      if(!webSocketAvailable) return;
-      webSocketClient.sendData(data);
+      if(connected()){
+        Serial.print(F("Sending data "));
+        Serial.println(data);
+        wifly.println(data);
+      }
     }
 
     // Things to actually implement

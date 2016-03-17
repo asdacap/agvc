@@ -49,7 +49,7 @@ void loop() {
     mCount = nmCount;
   }
 
-  //checkButton();
+  checkButton();
   cManager.loop();
 
   digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
