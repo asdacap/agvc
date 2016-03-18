@@ -16,20 +16,30 @@ var MessageLogSchema = new SimpleSchema({
 MessageLogs.attachSchema(MessageLogSchema);
 
 Meteor.methods({
-  addMessageLog(text){
-    console.log("adding "+text);
-    MessageLogs.insert({text: text});
+  addMessageLog(text, machineId){
+    if(machineId === undefined){
+      MessageLogs.insert({text: text});
+    }else{
+      MessageLogs.insert({text: text, fromMachineId: machineId});
+    }
   },
   removeMessageLog(id){
     MessageLogs.remove({_id: id});
   },
-  clearMessageLog(){
-    MessageLogs.remove({});
+  clearMessageLog(machineId){
+    if(machineId === undefined){
+      MessageLogs.remove({});
+    }else{
+      MessageLogs.remove({ fromMachineId: machineId });
+    }
   }
 });
 
 if(Meteor.isServer){
-  Meteor.publish("messages", function(){
-    return MessageLogs.find({});
+  Meteor.publish("messages", function(limit){
+    return MessageLogs.find({}, { limit, sort: { createdAt: -1 } });
+  });
+  Meteor.publish("machineMessages", function(machineId, limit){
+    return MessageLogs.find({ fromMachineId: machineId }, { limit, sort: { createdAt: -1 } });
   });
 }

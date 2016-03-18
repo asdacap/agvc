@@ -18,7 +18,12 @@ var styles = {
 
 MessageLogPage = React.createClass({
   mixins: [ReactMeteorData],
+  getInitialState(){
+    this.limit = new ReactiveVar(50);
+    return {};
+  },
   getMeteorData(){
+    Meteor.subscribe("messages", this.limit.get());
     return {
       messages: MessageLogs.find({}, { sort: { createdAt: -1 } }).fetch()
     }
@@ -31,6 +36,22 @@ MessageLogPage = React.createClass({
   },
   toggleNav(){
     this.refs.navPage.toggleNav();
+  },
+  onListScroll(e){
+    var obj = document.body;
+    if((obj.scrollTop+window.innerHeight) >= obj.scrollHeight){
+      if(this.limit.get() <= this.data.messages.length){
+        this.limit.set(this.limit.get()+50);
+      }
+    }
+  },
+  componentDidMount(){
+    var obj = document;
+    obj.addEventListener("scroll", this.onListScroll);
+  },
+  componentWillUnmount(){
+    var obj = document;
+    obj.removeEventListener("scroll", this.onListScroll);
   },
   render(){
     return (
@@ -47,7 +68,7 @@ MessageLogPage = React.createClass({
                   <TableHeaderColumn>Created At</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
-              <TableBody displayRowCheckbox={false}>
+              <TableBody displayRowCheckbox={false} ref="table_body">
                 {this.data.messages.map(function(message){
                    return <TableRow key={message.id}>
                      <TableRowColumn>
@@ -66,7 +87,3 @@ MessageLogPage = React.createClass({
     );
   }
 });
-
-if(Meteor.isClient){
-  Meteor.subscribe("messages");
-}
