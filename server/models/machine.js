@@ -17,7 +17,7 @@ var MachineCommandSchema = new SimpleSchema({
   }
 });
 
-var MachineSchema = new SimpleSchema({
+var MachineSchema = {
   machineId: {
     type: String,
     optional: false,
@@ -39,22 +39,40 @@ var MachineSchema = new SimpleSchema({
   commandQueue: {
     type: [MachineCommandSchema]
   }
+};
+
+AVAILABLE_READINGS.forEach(function(reading){
+  MachineSchema[reading] = {
+    type: Number,
+    optional: false
+  };
 });
 
+MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
+
+function setDefaultValue(machine){
+  _.extend(machine, {
+    commandQueue: []
+  });
+
+  AVAILABLE_READINGS.forEach(function(reading){
+    if(machine[reading] === undefined){
+      machine[reading] = 0;
+    }
+  });
+}
 
 Meteor.methods({
   addMachine(props){
-    _.extend(props, {
-      commandQueue: []
-    });
-
+    setDefaultValue(props);
     Machines.insert(props);
   },
   deleteMachine(machineId){
     Machines.remove({machineId: machineId});
   },
   editMachine(machine){
+    setDefaultValue(machine);
     Machines.update(machine._id, { $set: machine } );
   },
   sendCommand(machineId, command, droppable){

@@ -46,15 +46,17 @@ MachineListItem = React.createClass({
     this.setState({ openForm: false });
   },
   render(){
+    var self = this;
     return <Card style={styles.MachineListItem}>
       <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"}/>
       <CardText>
-        Command Queue:
+        Readings:
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
-            { this.props.machine.commandQueue.map(function(command){
+            { AVAILABLE_READINGS.map(function(reading){
               return <TableRow>
-                <TableRowColumn>{command.command}</TableRowColumn>
+                <TableRowColumn>{reading}</TableRowColumn>
+                <TableRowColumn>{self.props.machine[reading]}</TableRowColumn>
               </TableRow>;
               }) }
           </TableBody>

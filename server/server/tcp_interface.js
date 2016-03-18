@@ -60,6 +60,11 @@ _.extend(SocketHandler.prototype, {
     if(key === "machineId"){
       this.registerMachineId(value);
     }
+    if(this.machineObj !== undefined){
+      if(AVAILABLE_READINGS.indexOf(key) != -1){
+        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: Integer.parse(value) })
+      }
+    }
   },
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
