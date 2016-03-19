@@ -1,5 +1,42 @@
 {
   "dependencies": {
+    "d3": {
+      "version": "3.5.16"
+    },
+    "d3-scale": {
+      "version": "0.6.4",
+      "dependencies": {
+        "d3-array": {
+          "version": "0.7.1"
+        },
+        "d3-collection": {
+          "version": "0.1.2"
+        },
+        "d3-color": {
+          "version": "0.4.2"
+        },
+        "d3-format": {
+          "version": "0.5.1"
+        },
+        "d3-interpolate": {
+          "version": "0.7.0"
+        },
+        "d3-time": {
+          "version": "0.2.5"
+        },
+        "d3-time-format": {
+          "version": "0.3.1"
+        }
+      }
+    },
+    "d3-shape": {
+      "version": "0.6.0",
+      "dependencies": {
+        "d3-path": {
+          "version": "0.1.5"
+        }
+      }
+    },
     "externalify": {
       "version": "0.1.0",
       "dependencies": {

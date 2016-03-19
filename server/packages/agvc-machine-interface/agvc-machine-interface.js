@@ -52,7 +52,11 @@ AGVMachineHandler  = class{
     if(this.machineObj !== undefined){
       console.log("Key is "+key+" "+Readings.available_readings.indexOf(key)+" "+key.length);
       if(Readings.available_readings.indexOf(key) != -1){
-        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: parseInt(value, 0) })
+        var numValue = parseInt(value, 0);
+        var toSet = {};
+        toSet[key] = numValue;
+        Machines.update({ machineId: this.machineObj.machineId }, { $set: toSet } )
+        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: numValue })
       }
     }
   }

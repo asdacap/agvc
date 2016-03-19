@@ -8,6 +8,6 @@ setInterval(function(){
     num = Math.random()*100;
     socket.write("temperature:"+num+"\n");
     num++;
-},1000);
+},200);
 
 socket.write("machineId:ABC\n");
