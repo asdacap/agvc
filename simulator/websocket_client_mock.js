@@ -20,4 +20,4 @@ client.on('connectFailed', function(error){
 });
 
 console.log("connecting");
-client.connect('ws://127.0.0.1:8080/machine_websocket', null);
+client.connect('ws://127.0.0.1:3000/machine_websocket', null);
