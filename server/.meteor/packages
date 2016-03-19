@@ -32,3 +32,4 @@ momentjs:moment
 
 asdacap:agvc-model
 asdacap:agvc-machine-interface
+cosmos:browserify
