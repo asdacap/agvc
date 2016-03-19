@@ -44,12 +44,15 @@ AGVMachineHandler  = class{
   }
 
   onKeyValueMatch(key, value){
+    key = key.trim();
+    value = value.trim();
     if(key === "machineId"){
       this.registerMachineId(value);
     }
     if(this.machineObj !== undefined){
+      console.log("Key is "+key+" "+Readings.available_readings.indexOf(key)+" "+key.length);
       if(Readings.available_readings.indexOf(key) != -1){
-        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: Integer.parse(value) })
+        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: parseInt(value, 0) })
       }
     }
   }

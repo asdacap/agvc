@@ -21,8 +21,8 @@ var ReadingSchema = new SimpleSchema({
 Readings.attachSchema(ReadingSchema);
 
 if(Meteor.isServer){
-  Meteor.publish("readings", function(machineId, from){
-    return Readings.find({ machineId: machineId, createdAt: { $gt: from } });
+  Meteor.publish("readings", function(machineId, reading, fromDate){
+    return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
 }
 

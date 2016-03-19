@@ -51,9 +51,6 @@ MachinePage = React.createClass({
                 <Tab label="Status">
                   <MachineStatusTab machine={this.data.machine} />
                 </Tab>
-                <Tab label="Readings">
-                  <MachineReadingsTab machine={this.data.machine} />
-                </Tab>
                 <Tab label="Command Queue">
                   <MachineCommandQueueTab machine={this.data.machine} />
                 </Tab>
@@ -86,23 +83,26 @@ var MachineStatusTab = React.createClass({
   closeEdit(){
     this.setState({ openForm: false });
   },
+  goHistoryPage(reading){
+    FlowRouter.go('readingHistory', { machineId: this.props.machine.machineId, reading: reading });
+  },
   render(){
+    var self = this;
+    var listItems = Readings.available_readings.map(function(reading){
+      return <ListItem primaryText={reading} secondaryText={self.props.machine[reading].toString()}  onTouchTap={_ => self.goHistoryPage(reading) }/>;
+    });
+
     return <div>
       <List>
         <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
         <ListItem primaryText="Online Status" secondaryText={<MachineOnlineText machine={this.props.machine} />} />
+        {listItems}
         <ListItem primaryText="JSON" secondaryText={JSON.stringify(this.props.machine)} />
       </List>
       <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
       <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
       <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
     </div>;
-  }
-});
-
-var MachineReadingsTab = React.createClass({
-  render(){
-    return <div>"Machine Readings tab"</div>;
   }
 });
 

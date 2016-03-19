@@ -28,6 +28,7 @@ kadira:flow-router
 kadira:react-layout
 coniel:react-tap-event-plugin
 remcoder:chronos
+momentjs:moment
 
 asdacap:agvc-model
 asdacap:agvc-machine-interface
