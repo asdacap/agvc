@@ -41,7 +41,7 @@ var MachineSchema = {
   }
 };
 
-AVAILABLE_READINGS.forEach(function(reading){
+Readings.available_readings.forEach(function(reading){
   MachineSchema[reading] = {
     type: Number,
     optional: false
@@ -56,7 +56,7 @@ function setDefaultValue(machine){
     commandQueue: []
   });
 
-  AVAILABLE_READINGS.forEach(function(reading){
+  Readings.available_readings.forEach(function(reading){
     if(machine[reading] === undefined){
       machine[reading] = 0;
     }

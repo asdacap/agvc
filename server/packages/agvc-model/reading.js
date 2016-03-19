@@ -26,4 +26,4 @@ if(Meteor.isServer){
   });
 }
 
-AVAILABLE_READINGS = ["temperature", "battery"];
+Readings.available_readings = ["temperature", "battery"];

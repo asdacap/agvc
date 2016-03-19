@@ -20,8 +20,6 @@ meteorhacks:npm
 
 
 npm-container
-zimme:collection-timestampable
-aldeed:collection2
 reactive-var
 fortawesome:fontawesome
 izzilab:material-ui
@@ -30,3 +28,5 @@ kadira:flow-router
 kadira:react-layout
 coniel:react-tap-event-plugin
 remcoder:chronos
+
+asdacap:agvc-model

@@ -61,7 +61,7 @@ _.extend(SocketHandler.prototype, {
       this.registerMachineId(value);
     }
     if(this.machineObj !== undefined){
-      if(AVAILABLE_READINGS.indexOf(key) != -1){
+      if(Readings.available_readings.indexOf(key) != -1){
         Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: Integer.parse(value) })
       }
     }
