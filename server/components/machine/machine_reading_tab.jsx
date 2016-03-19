@@ -62,7 +62,6 @@ MachineReadingHistoryPage = React.createClass({
               this.data.machine === undefined ? <div style={styles.MachineLoading}>
                 <CircularProgress size={2}/>
               </div> :  <div>
-                History of {self.props.machineId}
                 <HistoryChart readings={this.data.readings} reading={this.props.reading} machine={this.data.machine} />
               </div>
             }
@@ -85,44 +84,51 @@ var HistoryChart = React.createClass({
       fromTime: moment().subtract(1, 'minutes')
     }
   },
+  getInitialState(){
+    return {
+      chartWidth: 200
+    }
+  },
+  resize(){
+    this.setState({ chartWidth: this.getDOMNode().offsetWidth});
+  },
+  componentDidMount(){
+    this.resize();
+    window.addEventListener('resize', this.resize);
+  },
+  componentWillUnmount(){
+    window.removeEventListener('resize', this.resize);
+  },
   render(){
-    var data = this.props.readings.map(d => [d.createdAt, d.reading]);
+
+    var data = this.props.readings.slice(0);
     var lastval = this.props.machine[this.props.reading];
-    var firstval = (data[0] !== undefined ? data[0][1] : lastval);
+    var firstval = (data[0] !== undefined ? data[0].reading : lastval);
     var toTime = moment();
-    data.unshift([this.data.fromTime.toDate(), firstval]);
-    data.push([toTime.toDate(), lastval]);
+    //var fromTime = this.data.fromTime;
+    var fromTime = moment().subtract(1, 'minutes');
+    data.unshift({
+      reading: firstval,
+      createdAt: fromTime.toDate()
+    });
+    data.push({
+      reading: lastval,
+      createdAt: toTime.toDate()
+    });
 
-    var values = data.map(d => d[1]);
-    var timeDomain = [this.data.fromTime.toDate(), toTime.toDate()];
-
-    var x = d3Scale.scaleTime()
-      .clamp(true)
-      .domain(timeDomain)
-      .range([0, 1000]);
-
-    var y = d3Scale.scaleLinear()
-      .clamp(true)
-      .domain([0, _.max(values)])
-      .range([1000, 0]);
-
-
-      /*
-    var area = d3Shape.area()
-      .x0(d => x(d.createdAt))
-      .x1(d => x(d.createdAt))
-      .y0(_ => 1000)
-      .y1(d => y(d.reading));
-      */
-
-    var area = d3Shape.area()
-      .x0(d => x(d[0]))
-      .x1(d => x(d[0]))
-      .y0(_ => 1000)
-      .y1(d => y(d[1]));
-
-    return <svg width="100%" height={300} viewBox="0 0 1000 1000" preserveAspectRatio="none">
-      <path d={area(data)} fill="green"/>
-    </svg>
+    var chartSeries = [
+      {
+        field: 'reading',
+        name: this.props.reading,
+        color: 'blue'
+      }
+    ]
+    return <AreaChart
+      xScale="time"
+      width={this.state.chartWidth}
+      height={500}
+      x={d => d.createdAt}
+      data={data}
+      chartSeries={chartSeries} />;
   }
 });
