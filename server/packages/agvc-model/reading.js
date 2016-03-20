@@ -26,4 +26,8 @@ if(Meteor.isServer){
   });
 }
 
-Readings.available_readings = ["temperature", "battery"];
+Readings.availableReadings = ["temperature", "battery"];
+Readings.readingTitle = {
+  temperature: "Temperature",
+  battery: "Battery"
+}

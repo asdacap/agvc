@@ -52,7 +52,7 @@ MachineReadingHistoryPage = React.createClass({
   },
   render(){
     var self = this;
-    var title = this.props.machineId +": "+this.props.reading;
+    var title = this.props.machineId +": "+Readings.readingTitle[this.props.reading];
 
     return <AppCanvas>
         <SideNavPage ref="navPage">
@@ -118,12 +118,12 @@ var HistoryChart = React.createClass({
 
     var domain = [fromTime.toDate(), toTime.toDate()];
 
-    data = _.filter(data, d => d.createdAt >= fromTime.toDate()); 
+    data = _.filter(data, d => d.createdAt >= fromTime.toDate());
 
     var chartSeries = [
       {
         field: 'reading',
-        name: this.props.reading,
+        name: Readings.readingTitle[this.props.reading],
         color: 'blue'
       }
     ]

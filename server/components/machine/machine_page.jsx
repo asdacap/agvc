@@ -88,8 +88,8 @@ var MachineStatusTab = React.createClass({
   },
   render(){
     var self = this;
-    var listItems = Readings.available_readings.map(function(reading){
-      return <ListItem primaryText={reading} secondaryText={self.props.machine[reading].toString()}  onTouchTap={_ => self.goHistoryPage(reading) }/>;
+    var listItems = Readings.availableReadings.map(function(reading){
+      return <ListItem primaryText={Readings.readingTitle[reading]} secondaryText={self.props.machine[reading].toString()}  onTouchTap={_ => self.goHistoryPage(reading) }/>;
     });
 
     return <div>

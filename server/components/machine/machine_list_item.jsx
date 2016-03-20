@@ -53,7 +53,7 @@ MachineListItem = React.createClass({
         Readings:
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
-            { Readings.available_readings.map(function(reading){
+            { Readings.availableReadings.map(function(reading){
               return <TableRow>
                 <TableRowColumn>{reading}</TableRowColumn>
                 <TableRowColumn>{self.props.machine[reading]}</TableRowColumn>

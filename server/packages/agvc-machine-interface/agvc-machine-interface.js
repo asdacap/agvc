@@ -50,8 +50,8 @@ AGVMachineHandler  = class{
       this.registerMachineId(value);
     }
     if(this.machineObj !== undefined){
-      console.log("Key is "+key+" "+Readings.available_readings.indexOf(key)+" "+key.length);
-      if(Readings.available_readings.indexOf(key) != -1){
+      console.log("Key is "+key+" "+Readings.availableReadings.indexOf(key)+" "+key.length);
+      if(Readings.availableReadings.indexOf(key) != -1){
         var numValue = parseInt(value, 0);
         var toSet = {};
         toSet[key] = numValue;
