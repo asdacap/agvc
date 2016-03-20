@@ -21,53 +21,7 @@ var styles = {
   }
 }
 
-
-MachineReadingHistoryPage = React.createClass({
-  mixins: [ReactMeteorData],
-  propTypes: {
-    machineId: React.PropTypes.string,
-    reading: React.PropTypes.string
-  },
-  getInitialState(){
-    var self = this;
-    Tracker.autorun(function(){
-      self.handle = Meteor.subscribe("machine", self.props.machineId);
-    })
-    return {};
-  },
-  getMeteorData(){
-    var self = this;
-
-    return {
-      ready: (self.handle.ready()),
-      machine: Machines.findOne({ machineId: this.props.machineId }),
-    }
-  },
-  toggleNav(){
-    this.refs.navPage.toggleNav();
-  },
-  render(){
-    var self = this;
-    var title = this.props.machineId +": "+Readings.readingTitle[this.props.reading];
-
-    return <AppCanvas>
-        <SideNavPage ref="navPage">
-          <div>
-            <AppBar title={title} onLeftIconButtonTouchTap={this.toggleNav}/>
-            {
-              this.data.machine === undefined ? <div style={styles.MachineLoading}>
-                <CircularProgress size={2}/>
-              </div> :  <div>
-                <HistoryChart reading={this.props.reading} machine={this.data.machine} />
-              </div>
-            }
-          </div>
-        </SideNavPage>
-      </AppCanvas>;
-  }
-});
-
-var HistoryChart = React.createClass({
+ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object,

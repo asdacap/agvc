@@ -6,13 +6,6 @@ FlowRouter.route('/', {
   }
 });
 
-FlowRouter.route('/machine/:machineId/readings/:reading', {
-  name: 'readingHistory',
-  action: function(params, queryParams) {
-    ReactLayout.render(MachineReadingHistoryPage, params);
-  }
-});
-
 FlowRouter.route('/machine/:machineId', {
   name: 'machine',
   action: function(params, queryParams) {

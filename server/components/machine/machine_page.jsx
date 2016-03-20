@@ -51,6 +51,9 @@ MachinePage = React.createClass({
                 <Tab label="Status">
                   <MachineStatusTab machine={this.data.machine} />
                 </Tab>
+                <Tab label="Readings">
+                  <ReadingsTab machine={this.data.machine} />
+                </Tab>
                 <Tab label="Command Queue">
                   <MachineCommandQueueTab machine={this.data.machine} />
                 </Tab>
@@ -89,7 +92,8 @@ var MachineStatusTab = React.createClass({
   render(){
     var self = this;
     var listItems = Readings.availableReadings.map(function(reading){
-      return <ListItem primaryText={Readings.readingTitle[reading]} secondaryText={self.props.machine[reading].toString()}  onTouchTap={_ => self.goHistoryPage(reading) }/>;
+      return <ListItem
+          primaryText={Readings.readingTitle[reading]} secondaryText={self.props.machine[reading].toString()} />;
     });
 
     return <div>
@@ -196,3 +200,10 @@ var MachineMessageLogTab = React.createClass({
     );
   }
 });
+
+var ReadingsTab = function(props){
+  var charts = Readings.availableReadings.map(function(reading){
+    return <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
+  });
+  return <div>{charts}</div>;
+};
