@@ -12,7 +12,8 @@ var { AppCanvas,
     List,
     ListItem,
     FlatButton,
-    RaisedButton
+    RaisedButton,
+    Paper
    } = MUI;
 
 var styles = {
@@ -21,6 +22,11 @@ var styles = {
   },
   ButtonWithMargin: {
     marginLeft: "0.5em"
+  },
+  ReadingTab: {
+    Content: {
+      padding: "1ex"
+    }
   }
 }
 
@@ -203,7 +209,11 @@ var MachineMessageLogTab = React.createClass({
 
 var ReadingsTab = function(props){
   var charts = Readings.availableReadings.map(function(reading){
-    return <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
+    return <div className="col-lg-6 col-md-4">
+      <Paper>
+        <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
+      </Paper>
+    </div>
   });
-  return <div>{charts}</div>;
+  return <div className="row" style={styles.ReadingTab.Content}>{charts}</div>;
 };
