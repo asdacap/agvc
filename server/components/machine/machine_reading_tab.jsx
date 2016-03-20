@@ -104,10 +104,14 @@ var HistoryChart = React.createClass({
     }
   },
   resize(){
-    this.setState({ chartWidth: this.getDOMNode().offsetWidth});
+    this.setState({ chartWidth: ReactDOM.findDOMNode(this).offsetWidth});
   },
   componentDidMount(){
-    this.resize();
+    var self = this;
+    self.resize();
+    setTimeout(function(){
+      self.resize();
+    },100);
     window.addEventListener('resize', this.resize);
   },
   componentWillUnmount(){
