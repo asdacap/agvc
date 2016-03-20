@@ -31,7 +31,7 @@ MachineReadingHistoryPage = React.createClass({
   getInitialState(){
     var self = this;
     Tracker.autorun(function(){
-      self.fromDate = Chronos.liveMoment().subtract(1, 'minutes');
+      self.fromDate = moment(Chronos.currentTime(10000)).subtract(1, 'minutes');
       self.handle = Meteor.subscribe("machine", self.props.machineId);
       self.handle2 = Meteor.subscribe("readings",
         self.props.machineId, self.props.reading, self.fromDate.toDate());
@@ -106,7 +106,7 @@ var HistoryChart = React.createClass({
     var firstval = (data[0] !== undefined ? data[0].reading : lastval);
     var toTime = moment();
     //var fromTime = this.data.fromTime;
-    var fromTime = moment().subtract(1, 'minutes');
+    var fromTime = this.data.fromTime;
     data.unshift({
       reading: firstval,
       createdAt: fromTime.toDate()
@@ -115,6 +115,10 @@ var HistoryChart = React.createClass({
       reading: lastval,
       createdAt: toTime.toDate()
     });
+
+    var domain = [fromTime.toDate(), toTime.toDate()];
+
+    data = _.filter(data, d => d.createdAt >= fromTime.toDate()); 
 
     var chartSeries = [
       {
@@ -129,6 +133,7 @@ var HistoryChart = React.createClass({
       height={500}
       x={d => d.createdAt}
       data={data}
+      domain={domain}
       chartSeries={chartSeries} />;
   }
 });
