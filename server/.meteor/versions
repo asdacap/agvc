@@ -5,6 +5,7 @@ aldeed:schema-index@1.0.1
 aldeed:simple-schema@1.5.3
 asdacap:agvc-machine-interface@0.0.1
 asdacap:agvc-model@0.0.1
+asdacap:agvc-reading@0.0.1
 autoupdate@1.2.4
 babel-compiler@5.8.24_1
 babel-runtime@0.1.4

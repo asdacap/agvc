@@ -32,3 +32,12 @@ Readings.readingTitle = {
   temperature: "Temperature",
   battery: "Battery"
 }
+
+var MachineSchema = {}
+Readings.availableReadings.forEach(function(reading){
+  MachineSchema[reading] = {
+    type: Number,
+    optional: false
+  };
+});
+Machines.attachSchema(MachineSchema);

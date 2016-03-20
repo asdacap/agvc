@@ -1,9 +1,8 @@
-
 Package.describe({
-  name: 'asdacap:agvc-model',
+  name: 'asdacap:agvc-reading',
   version: '0.0.1',
   // Brief, one-line summary of the package.
-  summary: 'Model for the avgc',
+  summary: '',
   // URL to the Git repository containing the source code for this package.
   git: '',
   // By default, Meteor will default to using README.md for documentation.
@@ -13,22 +12,21 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.2.1');
-
-  api.use('ecmascript');
-  api.use('underscore');
   api.use('mongo');
   api.use('zimme:collection-timestampable');
   api.use('aldeed:collection2');
+  api.use('ecmascript');
+  api.use('asdacap:agvc-model');
+  api.use('asdacap:agvc-machine-interface');
 
-  api.addFiles('machine.js');
-  api.addFiles('message_log_model.js');
-  api.export('MessageLogs');
-  api.export('Machines');
+  api.addFiles('agvc-reading.js');
+  api.addFiles('reading.js');
+  api.export('Readings');
 });
 
 Package.onTest(function(api) {
   api.use('ecmascript');
   api.use('tinytest');
-  api.use('asdacap:agvc-model');
-  api.addFiles('agvc-model-tests.js');
+  api.use('asdacap:agvc-reading');
+  api.addFiles('agvc-reading-tests.js');
 });

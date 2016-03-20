@@ -41,13 +41,6 @@ var MachineSchema = {
   }
 };
 
-Readings.availableReadings.forEach(function(reading){
-  MachineSchema[reading] = {
-    type: Number,
-    optional: false
-  };
-});
-
 MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
