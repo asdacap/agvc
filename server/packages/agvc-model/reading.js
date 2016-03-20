@@ -22,6 +22,7 @@ Readings.attachSchema(ReadingSchema);
 
 if(Meteor.isServer){
   Meteor.publish("readings", function(machineId, reading, fromDate){
+    console.log("Subscription redeceived "+machineId+" "+reading+" "+fromDate);
     return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
 }
