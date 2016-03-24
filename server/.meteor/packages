@@ -32,6 +32,5 @@ momentjs:moment
 asdacap:agvc-model
 asdacap:agvc-machine-interface
 asdacap:agvc-reading
-cosmos:browserify
-blaze # Sadly still required
 kadira:dochead
+cosmos:browserify@0.10.0

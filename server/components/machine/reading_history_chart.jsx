@@ -18,6 +18,9 @@ var { AppCanvas,
 var styles = {
   MachineLoading: {
     textAlign: "center"
+  },
+  AxisStyle: {
+    fontSize: "200%"
   }
 }
 
@@ -70,53 +73,88 @@ ReadingHistoryChart = React.createClass({
       self.resize();
     },100);
     window.addEventListener('resize', this.resize);
+
+    this.drawD3Chart();
   },
   componentDidUpdate(){
     var self = this;
     setTimeout(function(){
       self.resize();
     },100);
+
+    this.drawD3Chart();
   },
   componentWillUnmount(){
     window.removeEventListener('resize', this.resize);
   },
+  drawD3Chart(){
+    if(this.data.ready){
+      var data = this.data.readings.map(d => [d.createdAt, d.reading]);
+      var lastval = this.props.machine[this.props.reading];
+      var firstval = (data[0] !== undefined ? data[0][1] : lastval);
+      var toTime = moment();
+      data.unshift([this.data.fromTime.toDate(), firstval]);
+      data.push([toTime.toDate(), lastval]);
+
+      var values = data.map(d => d[1]);
+      var timeDomain = [this.data.fromTime.toDate(), toTime.toDate()];
+
+      var x = d3.time.scale()
+        .clamp(true)
+        .domain(timeDomain)
+        .range([0, 1000]);
+
+      var y = d3.scale.linear()
+        .clamp(true)
+        .domain([0, _.max(values)])
+        .range([1000, 0]);
+
+      /*
+      var area = d3Shape.area()
+      .x0(d => x(d.createdAt))
+      .x1(d => x(d.createdAt))
+      .y0(_ => 1000)
+      .y1(d => y(d.reading));
+      */
+
+      var area = d3.svg.area()
+        .x0(d => x(d[0]))
+        .x1(d => x(d[0]))
+        .y0(_ => 1000)
+        .y1(d => y(d[1]));
+
+      if(Readings.readingType[this.props.reading] == Boolean){
+        area = area.interpolate('step-before');
+      }
+
+      d3.select(this.refs.area)
+        .datum(data)
+        .attr("d", area);
+
+      var xAxis = d3.svg.axis()
+        .scale(x);
+
+      d3.select(this.refs.xAxis)
+        .call(xAxis);
+
+      var yAxis = d3.svg.axis()
+        .orient("left")
+        .scale(y);
+
+      d3.select(this.refs.yAxis)
+        .call(yAxis);
+    }
+  },
   render(){
 
     if(this.data.ready){
-      var data = this.data.readings.slice(0);
-      var lastval = this.props.machine[this.props.reading];
-      var firstval = (data[0] !== undefined ? data[0].reading : lastval);
-      var toTime = moment();
-      //var fromTime = this.data.fromTime;
-      var fromTime = this.data.fromTime;
-      data.unshift({
-        reading: firstval,
-        createdAt: fromTime.toDate()
-      });
-      data.push({
-        reading: lastval,
-        createdAt: toTime.toDate()
-      });
-
-      var domain = [fromTime.toDate(), toTime.toDate()];
-
-      data = _.filter(data, d => d.createdAt >= fromTime.toDate());
-
-      var chartSeries = [
-        {
-          field: 'reading',
-          name: Readings.readingTitle[this.props.reading],
-          color: 'blue'
-        }
-      ]
-      return <AreaChart
-        xScale="time"
-        width={this.state.chartWidth}
-        height={500}
-        x={d => d.createdAt}
-        data={data}
-        domain={domain}
-        chartSeries={chartSeries} />;
+      return <svg ref="svg" svg width="100%" height={300} viewBox="0 0 1050 1050" preserveAspectRatio="none">
+        <g transform="translate(50,00)">
+          <path ref="area" stroke="#000000" fill="#ff0000"></path>
+        </g>
+        <g ref="xAxis" style={styles.AxisStyle} transform="translate(50,1000)" />
+        <g ref="yAxis" style={styles.AxisStyle} transform="translate(50,0)" />
+      </svg>;
     }else{
       return <CircularProgress size={2}/>
     }
