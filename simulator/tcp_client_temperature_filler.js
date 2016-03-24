@@ -1,6 +1,5 @@
 
 var net = require('net');
-var frame = require('frame-stream');
 
 var socket = net.connect(10000);
 
