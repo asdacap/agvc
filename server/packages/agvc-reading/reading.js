@@ -9,7 +9,7 @@ var ReadingSchema = new SimpleSchema({
     optional: false
   },
   reading: {
-    type: Number,
+    type: "none", // None as some reading is of type boolean
     optional: false
   },
   machineId: {
@@ -27,33 +27,56 @@ if(Meteor.isServer){
   });
 }
 
-Readings.availableReadings = ["temperature", "battery"];
-Readings.readingTitle = {
-  temperature: "Temperature",
-  battery: "Battery"
-}
+_.extend(Readings, {
+  availableReadings: ["temperature", "battery", "online"],
+  readingTitle: {
+    temperature: "Temperature",
+    battery: "Battery",
+    online: "Online"
+  },
+  readingType: {
+    temperature: Number,
+    battery: Number,
+    online: Boolean
+  }
+})
 
 var MachineSchema = {}
 Readings.availableReadings.forEach(function(reading){
-  MachineSchema[reading] = {
-    type: Number,
-    optional: false
-  };
+  if(Readings.readingType[reading] == Boolean){
+    MachineSchema[reading] = {
+      type: Boolean,
+      optional: false
+    };
+  }else{
+    MachineSchema[reading] = {
+      type: Number,
+      optional: false
+    };
+  }
 });
 Machines.attachSchema(MachineSchema);
 
 // Set default value
 Readings.availableReadings.forEach(function(reading){
-  Machines.defaultValue[reading] = 0;
+  if(Readings.readingType[reading] == Boolean){
+    Machines.defaultValue[reading] = false;
+  }else{
+    Machines.defaultValue[reading] = 0;
+  }
 });
 
 // Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  var numValue = parseInt(value, 0);
+  if(Readings.readingType[reading] == Boolean){
+    // Assume it is already passed as boolean
+  }else{
+    value = parseInt(value, 0);
+  }
   var toSet = {};
-  toSet[reading] = numValue;
+  toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )
-  Readings.insert({ machineId: machineId, type: reading, reading: numValue })
+  Readings.insert({ machineId: machineId, type: reading, reading: value })
 }
 
 // Hook machine interface to listen for reading update

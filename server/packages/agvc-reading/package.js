@@ -13,6 +13,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.2.1');
   api.use('mongo');
+  api.use('underscore');
   api.use('zimme:collection-timestampable');
   api.use('aldeed:collection2');
   api.use('ecmascript');

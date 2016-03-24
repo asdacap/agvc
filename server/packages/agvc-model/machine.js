@@ -92,6 +92,9 @@ _.extend(Machines, {
         onlineAt: new Date()
       }
     });
+    Machines.find(query).fetch().forEach(machine => {
+      Machines.setReading(machine.machineId, "online", true);
+    });
   },
   markOffline(query){
     this.update(query, {
@@ -100,6 +103,9 @@ _.extend(Machines, {
         onlineOnServer: process.pid,
         onlineAt: new Date()
       }
+    });
+    Machines.find(query).fetch().forEach(machine => {
+      Machines.setReading(machine.machineId, "online", false);
     });
   }
 });

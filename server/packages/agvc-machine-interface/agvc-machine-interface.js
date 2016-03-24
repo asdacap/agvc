@@ -38,7 +38,6 @@ AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.queueHandler = undefined;
 
     this.bindRegisteredEvent();
-    this.unBindRegisteredEvent();
   }
 
   bindRegisteredEvent(){
@@ -49,7 +48,7 @@ AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   unBindRegisteredEvent(){
     eventRegistrations.forEach(ev => {
-      this.unbind(ev.event, ev.callback);
+      this.removeListener(ev.event, ev.callback);
     });
   }
 
@@ -124,6 +123,7 @@ AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       Machines.markOffline(this.machineObj._id);
       machinesConnection[this.machineObj.machineId] = undefined;
     }
+    this.unBindRegisteredEvent();
   }
 
 }
