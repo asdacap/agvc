@@ -21,6 +21,7 @@ Package.onUse(function(api) {
   api.addFiles('websocket_interface.js', 'server');
   api.export('startMachineTCPListener', 'server');
   api.export('startMachineWebSocketListener', 'server');
+  api.export('AGVMachineHandler', 'server');
 });
 
 Npm.depends({

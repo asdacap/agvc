@@ -41,3 +41,20 @@ Readings.availableReadings.forEach(function(reading){
   };
 });
 Machines.attachSchema(MachineSchema);
+
+if(Meteor.isServer){
+  Readings.availableReadings.forEach(function(reading){
+    function callback(value, machineObj){
+      if(machineObj === undefined) return;
+      var numValue = parseInt(value, 0);
+      var toSet = {};
+      toSet[reading] = numValue;
+      Machines.update({ machineId: machineObj.machineId }, { $set: toSet } )
+      Readings.insert({ machineId: machineObj.machineId, type: reading, reading: numValue })
+    }
+    AGVMachineHandler.registerEventHandler({
+      event: "key:"+reading,
+      callback: callback
+    });
+  });
+}

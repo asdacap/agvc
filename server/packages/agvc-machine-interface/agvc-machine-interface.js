@@ -1,5 +1,7 @@
 // Write your package code here!
-var running = Npm.require('is-running')
+var running = Npm.require('is-running');
+var EventEmitter = Npm.require('events').EventEmitter;
+var util = Npm.require('util');
 
 Meteor.setInterval(function(){
   // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
@@ -19,13 +21,36 @@ Meteor.setInterval(function(){
 // A mapping of machineId, driver and AGVMachineHandler
 var machinesConnection = {};
 
+// A list of event registration
+// The format of object is {
+//  event: "Event name",
+//  callback: Thecallback
+// }
+var eventRegistrations = [];
+
 // Handle ,achine messagings and online presence
-AGVMachineHandler  = class{
+AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   constructor(driver){
+    super();
     bindAllFunction(this);
     this.driver = driver;
     this.machineObj = undefined;
     this.queueHandler = undefined;
+
+    this.bindRegisteredEvent();
+    this.unBindRegisteredEvent();
+  }
+
+  bindRegisteredEvent(){
+    eventRegistrations.forEach(ev => {
+      this.on(ev.event, ev.callback);
+    });
+  }
+
+  unBindRegisteredEvent(){
+    eventRegistrations.forEach(ev => {
+      this.unbind(ev.event, ev.callback);
+    });
   }
 
   onData(data){
@@ -49,16 +74,7 @@ AGVMachineHandler  = class{
     if(key === "machineId"){
       this.registerMachineId(value);
     }
-    if(this.machineObj !== undefined){
-      console.log("Key is "+key+" "+Readings.availableReadings.indexOf(key)+" "+key.length);
-      if(Readings.availableReadings.indexOf(key) != -1){
-        var numValue = parseInt(value, 0);
-        var toSet = {};
-        toSet[key] = numValue;
-        Machines.update({ machineId: this.machineObj.machineId }, { $set: toSet } )
-        Readings.insert({ machineId: this.machineObj.machineId, type: key, reading: numValue })
-      }
-    }
+    this.emit("key:"+key, value, this.machineObj);
   }
 
   registerMachineId(machineId){
@@ -111,6 +127,10 @@ AGVMachineHandler  = class{
   }
 
 }
+
+AGVMachineHandler.registerEventHandler = function(evObj){
+  eventRegistrations.push(evObj);
+};
 
 function bindAllFunction(obj){
   _.each(_.functions(obj), function(func_name){
