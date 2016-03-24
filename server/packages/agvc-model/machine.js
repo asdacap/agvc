@@ -44,21 +44,13 @@ var MachineSchema = {
 MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
-function setDefaultValue(machine){
-  _.extend(machine, {
-    commandQueue: []
-  });
-
-  Readings.availableReadings.forEach(function(reading){
-    if(machine[reading] === undefined){
-      machine[reading] = 0;
-    }
-  });
+Machines.defaultValue = {
+  commandQueue: []
 }
 
 Meteor.methods({
   addMachine(props){
-    setDefaultValue(props);
+    _.extend(props, Machines.defaultValue);
     Machines.insert(props);
   },
   deleteMachine(machineId){

@@ -42,15 +42,26 @@ Readings.availableReadings.forEach(function(reading){
 });
 Machines.attachSchema(MachineSchema);
 
+// Set default value
+Readings.availableReadings.forEach(function(reading){
+  Machines.defaultValue[reading] = 0;
+});
+
+// Utility function to set readings
+Machines.setReading = function(machineId, reading, value){
+  var numValue = parseInt(value, 0);
+  var toSet = {};
+  toSet[reading] = numValue;
+  Machines.update({ machineId: machineId }, { $set: toSet } )
+  Readings.insert({ machineId: machineId, type: reading, reading: numValue })
+}
+
+// Hook machine interface to listen for reading update
 if(Meteor.isServer){
   Readings.availableReadings.forEach(function(reading){
     function callback(value, machineObj){
       if(machineObj === undefined) return;
-      var numValue = parseInt(value, 0);
-      var toSet = {};
-      toSet[reading] = numValue;
-      Machines.update({ machineId: machineObj.machineId }, { $set: toSet } )
-      Readings.insert({ machineId: machineObj.machineId, type: reading, reading: numValue })
+      Machines.setReading(machineObj.machineId, reading, value);
     }
     AGVMachineHandler.registerEventHandler({
       event: "key:"+reading,
