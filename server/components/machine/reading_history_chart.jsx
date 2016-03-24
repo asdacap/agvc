@@ -124,7 +124,7 @@ ReadingHistoryChart = React.createClass({
         .y1(d => y(d[1]));
 
       if(Readings.readingType[this.props.reading] == Boolean){
-        area = area.interpolate('step-before');
+        area = area.interpolate('step-after');
       }
 
       d3.select(this.refs.area)
@@ -141,6 +141,10 @@ ReadingHistoryChart = React.createClass({
         .orient("left")
         .scale(y);
 
+      if(Readings.readingType[this.props.reading] == Boolean){
+        yAxis = yAxis.ticks(1);
+      }
+
       d3.select(this.refs.yAxis)
         .call(yAxis);
     }
@@ -148,12 +152,12 @@ ReadingHistoryChart = React.createClass({
   render(){
 
     if(this.data.ready){
-      return <svg ref="svg" svg width="100%" height={300} viewBox="0 0 1050 1050" preserveAspectRatio="none">
-        <g transform="translate(50,00)">
+      return <svg ref="svg" svg width="100%" height={300} viewBox="0 0 1050 1070" preserveAspectRatio="none">
+        <g transform="translate(50,20)">
           <path ref="area" stroke="#000000" fill="#ff0000"></path>
         </g>
-        <g ref="xAxis" style={styles.AxisStyle} transform="translate(50,1000)" />
-        <g ref="yAxis" style={styles.AxisStyle} transform="translate(50,0)" />
+        <g ref="xAxis" style={styles.AxisStyle} transform="translate(50,1020)" />
+        <g ref="yAxis" style={styles.AxisStyle} transform="translate(50,20)" />
       </svg>;
     }else{
       return <CircularProgress size={2}/>
