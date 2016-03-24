@@ -33,3 +33,5 @@ asdacap:agvc-model
 asdacap:agvc-machine-interface
 asdacap:agvc-reading
 cosmos:browserify
+blaze # Sadly still required
+kadira:dochead
