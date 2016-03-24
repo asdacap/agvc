@@ -209,7 +209,7 @@ var MachineMessageLogTab = React.createClass({
 
 var ReadingsTab = function(props){
   var charts = Readings.availableReadings.map(function(reading){
-    return <div className="col-lg-6 col-md-4">
+    return <div className="col-lg-4 col-md-6 col-xs-12">
       <Paper>
         <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
       </Paper>

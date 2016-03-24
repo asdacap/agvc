@@ -58,7 +58,10 @@ ReadingHistoryChart = React.createClass({
     }
   },
   resize(){
-    this.setState({ chartWidth: ReactDOM.findDOMNode(this).offsetWidth});
+    var newWidth = ReactDOM.findDOMNode(this).offsetWidth;
+    if(this.state.chartWidth != newWidth){
+      this.setState({ chartWidth: newWidth });
+    }
   },
   componentDidMount(){
     var self = this;
@@ -67,6 +70,12 @@ ReadingHistoryChart = React.createClass({
       self.resize();
     },100);
     window.addEventListener('resize', this.resize);
+  },
+  componentDidUpdate(){
+    var self = this;
+    setTimeout(function(){
+      self.resize();
+    },100);
   },
   componentWillUnmount(){
     window.removeEventListener('resize', this.resize);
