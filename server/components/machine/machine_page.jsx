@@ -194,12 +194,13 @@ var MachineMessageLogTab = React.createClass({
               </TableHeader>
               <TableBody displayRowCheckbox={false} ref="table_body">
                 {this.data.messages.map(function(message){
+                   var duration = moment.duration(moment(message.createdAt).diff(moment(), 'seconds'), 'seconds');
                    return <TableRow key={message.id}>
                      <TableRowColumn>
                        {message.text}
                      </TableRowColumn>
                      <TableRowColumn>
-                       {message.createdAt.toString()}
+                       {duration.format("h [hrs], m [min], s [sec]")+" ago"}
                      </TableRowColumn>
                    </TableRow>;
                  })}
