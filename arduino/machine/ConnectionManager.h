@@ -1,6 +1,5 @@
 #include "settings.h"
 #include "wifi_hq/WiFlyHQ.h"
-#include "altsoftserial/AltSoftSerial.h"
 
 // For namespace
 template <class SerialType>

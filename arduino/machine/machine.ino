@@ -1,7 +1,6 @@
 
 //#include <SoftwareSerial.h>
 #include "wifi_hq/WiFlyHQ.h"
-#include "altsoftserial/AltSoftSerial.h"
 #include "ConnectionManager.h"
 #include "wiflyConfigurator.h"
 #include "lineFollowing.h"
