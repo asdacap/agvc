@@ -71,7 +71,7 @@ MessageLogPage = React.createClass({
               <TableBody displayRowCheckbox={false} ref="table_body">
                 {this.data.messages.map(function(message){
                    var duration = moment.duration(moment(message.createdAt).diff(moment(), 'seconds'), 'seconds');
-                   return <TableRow key={message.id}>
+                   return <TableRow key={message._id}>
                      <TableRowColumn>
                        {message.text}
                      </TableRowColumn>
