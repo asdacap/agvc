@@ -55,7 +55,7 @@ MachineListItem = React.createClass({
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
               return <TableRow>
-                <TableRowColumn>{reading}</TableRowColumn>
+                <TableRowColumn>{Readings.readingTitle[reading]}</TableRowColumn>
                 <TableRowColumn>{self.props.machine[reading]}</TableRowColumn>
               </TableRow>;
               }) }
