@@ -65,6 +65,7 @@ MessageLogPage = React.createClass({
               <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                 <TableRow>
                   <TableHeaderColumn>Message</TableHeaderColumn>
+                  <TableHeaderColumn>From Machine</TableHeaderColumn>
                   <TableHeaderColumn>Created At</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
@@ -74,6 +75,9 @@ MessageLogPage = React.createClass({
                    return <TableRow key={message._id}>
                      <TableRowColumn>
                        {message.text}
+                     </TableRowColumn>
+                     <TableRowColumn>
+                       {message.fromMachineId}
                      </TableRowColumn>
                      <TableRowColumn>
                        {duration.format("h [hrs], m [min], s [sec]")+" ago"}
