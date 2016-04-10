@@ -32,5 +32,6 @@ momentjs:moment
 asdacap:agvc-model
 asdacap:agvc-machine-interface
 asdacap:agvc-reading
+asdacap:agvc-location
 kadira:dochead
 cosmos:browserify@0.10.0

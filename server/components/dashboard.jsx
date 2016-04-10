@@ -10,6 +10,7 @@ Dashboard = React.createClass({
         <SideNavPage ref="navPage">
           <div>
             <AppBar title="Dashboard" onLeftIconButtonTouchTap={this.toggleNav}/>
+            <AllMachineMap />
             <MachineList />
           </div>
         </SideNavPage>
