@@ -55,61 +55,41 @@ void followline(){
 
   if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
     left (100, 100);
-    Serial.print("LEFT");
-    Serial.println();
   }
 
   else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){  // 1  1  0  0  0
     left (100, 110);
-    Serial.print("LEFT");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 0&& DS_4 == 0 && DS_5 == 0){  // 0  1  0  0  0
     Forward (125, 160);
-    Serial.print("FOWARD");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  1  1  0  0
     Forward (125, 165);
-    Serial.print("FOWARD");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  0  1  0  0
     Forward (145, 120);
-    Serial.print("FOWARD");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 1 && DS_5 == 0){  // 0  0  1  1  0
     Forward (140, 150);
-    Serial.print("FOWARD");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 0){  // 0  0  0  1  0
     Forward (135, 150);
-    Serial.print("FOWARD");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 ==0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 1){  // 0  0  0  1  1
     right (100, 100);
-    Serial.print("RIGHT");
-    Serial.println();
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 1){  // 0  0  0  0  1
     right (100, 100);
-    Serial.print("RIGHT");
-    Serial.println();
   }
   else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 1 && DS_4 == 1 && DS_5 == 1){  // 1  1  1  1  1
     Forward (145, 120);
-    Serial.print("FOWARD");
-    Serial.println();
   }
   else
   {
@@ -135,7 +115,6 @@ void lineSetup()
 
 void lineLoop()
 {
-  Serial.println("Line loop");
   DS_1 = digitalRead(pin_1);
   DS_2 = digitalRead(pin_2);
   DS_3 = digitalRead(pin_3);
