@@ -33,5 +33,8 @@ asdacap:agvc-model
 asdacap:agvc-machine-interface
 asdacap:agvc-reading
 asdacap:agvc-location
+asdacap:agvc-global-state
+
+underscore
 kadira:dochead
 cosmos:browserify@0.10.0

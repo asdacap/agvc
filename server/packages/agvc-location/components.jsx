@@ -4,7 +4,7 @@ AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     var handle = Meteor.subscribe("machines");
-    var atTime = new Date();
+    var atTime = GlobalStates.getServerTime();
     Chronos.liveUpdate(200);
 
     return {
