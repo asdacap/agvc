@@ -20,6 +20,7 @@
     "react-addons-update": "^0.14.0",
     "react-dom": "^0.14.8",
     "react-mounter": "^1.2.0",
+    "serialport-js": "^0.2.1",
     "split": "^1.0.0"
   },
   "devDependencies": {},

@@ -1,7 +1,30 @@
 import React from 'react';
-import { AppCanvas, AppBar, List, ListItem, RaisedButton, Dialog, FlatButton, TextField } from 'material-ui';
+import { AppCanvas,
+  AppBar,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  RaisedButton,
+  Dialog,
+  FlatButton,
+  MenuItem,
+  TextField,
+  CircularProgress,
+  SelectField
+ } from 'material-ui';
 import SideNavPage from '../components/SideNavPage';
 import SystemConfiguration from './ServerConfiguration';
+import SerialList from '../arduino-configurator/SerialList';
+import Machines from '../machine/Machines';
+
+let styles = {
+  arduinoConfiguration: {
+    CircularProgressContainer: {
+      textAlign: "center",
+    }
+  }
+};
 
 let ServerConfigurationForm = React.createClass({
   mixins: [ReactMeteorData],
@@ -99,15 +122,91 @@ let ServerConfigurationForm = React.createClass({
   }
 });
 
+let ConfigureArduinoDialog = React.createClass({
+  mixins: [ReactMeteorData],
+  getInitialState(){
+    return {
+      selectedMachine: "",
+      configuring: false
+    };
+  },
+  getMeteorData(){
+    Meteor.subscribe("machines");
+    return {
+      machines: Machines.find({}).fetch()
+    }
+  },
+  close(){
+    this.props.close();
+  },
+  configure(){
+    if(this.state.selectedMachine == ""){
+      alert("Please select a machine");
+      return;
+    }
+
+    let self = this;
+    this.setState({ configuring: true });
+    Meteor.call("configureArduino", this.props.port, this.state.selectedMachine);
+    Meteor.setTimeout(function(){
+      self.setState({ configuring: false });
+      self.close();
+    }, 10000);
+  },
+  selectedMachineChanged(e, idx, value){
+    this.setState({ selectedMachine: value });
+  },
+  render(){
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        disable={this.state.configuring}
+        onClick={this.close}
+        />,
+      <FlatButton
+        label="Configure"
+        primary={true}
+        disable={this.state.configuring}
+        onClick={this.configure}
+        />
+    ];
+
+    return <Dialog
+      title={"Configure Arduino at port "+this.props.port}
+      onRequestClose={this.props.close}
+      actions={actions}
+      autoDetectWindowHeight={false}
+      open={this.props.open}
+      >
+      { this.state.configuring ?
+        <div style={styles.arduinoConfiguration.CircularProgressContainer}>
+          <CircularProgress size={2}/>
+        </div>
+        :
+        <SelectField value={this.state.selectedMachine}
+           onChange={this.selectedMachineChanged}
+           floatingLabelText="Configure for machine" >
+          { this.data.machines.map(function(machine){
+            return <MenuItem value={machine.machineId} primaryText={machine.machineId} />
+          })}
+        </SelectField> }
+    </Dialog>;
+  }
+});
+
 export default ConfigurationPage = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
     return {
-      openForm: false
+      openForm: false,
+      openConfigureArduino: false,
+      selectedPort: ""
     }
   },
   getMeteorData(){
     return {
+      serialList: SerialList.get(),
       serverConfiguration: ServerConfiguration.get()
     }
   },
@@ -120,19 +219,41 @@ export default ConfigurationPage = React.createClass({
   closeForm(){
     this.setState({ openForm: false });
   },
+  openConfigureArduino(){
+    this.setState({ openConfigureArduino: true });
+  },
+  closeConfigureArduino(){
+    this.setState({ openConfigureArduino: false });
+  },
   render() {
+    let self = this;
     return <AppCanvas>
         <SideNavPage ref="navPage">
           <div>
             <AppBar title="Configuration" onLeftIconButtonTouchTap={this.toggleNav}/>
-            <List>
-              <ListItem primaryText="Wifi SSID" secondaryText={ this.data.serverConfiguration.wifiSSID } />
-              <ListItem primaryText="Wifi Passphrase" secondaryText={ this.data.serverConfiguration.wifiPassphrase } />
-              <ListItem primaryText="Server Host" secondaryText={ this.data.serverConfiguration.serverHost } />
-              <ListItem primaryText="Server Port" secondaryText={ this.data.serverConfiguration.serverPort } />
-              <ListItem primaryText="TCP Connect Delay" secondaryText={ this.data.serverConfiguration.tcpConnectDelay } />
-            </List>
-            <RaisedButton label="Edit" onTouchTap={this.openForm} />
+            <Tabs>
+              <Tab label="Server Configuration">
+                <List>
+                  <ListItem primaryText="Wifi SSID" secondaryText={ this.data.serverConfiguration.wifiSSID } />
+                  <ListItem primaryText="Wifi Passphrase" secondaryText={ this.data.serverConfiguration.wifiPassphrase } />
+                  <ListItem primaryText="Server Host" secondaryText={ this.data.serverConfiguration.serverHost } />
+                  <ListItem primaryText="Server Port" secondaryText={ this.data.serverConfiguration.serverPort } />
+                  <ListItem primaryText="TCP Connect Delay" secondaryText={ this.data.serverConfiguration.tcpConnectDelay } />
+                </List>
+                <RaisedButton label="Edit" onTouchTap={this.openForm} />
+              </Tab>
+              <Tab label="Configure Arduino">
+                <List>
+                  { this.data.serialList.map(function(sl){
+                    function onTouch(){
+                      self.setState({selectedPort: sl.port}, self.openConfigureArduino);
+                    }
+                    return <ListItem primaryText={sl.port} secondaryText={sl.info} onTouchTap={onTouch}/>
+                  }) }
+                </List>
+                <ConfigureArduinoDialog open={this.state.openConfigureArduino} close={this.closeConfigureArduino} port={self.state.selectedPort}/>
+              </Tab>
+            </Tabs>
             <ServerConfigurationForm open={this.state.openForm} close={this.closeForm} />
           </div>
         </SideNavPage>
