@@ -1,6 +1,5 @@
 import React from 'react';
-var MUI = require('material-ui');
-var { AppCanvas,
+import { AppCanvas,
     AppBar,
     Tabs,
     Tab,
@@ -16,7 +15,13 @@ var { AppCanvas,
     FlatButton,
     RaisedButton,
     Paper
-   } = MUI;
+  } from 'material-ui';
+import SideNavPage from '../SideNavPage';
+import { MachineOnlineText } from './common'
+import { EditMachineForm } from './MachineForm'
+import ReadingHistoryChart from './ReadingHistoryChart'
+import moment from 'moment';
+import 'moment-duration-format';
 
 var styles = {
   MachineLoading: {
@@ -35,7 +40,7 @@ var styles = {
   }
 }
 
-MachinePage = React.createClass({
+export default MachinePage = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machineId: React.PropTypes.string

@@ -1,5 +1,7 @@
 import React from 'react';
-var { AppCanvas, AppBar } = require('material-ui');
+import { AppCanvas, AppBar } from 'material-ui';
+import SideNavPage from './SideNavPage';
+import MachineList from './machine/MachineList';
 
 Dashboard = React.createClass({
 
@@ -18,3 +20,5 @@ Dashboard = React.createClass({
       </AppCanvas>;
   }
 });
+
+export default Dashboard;

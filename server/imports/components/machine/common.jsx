@@ -1,3 +1,4 @@
+import React from 'react';
 
 var styles={
   MachineOnlineText: {
@@ -17,4 +18,4 @@ var MachineOnlineText = function(props){
   }
 };
 
-export default MachineOnlineText;
+export { MachineOnlineText };

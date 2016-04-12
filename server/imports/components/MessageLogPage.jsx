@@ -1,6 +1,5 @@
 import React from 'react';
-var MUI = require('material-ui');
-var {
+import {
   AppCanvas,
   AppBar,
   FlatButton,
@@ -10,7 +9,9 @@ var {
   TableRow,
   TableBody,
   TableRowColumn
-} = MUI;
+} from 'material-ui';
+import SideNavPage from './SideNavPage';
+import moment from 'moment';
 
 var styles = {
   AppBar: {
@@ -18,7 +19,7 @@ var styles = {
   }
 }
 
-MessageLogPage = React.createClass({
+export default MessageLogPage = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
     this.limit = new ReactiveVar(50);

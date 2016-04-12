@@ -1,6 +1,6 @@
 import React from 'react';
-var MUI = require('material-ui');
-var { AppCanvas,
+import ReactDOM from 'react-dom';
+import { AppCanvas,
     AppBar,
     Tabs,
     Tab,
@@ -15,7 +15,9 @@ var { AppCanvas,
     ListItem,
     FlatButton,
     RaisedButton
-   } = MUI;
+  } from 'material-ui';
+import d3 from 'd3';
+import moment from 'moment';
 
 var styles = {
   MachineLoading: {
@@ -26,7 +28,7 @@ var styles = {
   }
 }
 
-ReadingHistoryChart = React.createClass({
+export default ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object,

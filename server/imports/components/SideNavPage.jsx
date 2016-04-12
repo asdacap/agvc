@@ -1,8 +1,7 @@
 import React from 'react';
-var MUI = require('material-ui');
-var { LeftNav, MenuItem } = MUI;
+import { LeftNav, MenuItem } from 'material-ui';
 
-SideNavPage = React.createClass({
+var SideNavPage = React.createClass({
   propTypes: {
     children: React.PropTypes.element.isRequired
   },
@@ -32,3 +31,5 @@ SideNavPage = React.createClass({
     );
   }
 });
+
+export default SideNavPage;

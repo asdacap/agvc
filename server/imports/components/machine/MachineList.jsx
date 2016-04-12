@@ -1,8 +1,9 @@
 import React from 'react';
-import MUI from 'material-ui';
 import ContentAdd from 'material-ui/lib/svg-icons/content/add';
+import { CreateMachineForm } from './MachineForm';
+import MachineListItem from './MachineListItem';
 
-var {
+import {
   Dialog,
   Card,
   CardText,
@@ -17,7 +18,7 @@ var {
   TableRowColumn,
   TextField,
   FloatingActionButton
-} = MUI;
+} from 'material-ui';
 
 var styles = {
   AddMachineFloatingButton: {
@@ -30,7 +31,7 @@ var styles = {
   }
 }
 
-MachineList = React.createClass({
+export default MachineList = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
     var openForm = new ReactiveVar(false);

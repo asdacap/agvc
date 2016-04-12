@@ -1,6 +1,5 @@
 import React from 'react';
-
-var {
+import {
   Dialog,
   Card,
   CardText,
@@ -15,7 +14,8 @@ var {
   TableRowColumn,
   TextField,
   FloatingActionButton
-} = require('material-ui');
+} from 'material-ui';
+import { EditMachineForm } from './MachineForm';
 
 var styles = {
   MachineListItem: {
@@ -29,7 +29,7 @@ var styles = {
   }
 };
 
-MachineListItem = React.createClass({
+export default MachineListItem = React.createClass({
   getInitialState(){
     return {
       openForm: false

@@ -21,7 +21,6 @@ fortawesome:fontawesome
 fourseven:scss
 kadira:flow-router
 remcoder:chronos
-momentjs:moment
 
 asdacap:agvc-model
 asdacap:agvc-machine-interface

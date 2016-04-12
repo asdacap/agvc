@@ -1,6 +1,6 @@
 import React from 'react';
 
-var {
+import {
   Dialog,
   Card,
   CardText,
@@ -15,7 +15,7 @@ var {
   TableRowColumn,
   TextField,
   FloatingActionButton
-} = require('material-ui');
+} from 'material-ui';
 
 var MachineFormCommon = {
   onMachineIdChange(e){
@@ -63,7 +63,7 @@ var MachineFormCommon = {
   }
 }
 
-EditMachineForm = React.createClass(_.extend({
+var EditMachineForm = React.createClass(_.extend({
   getInitialState(){
     return {
       machineId: this.props.machine.machineId
@@ -86,7 +86,7 @@ EditMachineForm = React.createClass(_.extend({
   }
 }, MachineFormCommon));
 
-CreateMachineForm = React.createClass(_.extend({
+var CreateMachineForm = React.createClass(_.extend({
   getInitialState(){
     return {
       machineId: ""
@@ -107,3 +107,5 @@ CreateMachineForm = React.createClass(_.extend({
     return "Create Machine";
   }
 }, MachineFormCommon));
+
+export { EditMachineForm, CreateMachineForm };
