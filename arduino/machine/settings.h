@@ -35,6 +35,7 @@
 
   void saveSettings(){
     Serial.println("Saving settings...");
+    Settings.version = MAGIC_VERSION;
     EEPROM.put(0, Settings);
   }
 
