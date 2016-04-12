@@ -22,10 +22,10 @@
   extern String MACHINE_ID;
 
   struct{
-    char wifiSSID[50];
-    char wifiPassphrase[50];
-    char serverHost[20];
-    char machineId[20];
+    char wifiSSID[51];
+    char wifiPassphrase[51];
+    char serverHost[51];
+    char machineId[51];
     int serverPort;
     int tcpConnectDelay;
     int version;
