@@ -2,8 +2,8 @@
 import running from 'is-running';
 import { EventEmitter } from 'events';
 import util from 'util';
-import Machines from '../../models/Machines';
-import MessageLogs from '../../models/MessageLogs';
+import Machines from '../../machine/Machines';
+import MessageLogs from '../../message-log/MessageLogs';
 
 Meteor.setInterval(function(){
   // Every 5000 second, loop through machines whose online from this PID and make sure we are online.

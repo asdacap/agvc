@@ -1,5 +1,5 @@
 import React from 'react';
-import Readings from '../../readings/Readings'
+import Readings from '../reading/Readings'
 
 
 import {

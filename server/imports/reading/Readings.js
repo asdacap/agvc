@@ -1,6 +1,6 @@
 // This file needs to be loaded first
 
-import Machines from '../models/Machines';
+import Machines from '../machine/Machines';
 
 export default Readings = new Mongo.Collection("readings");
 Readings.attachBehaviour("timestampable");

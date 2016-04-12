@@ -16,14 +16,14 @@ import { AppCanvas,
     RaisedButton,
     Paper
   } from 'material-ui';
-import SideNavPage from '../SideNavPage';
+import SideNavPage from '../components/SideNavPage';
 import { MachineOnlineText } from './common'
 import { EditMachineForm } from './MachineForm'
-import ReadingHistoryChart from './ReadingHistoryChart'
+import ReadingHistoryChart from '../reading/ReadingHistoryChart'
 import moment from 'moment';
 import 'moment-duration-format';
-import Machines from '../../models/Machines';
-import MessageLogs from '../../models/Machines';
+import Machines from './Machines';
+import MessageLogs from '../message-log/MessageLogs';
 
 var styles = {
   MachineLoading: {

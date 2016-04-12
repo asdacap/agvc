@@ -1,5 +1,5 @@
-import Readings from './Readings';
-import AGVMachineHandler from '../server/machine-interface/AGVMachineHandler';
+import Readings from '../Readings';
+import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 
 // Hook machine interface to listen for reading update
 if(Meteor.isServer){

@@ -1,7 +1,7 @@
 import '../commonBoot';
-import '../location/server/RFIDReader';
-import { startMachineTCPListener } from './machine-interface/TCPInterface'
-import '../readings/boot';
+import '../location/server/boot';
+import '../reading/server/boot';
+import { startMachineTCPListener } from '../machine-interface/server/TCPInterface'
 
 Meteor.startup(function(){
   startMachineTCPListener();

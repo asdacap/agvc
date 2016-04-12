@@ -1,7 +1,7 @@
 import {mount} from 'react-mounter';
 import Dashboard from './components/Dashboard';
-import MachinePage from './components/machine/MachinePage';
-import MessageLogPage from './components/MessageLogPage';
+import MachinePage from './machine/MachinePage';
+import MessageLogPage from './message-log/MessageLogPage';
 
 FlowRouter.route('/', {
   name: 'dashboard',

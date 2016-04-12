@@ -1,5 +1,6 @@
 
 // File which contain common boot sequence between client and server
 
-import './boot/server-time';
-import './models/Machines';
+import './machine/Machines';
+import './global-state/boot';
+import './reading/Readings';

@@ -10,9 +10,9 @@ import {
   TableBody,
   TableRowColumn
 } from 'material-ui';
-import SideNavPage from './SideNavPage';
+import SideNavPage from '../components/SideNavPage';
 import moment from 'moment';
-import MessageLogs from '../models/MessageLogs';
+import MessageLogs from './MessageLogs';
 
 var styles = {
   AppBar: {

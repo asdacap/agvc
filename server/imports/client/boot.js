@@ -1,6 +1,6 @@
 import '../commonBoot';
 import '../routes';
-import '../readings/Readings';
+import '../reading/Readings';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();

@@ -1,4 +1,4 @@
-import AGVMachineHandler from '../../server/machine-interface/AGVMachineHandler';
+import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 import LocationLogs from '../LocationLogs';
 
 // This file handlers the mapping between RFID string read from the machine

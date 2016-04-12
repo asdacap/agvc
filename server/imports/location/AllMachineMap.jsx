@@ -1,6 +1,6 @@
 import React from 'react';
-import GlobalStates from '../models/GlobalStates';
-import Machines from '../models/Machines';
+import GlobalStates from '../global-state/GlobalStates';
+import Machines from '../machine/Machines';
 import LocationLogs from './LocationLogs';
 import Map from './Map';
 
