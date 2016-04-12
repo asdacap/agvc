@@ -1,6 +1,8 @@
 #include "settings.h"
 #include "wifi_hq/WiFlyHQ.h"
 
+#ifndef CONNECTION_MANAGER
+#define CONNECTION_MANAGER
 // For namespace
 template <class SerialType>
 class ConnectionManager{
@@ -45,3 +47,4 @@ class ConnectionManager{
 };
 
 #include "ConnectionManagerImpl.h"
+#endif

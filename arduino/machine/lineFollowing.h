@@ -16,84 +16,82 @@ int DS_3 = 0;
 int DS_4 = 0;
 int DS_5 = 0;         //initilize variables for sensor reading
 
-int count = 0;    //setting the initial value of count equal to 0
+long lastForward = 0;
+void SmarterForward(int pwm_left,int pwm_right){
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Forward(int pwm_left,int pwm_right){
-  digitalWrite(RightDir, LOW);
-  digitalWrite(LeftDir , LOW);
-  analogWrite (RightEn , pwm_right);   //PWM Speed Control
-  analogWrite (LeftEn  , pwm_left);
+  lastForward = millis();
+  //Serial.print("Forward! ");
+  //Serial.print(pwm_left);
+  //Serial.print(" ");
+  //Serial.println(pwm_right);
+
+  digitalWrite(RightDir, pwm_right > 0 ? LOW : HIGH);
+  digitalWrite(LeftDir , pwm_left > 0 ? LOW : HIGH);
+  analogWrite (RightEn , abs(pwm_right));   //PWM Speed Control
+  analogWrite (LeftEn  , abs(pwm_left));
 }
-void Backward(int pwm_left,int pwm_right){
-  digitalWrite(RightDir, HIGH);
-  digitalWrite(LeftDir , HIGH);
-  analogWrite (RightEn , pwm_right);   //PWM Speed Control
-  analogWrite (LeftEn  , pwm_left);        //control speed motor
-}
-void right(int pwm_left,int pwm_right){
-  digitalWrite(RightDir, HIGH);
-  digitalWrite(LeftDir , LOW);
-  analogWrite (RightEn , pwm_right);   //PWM Speed Control
-  analogWrite (LeftEn  , pwm_left);
-}
-void left(int pwm_left,int pwm_right){
-  digitalWrite(RightDir, LOW);
-  digitalWrite(LeftDir , HIGH);
-  analogWrite (RightEn , pwm_right);   //PWM Speed Control
-  analogWrite (LeftEn  , pwm_left);
-}
-void stopp()
-{
-  digitalWrite(RightDir, LOW);
-  digitalWrite(LeftDir , LOW);
-  analogWrite (RightEn , 0);   //PWM Speed Control
-  analogWrite (LeftEn  , 0);
-}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void followline(){
 
+  // Modified to always go forward
+  int RIGHT_OFFSET = 40;
+  int LEFT_OFFSET = 0;
+
+  int S0 = -100;
+  int S1 = -50;
+  int S2 = 0;
+  int S3 = 50;
+  int S4 = 100;
+
   if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
-    left (100, 100);
+    SmarterForward(S0+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){  // 1  1  0  0  0
-    left (100, 110);
+    SmarterForward(S1+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 0&& DS_4 == 0 && DS_5 == 0){  // 0  1  0  0  0
-    Forward (125, 160);
+    SmarterForward(S2+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  1  1  0  0
-    Forward (125, 165);
+    SmarterForward(S3+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  0  1  0  0
-    Forward (145, 120);
+    SmarterForward(S4+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 1 && DS_5 == 0){  // 0  0  1  1  0
-    Forward (140, 150);
+    SmarterForward(S4+LEFT_OFFSET, S3+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 0){  // 0  0  0  1  0
-    Forward (135, 150);
+    SmarterForward(S4+LEFT_OFFSET, S2+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 ==0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 1){  // 0  0  0  1  1
-    right (100, 100);
+    SmarterForward(S4+LEFT_OFFSET, S1+RIGHT_OFFSET);
   }
 
   else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 1){  // 0  0  0  0  1
-    right (100, 100);
+    SmarterForward(S4+LEFT_OFFSET, S0+RIGHT_OFFSET);
   }
   else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 1 && DS_4 == 1 && DS_5 == 1){  // 1  1  1  1  1
-    Forward (145, 120);
+    SmarterForward(S4+LEFT_OFFSET, S4+RIGHT_OFFSET);
   }
   else
   {
-    Serial.print("No combination found");
+    static long lastC;
+    if(millis() - lastForward > 1000){
+      long newC = millis()/1000;
+      if(newC!=lastC){
+        Serial.println("Stopping due to out of circuit");
+      }
+      stopp();
+    }
   }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

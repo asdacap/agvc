@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <MFRC522.h>
+#include "ConnectionManager.h"
 
 #define RST_PIN         40          // Configurable, see typical pin layout above
 #define SS_PIN          53         // Configurable, see typical pin layout above
@@ -11,11 +12,21 @@ void rfidSetup() {
   while (!Serial);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
   SPI.begin();			// Init SPI bus
   mfrc522.PCD_Init();		// Init MFRC522
-  mfrc522.PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
-  Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
 
-void rfidLoop() {
+/**
+ * Helper routine to dump a byte array as hex values to a String.
+ */
+String byteHexToString(byte *buffer, byte bufferSize) {
+  String str="";
+  for (byte i = 0; i < bufferSize; i++) {
+    str.concat(String(buffer[i] < 0x10 ? " 0" : " "));
+    str.concat(String(buffer[i], HEX));
+  }
+  return str;
+}
+
+void rfidLoop(ConnectionManager<HardwareSerial> &cManager) {
   // Look for new cards
   if ( ! mfrc522.PICC_IsNewCardPresent()) {
     return;
@@ -26,6 +37,11 @@ void rfidLoop() {
     return;
   }
 
-  // Dump debug info about the card; PICC_HaltA() is automatically called
-  mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+  Serial.println("RFID detected");
+  String rfid = String(byteHexToString(mfrc522.uid.uidByte, mfrc522.uid.size));
+  String it = "rfid:"+rfid;
+
+  // Print and send the data to server
+  Serial.println(it);
+  cManager.sendData(it);
 }
