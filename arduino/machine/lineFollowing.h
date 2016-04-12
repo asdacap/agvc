@@ -90,7 +90,7 @@ void followline(){
       if(newC!=lastC){
         Serial.println("Stopping due to out of circuit");
       }
-      stopp();
+      SmarterForward(0,0);
     }
   }
 }
@@ -107,8 +107,6 @@ void lineSetup()
   pinMode(pin_3 , INPUT);
   pinMode(pin_4 , INPUT);
   pinMode(pin_5 , INPUT);         //declare pins as INPUT for sensors
-
-  Forward(100,100);
 }
 
 void lineLoop()
