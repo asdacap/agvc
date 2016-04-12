@@ -27,8 +27,8 @@ void setup() {
   cManager.setup(&wifiSerial);
   Serial.println(F("Setup done"));
 
-  rfidSetup();
-  lineSetup();
+  RFID::setup();
+  LineFollowing::setup();
 }
 
 int mCount = 0;
@@ -45,6 +45,6 @@ void loop() {
   // Blinking. Useful to detect hangs
   digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
 
-  rfidLoop(cManager);
-  lineLoop();
+  RFID::loop(cManager);
+  LineFollowing::loop();
 }
