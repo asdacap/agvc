@@ -23,6 +23,7 @@ class ConnectionManager{
     void loopTCPConnectivityCheck();
     void onTCPConnected();
     void listenReceive();
+    void registerMachine();
     void loop();
     void slowLoop();
     void sendData(String data){

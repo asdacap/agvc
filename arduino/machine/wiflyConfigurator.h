@@ -26,13 +26,13 @@ void configureWifly(T &wifiSerial){
   sendAndPrintResult("set sys sleep 0", wifiSerial);
   sendAndPrintResult("set comm idle 0", wifiSerial);
   sendAndPrintResult("set ip dhcp 1", wifiSerial);
-  sendAndPrintResult("set wlan ssid " + WIFI_SSID, wifiSerial);
-  sendAndPrintResult("set wlan phrase " + WIFI_PASSPHRASE, wifiSerial);
+  sendAndPrintResult("set wlan ssid " + String(Settings.wifiSSID), wifiSerial);
+  sendAndPrintResult("set wlan phrase " + String(Settings.wifiPassphrase), wifiSerial);
   sendAndPrintResult("set wlan auth 4", wifiSerial);
   sendAndPrintResult("set wlan join 1", wifiSerial);
-  sendAndPrintResult("set ip host " + SERVER_IP, wifiSerial);
-  sendAndPrintResult("set ip remote " + SERVER_PORT, wifiSerial);
-  sendAndPrintResult("set sys autoconn "+TCP_CONNECT_DELAY, wifiSerial);
+  sendAndPrintResult("set ip host " + String(Settings.serverIp), wifiSerial);
+  sendAndPrintResult("set ip remote " + String(Settings.serverPort), wifiSerial);
+  sendAndPrintResult("set sys autoconn "+ String(Settings.tcpConnectDelay), wifiSerial);
   sendAndPrintResult("save", wifiSerial);
   sendAndPrintResult("exit", wifiSerial);
 

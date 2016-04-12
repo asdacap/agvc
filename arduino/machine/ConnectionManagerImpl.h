@@ -32,12 +32,17 @@ void ConnectionManager<SerialType>::listenReceive(){
       Serial.print(F("Receive data: "));
       Serial.println(data);
       if(data == F("identify") ){
-        Serial.println(F("Sending registration..."));
-        wifly.print(F("machineId:"));
-        wifly.println(MACHINE_ID);
+        registerMachine();
       }
     }
   }
+}
+
+template <class SerialType>
+void ConnectionManager<SerialType>::registerMachine(){
+  Serial.println(F("Sending registration..."));
+  wifly.print(F("machineId:"));
+  wifly.println(Settings.machineId);
 }
 
 template <class SerialType>

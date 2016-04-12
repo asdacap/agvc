@@ -10,6 +10,7 @@ ConnectionManager<HardwareSerial> cManager;
 void setup() {
   Serial.begin(9600);
   Serial.println(F("Setting up..."));
+  loadSettings();
   // Just in case
   for(int i=0; i<14; i++){
     pinMode(i, INPUT);
@@ -19,8 +20,6 @@ void setup() {
   pinMode(LED3, OUTPUT);
   pinMode(LED4, OUTPUT);
   pinMode(BUTTON, INPUT_PULLUP);
-  pinMode(CONNECT_INPUT, INPUT);
-  digitalWrite(CONNECT_INPUT, LOW);
 
   configureWifly(wifiSerial);
 
@@ -33,18 +32,18 @@ void setup() {
 
 int mCount = 0;
 void loop() {
+  // Blinking. Useful to detect hangs
+  digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
+
   // A debug for checking if it is looping
-  int nmCount = millis()/1000;
+  int nmCount = millis()/5000;
   if(nmCount != mCount){
     Serial.println(F("Looping"));
     mCount = nmCount;
   }
 
   cManager.loop();
-
-  // Blinking. Useful to detect hangs
-  digitalWrite(LED, (millis()/50)%2 ? HIGH : LOW);
-
   RFID::loop(cManager);
   LineFollowing::loop();
+  loopCommand();
 }
