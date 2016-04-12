@@ -22,12 +22,8 @@ fourseven:scss
 kadira:flow-router
 remcoder:chronos
 
-asdacap:agvc-model
-asdacap:agvc-machine-interface
-asdacap:agvc-reading
-asdacap:agvc-location
-asdacap:agvc-global-state
-
 underscore
 kadira:dochead
 react-meteor-data
+aldeed:collection2
+zimme:collection-timestampable

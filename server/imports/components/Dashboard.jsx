@@ -2,6 +2,7 @@ import React from 'react';
 import { AppCanvas, AppBar } from 'material-ui';
 import SideNavPage from './SideNavPage';
 import MachineList from './machine/MachineList';
+import AllMachineMap from '../location/AllMachineMap';
 
 Dashboard = React.createClass({
 

@@ -1,5 +1,5 @@
 
-MessageLogs = new Mongo.Collection("messages");
+var MessageLogs = new Mongo.Collection("messages");
 MessageLogs.attachBehaviour("timestampable");
 
 var MessageLogSchema = new SimpleSchema({
@@ -43,3 +43,5 @@ if(Meteor.isServer){
     return MessageLogs.find({ fromMachineId: machineId }, { limit, sort: { createdAt: -1 } });
   });
 }
+
+export default MessageLogs;

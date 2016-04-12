@@ -1,3 +1,4 @@
+import GlobalStates from '../models/GlobalStates'
 
 // Needed to syncronize time on client and server
 

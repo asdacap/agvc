@@ -1,5 +1,6 @@
 
-var websocket = Npm.require('websocket-driver');
+import AGVMachineHandler from './AGVMachineHandler'
+import websocket from 'websocket-driver';
 
 var ROBOT_WEBSOCKET_PATH = '/machine_websocket'
 
@@ -50,3 +51,5 @@ _.extend(WebSocketConnectionHandler.prototype, {
     this.driver.write(message);
   }
 });
+
+export { startMachineWebSocketListener };

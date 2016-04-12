@@ -1,6 +1,11 @@
+import React from 'react';
+import GlobalStates from '../models/GlobalStates';
+import Machines from '../models/Machines';
+import LocationLogs from './LocationLogs';
+import Map from './Map';
 
 // Draw the map along with all the machines
-AllMachineMap = React.createClass({
+export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     var handle = Meteor.subscribe("machines");

@@ -12,6 +12,7 @@ import {
 } from 'material-ui';
 import SideNavPage from './SideNavPage';
 import moment from 'moment';
+import MessageLogs from '../models/MessageLogs';
 
 var styles = {
   AppBar: {

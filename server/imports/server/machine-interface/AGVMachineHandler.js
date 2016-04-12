@@ -1,7 +1,9 @@
-// Write your package code here!
-var running = Npm.require('is-running');
-var EventEmitter = Npm.require('events').EventEmitter;
-var util = Npm.require('util');
+
+import running from 'is-running';
+import { EventEmitter } from 'events';
+import util from 'util';
+import Machines from '../../models/Machines';
+import MessageLogs from '../../models/MessageLogs';
 
 Meteor.setInterval(function(){
   // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
@@ -29,7 +31,7 @@ var machinesConnection = {};
 var eventRegistrations = [];
 
 // Handle ,achine messagings and online presence
-AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
+var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   constructor(driver){
     super();
     bindAllFunction(this);
@@ -138,3 +140,5 @@ function bindAllFunction(obj){
   });
   return obj;
 };
+
+export default AGVMachineHandler;

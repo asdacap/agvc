@@ -1,3 +1,5 @@
+import AGVMachineHandler from '../../server/machine-interface/AGVMachineHandler';
+import LocationLogs from '../LocationLogs';
 
 // This file handlers the mapping between RFID string read from the machine
 // into a location log. It also handle the rudimentary scheduling, ie predicting

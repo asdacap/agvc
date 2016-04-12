@@ -1,4 +1,7 @@
 import React from 'react';
+import Readings from '../../readings/Readings'
+
+
 import {
   Dialog,
   Card,

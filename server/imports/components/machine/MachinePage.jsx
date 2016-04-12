@@ -22,6 +22,8 @@ import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from './ReadingHistoryChart'
 import moment from 'moment';
 import 'moment-duration-format';
+import Machines from '../../models/Machines';
+import MessageLogs from '../../models/Machines';
 
 var styles = {
   MachineLoading: {
@@ -108,8 +110,12 @@ var MachineStatusTab = React.createClass({
   render(){
     var self = this;
     var listItems = Readings.availableReadings.map(function(reading){
+      var secondaryText = "";
+      if(self.props.machine[reading] !== undefined){
+        secondaryText = self.props.machine[reading].toString();
+      }
       return <ListItem
-          primaryText={Readings.readingTitle[reading]} secondaryText={self.props.machine[reading].toString()} />;
+          primaryText={Readings.readingTitle[reading]} secondaryText={secondaryText} />;
     });
 
     return <div>

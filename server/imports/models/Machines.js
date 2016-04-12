@@ -1,5 +1,5 @@
 
-Machines = new Mongo.Collection("machines");
+var Machines = new Mongo.Collection("machines");
 Machines.attachBehaviour("timestampable");
 
 var MachineCommandSchema = new SimpleSchema({
@@ -41,7 +41,7 @@ var MachineSchema = {
   }
 };
 
-MachineSchema = new SimpleSchema(MachineSchema);
+var MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
 Machines.defaultValue = {
@@ -57,7 +57,7 @@ Meteor.methods({
     Machines.remove({machineId: machineId});
   },
   editMachine(machine){
-    setDefaultValue(machine);
+    _.extend(machine, Machines.defaultValue);
     Machines.update(machine._id, { $set: machine } );
   },
   sendCommand(machineId, command, droppable){
@@ -109,3 +109,5 @@ _.extend(Machines, {
     });
   }
 });
+
+export default Machines;

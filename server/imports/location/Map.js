@@ -2,7 +2,7 @@
 // This map represent how to transfer the location representation to visual cuues
 // on the screen. Point is represented by a coordinate. Path is represented by
 // SVG path description
-Map = {
+export default Map = {
   points: [{
     id: "point_1",
     visualX: 0,

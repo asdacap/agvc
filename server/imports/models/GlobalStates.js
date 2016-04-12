@@ -11,3 +11,5 @@ if(Meteor.isServer){
 if(Meteor.isClient){
   Meteor.subscribe('global_states'); // Subscribe to everything
 }
+
+export default GlobalStates;

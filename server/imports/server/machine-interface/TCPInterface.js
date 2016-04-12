@@ -1,8 +1,7 @@
 
-// Plans for TCP is scrapped in favour of websocket
-
-var net = Npm.require('net');
-var split = Npm.require('split');
+import net from 'net';
+import split from 'split';
+import AGVMachineHandler from './AGVMachineHandler'
 
 // Handle listening to port
 var TCPListener = function(){
@@ -59,3 +58,5 @@ startMachineTCPListener = function(){
   var listener = new TCPListener();
   listener.start();
 }
+
+export { startMachineTCPListener, TCPListener };

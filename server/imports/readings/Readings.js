@@ -1,6 +1,8 @@
 // This file needs to be loaded first
 
-Readings = new Mongo.Collection("readings");
+import Machines from '../models/Machines';
+
+export default Readings = new Mongo.Collection("readings");
 Readings.attachBehaviour("timestampable");
 
 var ReadingSchema = new SimpleSchema({
@@ -77,18 +79,4 @@ Machines.setReading = function(machineId, reading, value){
   toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )
   Readings.insert({ machineId: machineId, type: reading, reading: value })
-}
-
-// Hook machine interface to listen for reading update
-if(Meteor.isServer){
-  Readings.availableReadings.forEach(function(reading){
-    function callback(value, machineObj){
-      if(machineObj === undefined) return;
-      Machines.setReading(machineObj.machineId, reading, value);
-    }
-    AGVMachineHandler.registerEventHandler({
-      event: "key:"+reading,
-      callback: callback
-    });
-  });
 }

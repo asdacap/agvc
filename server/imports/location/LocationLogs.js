@@ -1,5 +1,5 @@
 
-LocationLogs = new Mongo.Collection("locations");
+export default LocationLogs = new Mongo.Collection("locations");
 LocationLogs.attachBehaviour('timestampable');
 
 var LocationLogSchema = {
