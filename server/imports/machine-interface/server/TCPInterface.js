@@ -36,6 +36,9 @@ var SocketHandler = function(socket){
 }
 
 _.extend(SocketHandler.prototype, {
+  close(){
+    this.socket.close();
+  },
   onError(){
     console.log("connection error");
   },

@@ -21,9 +21,6 @@ void ConnectionManager<SerialType>::loopTCPConnectivityCheck(){
 
 template <class SerialType>
 void ConnectionManager<SerialType>::onTCPConnected(){
-  Serial.println(F("Sending registration..."));
-  wifly.print(F("machineId:"));
-  wifly.println(MACHINE_ID);
 }
 
 template <class SerialType>
@@ -34,6 +31,11 @@ void ConnectionManager<SerialType>::listenReceive(){
     if (data.length() > 0) {
       Serial.print(F("Receive data: "));
       Serial.println(data);
+      if(data == F("identify") ){
+        Serial.println(F("Sending registration..."));
+        wifly.print(F("machineId:"));
+        wifly.println(MACHINE_ID);
+      }
     }
   }
 }

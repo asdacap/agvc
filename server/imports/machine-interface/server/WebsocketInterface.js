@@ -47,6 +47,9 @@ _.extend(WebSocketConnectionHandler.prototype, {
   getName(){
     return 'websocket';
   },
+  close(){
+    this.socket.close();
+  },
   sendMessage(message){
     this.driver.write(message);
   }

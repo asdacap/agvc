@@ -40,6 +40,9 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.queueHandler = undefined;
 
     this.bindRegisteredEvent();
+    this.incomingQueue = [];
+
+    this.driver.sendMessage("identify");
   }
 
   bindRegisteredEvent(){
@@ -63,10 +66,28 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       MessageLogs.insert({ text: data, fromMachineId: this.machineObj.machineId });
     }
 
-    var keyValueMatch = data.match(/([^:]+):([^:]+)/);
-    if(keyValueMatch !== null){
+    if(this.machineObj === undefined){
+      var keyValueMatch = data.match(/([^:]+):([^:]+)/);
+      if(keyValueMatch !== null && keyValueMatch[1] == "machineId"){ // Its a registration
         this.onKeyValueMatch(keyValueMatch[1], keyValueMatch[2]);
+
+        if(this.machineObj !== undefined){
+          this.incomingQueue.forEach(dat => this.onData(dat));
+          this.incomingQueue = [];
+        }else{
+          this.incomingQueue.push(data);
+        }
+      }else{
+        this.incomingQueue.push(data);
+        this.driver.sendMessage("indentify"); // Please tell me who are you...
+      }
+    }else{
+      var keyValueMatch = data.match(/([^:]+):([^:]+)/);
+      if(keyValueMatch !== null){
+        this.onKeyValueMatch(keyValueMatch[1], keyValueMatch[2]);
+      }
     }
+
   }
 
   onKeyValueMatch(key, value){
@@ -81,27 +102,27 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
       console.warn("Connection still exist for machineId "+machineId);
+      console.warn("Will close and replace");
+      machinesConnection[machineId].driver.close();
+    }
+
+    this.machineObj = Machines.findOne({ machineId: machineId });
+    if(this.machineObj === undefined){
+      console.warn("Failed to find machine with id "+machineId);
       return;
     }
-    if(machinesConnection[machineId] === undefined){
-      this.machineObj = Machines.findOne({ machineId: machineId });
-      if(this.machineObj === undefined){
-        console.warn("Failed to find machine with id "+machineId);
-        return;
-      }
 
-      console.log("Registering connection for machine "+machineId);
-      machinesConnection[machineId] = this;
+    console.log("Registering connection for machine "+machineId);
+    machinesConnection[machineId] = this;
 
-      Machines.markOnline(this.machineObj._id);
+    Machines.markOnline(this.machineObj._id);
 
-      this.queueHandler = Machines.find({ machineId: machineId }).observe({
-        changed: this.onMachineChanged
-      });
+    this.queueHandler = Machines.find({ machineId: machineId }).observe({
+      changed: this.onMachineChanged
+    });
 
-      // Send previous command.
-      this.onMachineChanged(this.machineObj);
-    }
+    // Send previous command.
+    this.onMachineChanged(this.machineObj);
   }
 
   onMachineChanged(newDocument, oldDocument){
