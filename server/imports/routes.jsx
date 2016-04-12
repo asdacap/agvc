@@ -2,6 +2,7 @@ import {mount} from 'react-mounter';
 import Dashboard from './components/Dashboard';
 import MachinePage from './machine/MachinePage';
 import MessageLogPage from './message-log/MessageLogPage';
+import ConfigurationPage from './server-configuration/ConfigurationPage';
 
 FlowRouter.route('/', {
   name: 'dashboard',
@@ -21,6 +22,13 @@ FlowRouter.route('/message_logs', {
   name: 'message_logs',
   action: function(params, queryParams) {
     mount(MessageLogPage);
+  }
+});
+
+FlowRouter.route('/configurations', {
+  name: 'configurations',
+  action: function(params, queryParams) {
+    mount(ConfigurationPage);
   }
 });
 

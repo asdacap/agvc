@@ -4,3 +4,4 @@
 import './machine/Machines';
 import './global-state/boot';
 import './reading/Readings';
+import './server-configuration/boot';

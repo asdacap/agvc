@@ -25,6 +25,7 @@ var SideNavPage = React.createClass({
           open={this.state.open}>
           <MenuItem onTouchTap={ _ => FlowRouter.go("dashboard") }>Dashboard</MenuItem>
           <MenuItem onTouchTap={ _ => FlowRouter.go("message_logs") }>Message Logs</MenuItem>
+          <MenuItem onTouchTap={ _ => FlowRouter.go("configurations") }>Configurations</MenuItem>
         </LeftNav>
         {React.cloneElement(this.props.children, { toggleNav: this.toggleNav })}
       </div>
