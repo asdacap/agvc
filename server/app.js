@@ -1,11 +1,9 @@
 // Place where initial stuff lives
 
-import injectTapEventPlugin from 'react-tap-event-plugin';
-injectTapEventPlugin();
+if(Meteor.isClient){
+  require('/imports/client/boot');
+}
 
 if(Meteor.isServer){
-  Meteor.startup(function(){
-    startMachineTCPListener();
-    startMachineWebSocketListener();
-  });
+  require('/imports/server/boot');
 }
