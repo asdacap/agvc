@@ -24,7 +24,7 @@
   struct{
     char wifiSSID[50];
     char wifiPassphrase[50];
-    char serverIp[20];
+    char serverHost[20];
     char machineId[20];
     int serverPort;
     int tcpConnectDelay;
@@ -45,7 +45,7 @@
       Serial.println("Invalid settings found. Setting default.");
       strcpy(Settings.wifiSSID, "localhost.localdomain");
       strcpy(Settings.wifiPassphrase, "hgMTc01e");
-      strcpy(Settings.serverIp, "10.42.0.2");
+      strcpy(Settings.serverHost, "10.42.0.2");
       strcpy(Settings.machineId, "ABC");
       Settings.serverPort = 10000;
       Settings.tcpConnectDelay = 5;
@@ -66,7 +66,7 @@
       Serial.println(F("Dumping configuration.."));
       Serial.println(String(F("wifiSSID:")) + String(Settings.wifiSSID));
       Serial.println(String(F("wifiPassphrase:")) + String(Settings.wifiPassphrase));
-      Serial.println(String(F("serverIp:")) + String(Settings.serverIp));
+      Serial.println(String(F("serverHost:")) + String(Settings.serverHost));
       Serial.println(String(F("serverPort:")) + String(Settings.serverPort));
       Serial.println(String(F("tcpConnectDelay:")) + String(Settings.tcpConnectDelay));
       Serial.println(String(F("machineId:")) + String(Settings.machineId));
@@ -79,9 +79,9 @@
       String value = command.substring(15);
       strcpy(Settings.wifiPassphrase, value.c_str());
       Serial.println(F("ack"));
-    }else if(command.startsWith(F("serverIp:"))){
+    }else if(command.startsWith(F("serverHost:"))){
       String value = command.substring(9);
-      strcpy(Settings.serverIp, value.c_str());
+      strcpy(Settings.serverHost, value.c_str());
       Serial.println(F("ack"));
     }else if(command.startsWith(F("machineId:"))){
       String value = command.substring(10);

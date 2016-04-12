@@ -30,7 +30,7 @@ void configureWifly(T &wifiSerial){
   sendAndPrintResult("set wlan phrase " + String(Settings.wifiPassphrase), wifiSerial);
   sendAndPrintResult("set wlan auth 4", wifiSerial);
   sendAndPrintResult("set wlan join 1", wifiSerial);
-  sendAndPrintResult("set ip host " + String(Settings.serverIp), wifiSerial);
+  sendAndPrintResult("set ip host " + String(Settings.serverHost), wifiSerial);
   sendAndPrintResult("set ip remote " + String(Settings.serverPort), wifiSerial);
   sendAndPrintResult("set sys autoconn "+ String(Settings.tcpConnectDelay), wifiSerial);
   sendAndPrintResult("save", wifiSerial);
