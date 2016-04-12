@@ -1,3 +1,6 @@
+import React from 'react';
+import MUI from 'material-ui';
+import ContentAdd from 'material-ui/lib/svg-icons/content/add';
 
 var {
   Dialog,
@@ -15,8 +18,6 @@ var {
   TextField,
   FloatingActionButton
 } = MUI;
-
-var ContentAdd = MUI.Libs.SvgIcons.ContentAdd;
 
 var styles = {
   AddMachineFloatingButton: {

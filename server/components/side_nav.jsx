@@ -1,3 +1,5 @@
+import React from 'react';
+var MUI = require('material-ui');
 var { LeftNav, MenuItem } = MUI;
 
 SideNavPage = React.createClass({

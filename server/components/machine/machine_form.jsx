@@ -1,3 +1,5 @@
+import React from 'react';
+
 var {
   Dialog,
   Card,
@@ -13,7 +15,7 @@ var {
   TableRowColumn,
   TextField,
   FloatingActionButton
-} = MUI;
+} = require('material-ui');
 
 var MachineFormCommon = {
   onMachineIdChange(e){

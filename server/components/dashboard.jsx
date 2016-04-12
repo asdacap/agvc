@@ -1,4 +1,5 @@
-var { AppCanvas, AppBar } = MUI;
+import React from 'react';
+var { AppCanvas, AppBar } = require('material-ui');
 
 Dashboard = React.createClass({
 

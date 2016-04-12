@@ -1,22 +1,23 @@
+import {mount} from 'react-mounter';
 
 FlowRouter.route('/', {
   name: 'dashboard',
   action: function(params, queryParams) {
-    ReactLayout.render(Dashboard, params);
+    mount(Dashboard, params);
   }
 });
 
 FlowRouter.route('/machine/:machineId', {
   name: 'machine',
   action: function(params, queryParams) {
-    ReactLayout.render(MachinePage, params);
+    mount(MachinePage, params);
   }
 });
 
 FlowRouter.route('/message_logs', {
   name: 'message_logs',
   action: function(params, queryParams) {
-    ReactLayout.render(MessageLogPage);
+    mount(MessageLogPage);
   }
 });
 
