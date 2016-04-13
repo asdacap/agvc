@@ -58,12 +58,12 @@ namespace ConnectionManager{
   // Run each loop to check tcp connectivity stuff.
   void loopTCPConnectivityCheck(){
     if(!wasConnected && connected()){
-      onTCPConnected();
+      // Handled when registered instead of here
+    }
+    if(wasConnected && !connected()){
+      GlobalListener::onDisconnect();
     }
     wasConnected = connected();
-  }
-
-  void onTCPConnected(){
   }
 
   void listenReceive(){
@@ -76,6 +76,7 @@ namespace ConnectionManager{
         if(data == F("identify") ){
           registerMachine();
         }
+        GlobalListener::onData(data);
       }
     }
   }
@@ -90,13 +91,6 @@ namespace ConnectionManager{
   void loop(){
     loopTCPConnectivityCheck();
     listenReceive();
-    digitalWrite(LED2, ledON ? HIGH : LOW);
-
-    static int mCount = 0;
-    int nmCount = millis()/1000;
-    if(mCount != nmCount){
-      mCount = nmCount;
-    }
   }
 }
 

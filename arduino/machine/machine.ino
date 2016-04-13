@@ -57,4 +57,10 @@ namespace GlobalListener{
   void onConnect(){
     States::onConnect();
   }
+  void onDisconnect(){
+    // Nothing yet
+  }
+  void onData(String s){
+    // Nothing yet
+  }
 }

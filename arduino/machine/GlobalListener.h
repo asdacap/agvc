@@ -7,6 +7,8 @@
 // to delegate to other module
 namespace GlobalListener{
   void onConnect();
+  void onDisconnect();
+  void onData(String s);
 }
 
 #endif
