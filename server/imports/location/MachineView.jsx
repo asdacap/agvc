@@ -90,9 +90,7 @@ export default MachineView = React.createClass({
   render(){
 
     if(this.data.locationLog === undefined){
-      return <g>
-        <text fontFamily="Arial" fontSize="30" y="15" stroke="red" textAnchor="middle">{this.props.machine.machineId + "no position"}</text>
-      </g>; // Nothing
+      return <g></g>; // Nothing
     }
 
     var point = this.getLocationPoint();
