@@ -92,7 +92,7 @@
       Settings.serverPort = command.substring(11).toInt();
       Serial.println(F("ack"));
     }else if(command.startsWith(F("tcpConnectDelay:"))){
-      Settings.tcpConnectDelay = command.substring(15).toInt();
+      Settings.tcpConnectDelay = command.substring(16).toInt();
       Serial.println(F("ack"));
     }else{
       Serial.println(String(F("Unknown command "))+command);
