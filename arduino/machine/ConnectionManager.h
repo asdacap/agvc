@@ -97,7 +97,7 @@ namespace ConnectionManager{
     int newCounter = millis()/5000;
     if(newCounter != oldCounter){
       oldCounter = newCounter;
-      sendData("ping");
+      sendData("p");
     }
   }
 }

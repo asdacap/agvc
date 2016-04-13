@@ -46,7 +46,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   onData(data){
     this.dataSeq = this.dataSeq+1;
     this.checkDataSequenceTimeout(this.dataSeq);
-    if(data == "ping") return;
+    if(data == "p") return;
     console.log("Got data "+data);
 
     if(data == "") return;
