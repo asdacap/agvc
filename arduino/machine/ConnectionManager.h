@@ -58,7 +58,7 @@ namespace ConnectionManager{
   // Run each loop to check tcp connectivity stuff.
   void loopTCPConnectivityCheck(){
     if(!wasConnected && connected()){
-      // Handled when registered instead of here
+      registerMachine();
     }
     if(wasConnected && !connected()){
       GlobalListener::onDisconnect();
@@ -91,6 +91,14 @@ namespace ConnectionManager{
   void loop(){
     loopTCPConnectivityCheck();
     listenReceive();
+
+    // Make sure the connection does not time out
+    static int oldCounter;
+    int newCounter = millis()/5000;
+    if(newCounter != oldCounter){
+      oldCounter = newCounter;
+      sendData("ping");
+    }
   }
 }
 

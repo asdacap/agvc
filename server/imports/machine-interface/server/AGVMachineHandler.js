@@ -5,21 +5,6 @@ import util from 'util';
 import Machines from '../../machine/Machines';
 import MessageLogs from '../../message-log/MessageLogs';
 
-Meteor.setInterval(function(){
-  // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
-  // Also cleanup machine whose pid is not running.
-  // This assume the server cluster is on the same server.
-  Machines.find({ online: true }).fetch().forEach(function(machine){
-    if(!running(machine.onlineOnServer)){
-      console.log("Cleanup not running pid "+machine.machineId);
-      Machines.markOffline(machine._id);
-    }else if(process.pid == machine.onlineOnServer && machinesConnection[machine.machineId] === undefined){
-      console.log("Cleanup machinesConnection "+machine.machineId);
-      Machines.markOffline(machine._id);
-    }
-  });
-}, 5000);
-
 // A mapping of machineId, driver and AGVMachineHandler
 var machinesConnection = {};
 
@@ -43,6 +28,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.incomingQueue = [];
 
     this.driver.sendMessage("identify");
+    this.dataSeq = 0;
   }
 
   bindRegisteredEvent(){
@@ -58,7 +44,11 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   }
 
   onData(data){
+    this.dataSeq = this.dataSeq+1;
+    this.checkDataSequenceTimeout(this.dataSeq);
+    if(data == "ping") return;
     console.log("Got data "+data);
+
     if(data == "") return;
     if(this.machineObj === undefined){
       MessageLogs.insert({ text: data });
@@ -90,6 +80,17 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   }
 
+  // This check if no data was sent within 10000 milisecond, that means it has been disconnected.
+  checkDataSequenceTimeout(seq){
+    let self = this;
+    setTimeout(function(){
+      if(seq == self.dataSeq){
+        self.driver.close();
+        self.onClose();
+      }
+    }, 10000);
+  }
+
   onKeyValueMatch(key, value){
     key = key.trim();
     value = value.trim();
@@ -101,9 +102,8 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
-      console.warn("Connection still exist for machineId "+machineId);
-      console.warn("Will close and replace");
-      machinesConnection[machineId].driver.close();
+      console.warn("Connection still exist for machineId "+machineId+" will ignore registration");
+      return;
     }
 
     this.machineObj = Machines.findOne({ machineId: machineId });
@@ -155,6 +155,24 @@ AGVMachineHandler.registerEventHandler = function(evObj){
   eventRegistrations.push(evObj);
 };
 
+let startOfflineSweeper = function(){
+  Meteor.setInterval(function(){
+    // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
+    // Also cleanup machine whose pid is not running.
+    // This assume the server cluster is on the same server.
+    console.log("Cleaning offline connection...");
+    Machines.find({ online: true }).fetch().forEach(function(machine){
+      if(!running(machine.onlineOnServer)){
+        console.log("Cleanup not running pid "+machine.machineId);
+        Machines.markOffline(machine._id);
+      }else if(process.pid == machine.onlineOnServer && machinesConnection[machine.machineId] === undefined){
+        console.log("Cleanup machinesConnection "+machine.machineId);
+        Machines.markOffline(machine._id);
+      }
+    });
+  }, 5000);
+}
+
 function bindAllFunction(obj){
   _.each(_.functions(obj), function(func_name){
     obj[func_name] = Meteor.bindEnvironment(_.bind(obj[func_name], obj));
@@ -163,3 +181,4 @@ function bindAllFunction(obj){
 };
 
 export default AGVMachineHandler;
+export { startOfflineSweeper };

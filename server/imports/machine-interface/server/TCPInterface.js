@@ -26,18 +26,24 @@ var SocketHandler = function(socket){
   bindAllFunction(this);
   this.socket = socket;
   this.socket.on('error', this.onError);
-  this.socket.on('data', function(data){
-    console.log("raw data received "+data.toString());
-  });
   this.splitted = this.socket.pipe(split());
   this.machineHandler = new AGVMachineHandler(this);
-  this.splitted.on('data',this.machineHandler.onData);
-  this.socket.on('close', this.machineHandler.onClose);
+  this.splitted.on('data', this.machineHandler.onData);
+  this.socket.on('close', this.onClose);
+  this.socket.on('end', this.onEnd);
 }
 
 _.extend(SocketHandler.prototype, {
   close(){
-    this.socket.close();
+    this.socket.end();
+  },
+  onClose(){
+    console.log("Socket close");
+    this.machineHandler.onClose();
+  },
+  onEnd(){
+    console.log("Socket end");
+    this.machineHandler.onClose();
   },
   onError(){
     console.log("connection error");

@@ -15,8 +15,8 @@ var TCPListener = function(){
 
 _.extend(TCPListener.prototype,{
   start(){
-    console.log("Starting tcp server on port "+8080+"...");
-    this.server.listen(8080);
+    console.log("Starting tcp server on port "+10000+"...");
+    this.server.listen(10000);
   },
   onConnect(socket){
     console.log("Incoming connection...");
@@ -26,7 +26,10 @@ _.extend(TCPListener.prototype,{
 
 // Handle per-connection message
 var SocketHandler = function(socket){
+  var self = this;
   this.socket = socket;
+  this.socket.setKeepAlive(true, 10000);
+  this.socket.setNoDelay(true);
   this.socket.on('close', this.onClose);
   this.socket.on('error', this.onError);
   this.socket.on('data', function(data){
@@ -34,6 +37,7 @@ var SocketHandler = function(socket){
   });
   this.outMessage = frame.encode();
   this.outMessage.pipe(this.socket);
+  this.socket.setTimeout(5000, this.onTimeout);
 
   allSockets.push(this);
 
@@ -41,7 +45,7 @@ var SocketHandler = function(socket){
   setInterval(function(){
     console.log("Countdown "+num);
     num++;
-}, 1000);
+  }, 1000);
 }
 
 _.extend(SocketHandler.prototype,{
@@ -52,6 +56,10 @@ _.extend(SocketHandler.prototype,{
   },
   onError(){
     console.log("connection error");
+  },
+  onTimeout(){
+    console.log("On timeout");
+    this.socket.end();
   }
 });
 
