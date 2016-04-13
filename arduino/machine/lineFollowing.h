@@ -35,55 +35,89 @@ namespace LineFollowing{
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  int S0 = -100;
+  int S1 = -50;
+  int S2 = 0;
+  int S3 = 50;
+  int S4 = 100;
+
+  int speedL[10] = {
+    S0,
+    S1,
+    S2,
+    S3,
+    S4,
+    S4,
+    S4,
+    S4,
+    S4,
+    S4
+  };
+
+  int speedR[10] = {
+    S4,
+    S4,
+    S4,
+    S4,
+    S4,
+    S3,
+    S2,
+    S1,
+    S0,
+    S4
+  };
+
+  // Special smoothing calculation
+  // Turns out.. this make it worst.
+  int oldSpeedL = 0;
+  int oldSpeedR = 0;
+  int oldTime = 0;
+  int stageSpeedL = 0;
+  int stageSpeedR = 0;
+  int stageDir = 0;
+  int transitionDuration = 10;
+
   void followline(){
 
-    // Modified to always go forward
-    int RIGHT_OFFSET = 40;
-    int LEFT_OFFSET = 0;
-
-    int S0 = -100;
-    int S1 = -50;
-    int S2 = 0;
-    int S3 = 50;
-    int S4 = 100;
-
+    int curDir = 0;
     if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
-      SmarterForward(S0+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 0;
     }
 
     else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){  // 1  1  0  0  0
-      SmarterForward(S1+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 1;
     }
 
     else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 0&& DS_4 == 0 && DS_5 == 0){  // 0  1  0  0  0
-      SmarterForward(S2+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 2;
     }
 
     else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  1  1  0  0
-      SmarterForward(S3+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 3;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  0  1  0  0
-      SmarterForward(S4+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 4;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 1 && DS_5 == 0){  // 0  0  1  1  0
-      SmarterForward(S4+LEFT_OFFSET, S3+RIGHT_OFFSET);
+      curDir = 5;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 0){  // 0  0  0  1  0
-      SmarterForward(S4+LEFT_OFFSET, S2+RIGHT_OFFSET);
+      curDir = 6;
     }
 
     else if (DS_1 == 0 && DS_2 ==0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 1){  // 0  0  0  1  1
-      SmarterForward(S4+LEFT_OFFSET, S1+RIGHT_OFFSET);
+      curDir = 7;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 1){  // 0  0  0  0  1
-      SmarterForward(S4+LEFT_OFFSET, S0+RIGHT_OFFSET);
+      curDir = 8;
     }
     else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 1 && DS_4 == 1 && DS_5 == 1){  // 1  1  1  1  1
-      SmarterForward(S4+LEFT_OFFSET, S4+RIGHT_OFFSET);
+      curDir = 9;
     }
     else
     {
@@ -95,7 +129,55 @@ namespace LineFollowing{
         }
         SmarterForward(0,0);
       }
+      return;
     }
+
+    // Stage is now old
+    if(stageDir != curDir){
+      stageDir = curDir;
+      oldTime = millis();
+      oldSpeedL = stageSpeedL;
+      oldSpeedR = stageSpeedR;
+    }
+
+    // Calculate the difference in time, capped to transitionDuration
+    int durDiff = millis() - oldTime;
+    if(durDiff > transitionDuration) durDiff = transitionDuration;
+
+    // Calculate the new diff
+    long diffL = speedL[curDir]-oldSpeedL;
+    diffL = diffL*durDiff/transitionDuration;
+    long diffR = speedR[curDir]-oldSpeedR;
+    diffR = diffR*durDiff/transitionDuration;
+
+    /*
+    Serial.print("DurDiff ");
+    Serial.println(durDiff);
+    Serial.print("speedL ");
+    Serial.print(speedL[curDir]);
+    Serial.print(" speedR ");
+    Serial.println(speedR[curDir]);
+    Serial.print("DiffL ");
+    Serial.print(diffL);
+    Serial.print(" diffR ");
+    Serial.println(diffR);
+    Serial.print("OldL ");
+    Serial.print(oldSpeedL);
+    Serial.print(" OldR ");
+    Serial.println(oldSpeedR);
+    */
+
+    // Calculate new speed
+    stageSpeedL = oldSpeedL+diffL;
+    stageSpeedR = oldSpeedR+diffR;
+
+
+    // Offset
+    int RIGHT_OFFSET = 40;
+    int LEFT_OFFSET = 0;
+
+    // Apply it
+    SmarterForward(stageSpeedL+LEFT_OFFSET, stageSpeedR+RIGHT_OFFSET);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
