@@ -40,7 +40,7 @@ AGVMachineHandler.registerEventHandler({
   callback: function(value, machineObj){
     console.log("rfid event received "+value);
     if(ResponseMap[value] === undefined){
-      console.log("ERROR: RFID string "+value+" has no response mapping!");
+      console.warn("ERROR: RFID string "+value+" has no response mapping!");
       return;
     }
 

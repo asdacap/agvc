@@ -177,9 +177,7 @@ var MachineMessageLogTab = React.createClass({
   },
   onListScroll(e){
     var obj = document.body;
-    console.log("on scroll "+(obj.scrollTop+window.innerHeight)+" and "+obj.scrollHeight);
     if((obj.scrollTop+window.innerHeight)+5 >= obj.scrollHeight){
-      console.log("passes");
       if(this.limit.get() <= this.data.messages.length){
         this.limit.set(this.limit.get()+50);
       }

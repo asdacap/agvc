@@ -160,7 +160,6 @@ let startOfflineSweeper = function(){
     // Every 5000 second, loop through machines whose online from this PID and make sure we are online.
     // Also cleanup machine whose pid is not running.
     // This assume the server cluster is on the same server.
-    console.log("Cleaning offline connection...");
     Machines.find({ online: true }).fetch().forEach(function(machine){
       if(!running(machine.onlineOnServer)){
         console.log("Cleanup not running pid "+machine.machineId);

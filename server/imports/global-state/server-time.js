@@ -9,7 +9,6 @@ if(Meteor.isServer){
   }
   Meteor.setInterval(function(){
     GlobalStates.update({ name: "serverTime" }, { $set: { serverTime: new Date() } });
-    console.log("Updating time");
   }, 10000);
 }
 

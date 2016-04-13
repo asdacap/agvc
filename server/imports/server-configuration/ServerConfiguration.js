@@ -28,7 +28,7 @@ export default ServerConfiguration = {
         }
       });
     }else{
-      console.log("Invalid server configuration "+JSON.stringify(schema.invalidKeys()));
+      console.warn("Invalid server configuration "+JSON.stringify(schema.invalidKeys()));
     }
   },
   schema: {
