@@ -1,3 +1,4 @@
+#include "states.h"
 
 namespace LineFollowing{
 
@@ -116,10 +117,15 @@ namespace LineFollowing{
         long newC = millis()/1000;
         if(newC!=lastC){
           Serial.println("Stopping due to out of circuit");
+          States::setOutOfCircuit();
         }
         SmarterForward(0,0);
       }
       return;
+    }
+
+    if(States::outOfCircuit){
+      States::clearOutOfCircuit();
     }
 
     // Offset

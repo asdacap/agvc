@@ -30,15 +30,17 @@ if(Meteor.isServer){
 }
 
 _.extend(Readings, {
-  availableReadings: ["temperature", "battery", "online"],
+  availableReadings: ["temperature", "battery", "online", "outOfCircuit"],
   readingTitle: {
     temperature: "Temperature",
     battery: "Battery",
+    outOfCircuit: "Out of circuit",
     online: "Online"
   },
   readingType: {
     temperature: Number,
     battery: Number,
+    outOfCircuit: Boolean,
     online: Boolean
   }
 })

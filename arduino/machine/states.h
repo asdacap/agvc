@@ -1,5 +1,8 @@
 #include "ConnectionManager.h"
 
+#ifndef STATES
+#define STATES
+
 namespace States{
   bool outOfCircuit = false;
 
@@ -25,3 +28,5 @@ namespace States{
     sendOutOfCircuitStatus();
   }
 }
+
+#endif
