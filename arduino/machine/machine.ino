@@ -6,7 +6,6 @@
 #include "debounce.h"
 
 HardwareSerial &wifiSerial = Serial1;
-ConnectionManager<HardwareSerial> cManager;
 
 void setup() {
   Serial.begin(9600);
@@ -24,7 +23,7 @@ void setup() {
 
   configureWifly(wifiSerial);
 
-  cManager.setup(&wifiSerial);
+  ConnectionManager::setup(&wifiSerial);
   Serial.println(F("Setup done"));
 
   RFID::setup();
@@ -47,17 +46,8 @@ void loop() {
     mCount = nmCount;
   }
 
-  cManager.loop();
+  ConnectionManager::loop();
   RFID::loop();
   LineFollowing::loop();
   loopCommand();
-}
-
-void sendDataProxy(String s){
-  cManager.sendData(s);
-}
-
-Debounce<String> dbc(sendDataProxy, 1000);
-void debouncedSendData(String s){
-  dbc.call(s);
 }

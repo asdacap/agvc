@@ -1,15 +1,15 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include "ConnectionManager.h"
+#include "debounce.h"
 
 #define RST_PIN         40          // Configurable, see typical pin layout above
 #define SS_PIN          53         // Configurable, see typical pin layout above
 
-extern void debouncedSendData(String s);
-
 namespace RFID{
 
   MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
+  Debounce<String> dbc(ConnectionManager::sendData, 1000);
 
   void setup() {
     Serial.begin(9600);		// Initialize serial communications with the PC
@@ -45,7 +45,7 @@ namespace RFID{
     String it = "rfid:"+rfid;
 
     // Print and send the data to server
-    debouncedSendData(it);
+    dbc.call(it);
   }
 
 }
