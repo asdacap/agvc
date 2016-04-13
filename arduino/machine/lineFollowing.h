@@ -116,7 +116,6 @@ namespace LineFollowing{
       if(millis() - lastForward > 1000){
         long newC = millis()/1000;
         if(newC!=lastC){
-          Serial.println("Stopping due to out of circuit");
           States::setOutOfCircuit();
         }
         SmarterForward(0,0);
