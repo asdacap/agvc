@@ -33,6 +33,7 @@ let startSerialListener = function(){
         port.send('tcpConnectDelay:'+conf.tcpConnectDelay);
         port.send('machineId:'+confObj.machineId);
         port.send('save');
+        port.send('reconfigure');
         setTimeout(function(){
           console.log("Command sent");
           port.close();

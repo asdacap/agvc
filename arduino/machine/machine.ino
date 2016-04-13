@@ -30,6 +30,10 @@ void setup() {
   LineFollowing::setup();
 }
 
+void reconfigure(){
+  configureWifly(wifiSerial);
+}
+
 int mCount = 0;
 void loop() {
   // Blinking. Useful to detect hangs

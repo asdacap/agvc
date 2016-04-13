@@ -13,6 +13,8 @@
   //extern String SERVER_PORT;
   //extern String TCP_CONNECT_DELAY; // Delay between tcp connection attempt.
 
+  extern void reconfigure();
+
   int LED = 22;
   int LED2 = 23;
   int LED3 = 24;
@@ -61,6 +63,8 @@
     String command = Serial.readStringUntil('\n');
     if(command == F("save")){
       saveSettings();
+    }else if(command == F("reconfigure")){
+      reconfigure();
     }else if(command == F("load")){
       loadSettings();
     }else if(command == F("dump")){
