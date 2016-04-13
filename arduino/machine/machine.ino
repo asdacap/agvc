@@ -4,6 +4,7 @@
 #include "lineFollowing.h"
 #include "rfid.h"
 #include "debounce.h"
+#include "states.h"
 
 HardwareSerial &wifiSerial = Serial1;
 
@@ -50,4 +51,10 @@ void loop() {
   RFID::loop();
   LineFollowing::loop();
   loopCommand();
+}
+
+namespace GlobalListener{
+  void onConnect(){
+    States::onConnect();
+  }
 }

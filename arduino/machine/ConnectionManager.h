@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "wifi_hq/WiFlyHQ.h"
+#include "GlobalListener.h"
 
 #ifndef CONNECTION_MANAGER
 #define CONNECTION_MANAGER
@@ -83,6 +84,7 @@ namespace ConnectionManager{
     Serial.println(F("Sending registration..."));
     wifly.print(F("machineId:"));
     wifly.println(Settings.machineId);
+    GlobalListener::onConnect();
   }
 
   void loop(){
