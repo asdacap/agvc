@@ -79,7 +79,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         }
       }else{
         this.incomingQueue.push(data);
-        this.driver.sendMessage("indentify"); // Please tell me who are you...
+        this.driver.sendMessage("identify"); // Please tell me who are you...
       }
     }else{
       var keyValueMatch = data.match(/([^:]+):([^:]+)/);
