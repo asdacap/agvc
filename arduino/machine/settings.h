@@ -81,7 +81,7 @@
       strcpy(Settings.wifiPassphrase, value.c_str());
       Serial.println(F("ack"));
     }else if(command.startsWith(F("serverHost:"))){
-      String value = command.substring(9);
+      String value = command.substring(11);
       strcpy(Settings.serverHost, value.c_str());
       Serial.println(F("ack"));
     }else if(command.startsWith(F("machineId:"))){
