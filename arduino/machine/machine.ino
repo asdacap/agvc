@@ -3,6 +3,7 @@
 #include "wiflyConfigurator.h"
 #include "lineFollowing.h"
 #include "rfid.h"
+#include "debounce.h"
 
 HardwareSerial &wifiSerial = Serial1;
 ConnectionManager<HardwareSerial> cManager;
@@ -47,7 +48,16 @@ void loop() {
   }
 
   cManager.loop();
-  RFID::loop(cManager);
+  RFID::loop();
   LineFollowing::loop();
   loopCommand();
+}
+
+void sendDataProxy(String s){
+  cManager.sendData(s);
+}
+
+Debounce<String> dbc(sendDataProxy, 1000);
+void debouncedSendData(String s){
+  dbc.call(s);
 }

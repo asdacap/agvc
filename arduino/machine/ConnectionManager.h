@@ -31,6 +31,9 @@ class ConnectionManager{
         Serial.print(F("Sending data "));
         Serial.println(data);
         wifly.println(data);
+      }else{
+        Serial.print(F("Cannot send due to no connection "));
+        Serial.println(data);
       }
     }
 

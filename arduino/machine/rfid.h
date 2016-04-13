@@ -5,6 +5,8 @@
 #define RST_PIN         40          // Configurable, see typical pin layout above
 #define SS_PIN          53         // Configurable, see typical pin layout above
 
+extern void debouncedSendData(String s);
+
 namespace RFID{
 
   MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
@@ -28,7 +30,7 @@ namespace RFID{
     return str;
   }
 
-  void loop(ConnectionManager<HardwareSerial> &cManager) {
+  void loop() {
     // Look for new cards
     if ( ! mfrc522.PICC_IsNewCardPresent()) {
       return;
@@ -39,13 +41,11 @@ namespace RFID{
       return;
     }
 
-    Serial.println("RFID detected");
     String rfid = String(byteHexToString(mfrc522.uid.uidByte, mfrc522.uid.size));
     String it = "rfid:"+rfid;
 
     // Print and send the data to server
-    Serial.println(it);
-    cManager.sendData(it);
+    debouncedSendData(it);
   }
 
 }
