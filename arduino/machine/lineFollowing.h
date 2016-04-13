@@ -68,16 +68,6 @@ namespace LineFollowing{
     S4
   };
 
-  // Special smoothing calculation
-  // Turns out.. this make it worst.
-  int oldSpeedL = 0;
-  int oldSpeedR = 0;
-  int oldTime = 0;
-  int stageSpeedL = 0;
-  int stageSpeedR = 0;
-  int stageDir = 0;
-  int transitionDuration = 10;
-
   void followline(){
 
     int curDir = 0;
@@ -132,52 +122,12 @@ namespace LineFollowing{
       return;
     }
 
-    // Stage is now old
-    if(stageDir != curDir){
-      stageDir = curDir;
-      oldTime = millis();
-      oldSpeedL = stageSpeedL;
-      oldSpeedR = stageSpeedR;
-    }
-
-    // Calculate the difference in time, capped to transitionDuration
-    int durDiff = millis() - oldTime;
-    if(durDiff > transitionDuration) durDiff = transitionDuration;
-
-    // Calculate the new diff
-    long diffL = speedL[curDir]-oldSpeedL;
-    diffL = diffL*durDiff/transitionDuration;
-    long diffR = speedR[curDir]-oldSpeedR;
-    diffR = diffR*durDiff/transitionDuration;
-
-    /*
-    Serial.print("DurDiff ");
-    Serial.println(durDiff);
-    Serial.print("speedL ");
-    Serial.print(speedL[curDir]);
-    Serial.print(" speedR ");
-    Serial.println(speedR[curDir]);
-    Serial.print("DiffL ");
-    Serial.print(diffL);
-    Serial.print(" diffR ");
-    Serial.println(diffR);
-    Serial.print("OldL ");
-    Serial.print(oldSpeedL);
-    Serial.print(" OldR ");
-    Serial.println(oldSpeedR);
-    */
-
-    // Calculate new speed
-    stageSpeedL = oldSpeedL+diffL;
-    stageSpeedR = oldSpeedR+diffR;
-
-
     // Offset
     int RIGHT_OFFSET = 40;
     int LEFT_OFFSET = 0;
 
     // Apply it
-    SmarterForward(stageSpeedL+LEFT_OFFSET, stageSpeedR+RIGHT_OFFSET);
+    SmarterForward(speedL[curDir]+LEFT_OFFSET, speedR[curDir]+RIGHT_OFFSET);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
