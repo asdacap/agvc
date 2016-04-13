@@ -121,7 +121,6 @@ var MachineStatusTab = React.createClass({
     return <div>
       <List>
         <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
-        <ListItem primaryText="Online Status" secondaryText={<MachineOnlineText machine={this.props.machine} />} />
         {listItems}
         <ListItem primaryText="JSON" secondaryText={JSON.stringify(this.props.machine)} />
       </List>

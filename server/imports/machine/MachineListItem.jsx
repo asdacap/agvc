@@ -16,7 +16,8 @@ import {
   TableBody,
   TableRowColumn,
   TextField,
-  FloatingActionButton
+  FloatingActionButton,
+  Styles
 } from 'material-ui';
 import { EditMachineForm } from './MachineForm';
 
@@ -51,9 +52,15 @@ export default MachineListItem = React.createClass({
     this.setState({ openForm: false });
   },
   render(){
-    var self = this;
+    let self = this;
+
+    let subtitleColor = Styles.Colors.lightBlack;
+    if(this.props.machine.online){
+      subtitleColor = Styles.Colors.lightGreenA400;
+    }
+
     return <Card style={styles.MachineListItem}>
-      <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"}/>
+      <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"} subtitleColor={subtitleColor}/>
       <CardText>
         Readings:
         <Table selectable={false} height={ styles.Table.height }>
