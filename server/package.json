@@ -9,6 +9,7 @@
     "material-ui": "^0.15.0-alpha.2",
     "moment": "^2.12.0",
     "moment-duration-format": "^1.3.0",
+    "point-at-length": "^1.0.1",
     "react": "^0.14.8",
     "react-addons-create-fragment": "^0.14.0",
     "react-addons-css-transition-group": "^0.14.0",

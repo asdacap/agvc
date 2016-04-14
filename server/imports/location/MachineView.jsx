@@ -1,4 +1,5 @@
 import React from 'react';
+import StateCalculator from '../machine/StateCalculator';
 
 let styles = {
   AGVStyle: {
@@ -18,82 +19,18 @@ export default MachineView = React.createClass({
   },
   getMeteorData(){
 
-    Meteor.subscribe("location_logs", this.props.machine.machineId, this.props.atTime);
-
-    // Find the first log before at that time
-    var locationLog = LocationLogs.findOne({
-      machineId: this.props.machine.machineId,
-      createdAt: { $lte: this.props.atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    });
-
+    StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
     return {
-      locationLog
-    }
-  },
-  getLocationPoint(){
-    if(this.data.locationLog.type === 'point'){
-      var point = Map.getPoint(this.data.locationLog.pointId);
-      if(point === undefined){
-        console.error("Error point "+this.data.locationLog.pointId+" is not defined");
-        return {
-          x: 0,
-          y: 0
-        }
-      }
-      return {
-        x: point.visualX,
-        y: point.visualY
-      };
-    }else if(this.data.locationLog.type === 'path'){
-      var path = Map.getPath(this.data.locationLog.pathId);
-      if(path === undefined){
-        console.error("Error path "+this.data.locationLog.pathId+" is not defined");
-        return {
-          x: 0,
-          y: 0
-        }
-      }
-
-      var pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      pathEl.setAttribute("d", path.svgPathD);
-
-      var length = pathEl.getTotalLength();
-      var speed = path.machineSpeed;
-      var timePassed = (this.props.atTime.getTime() - this.data.locationLog.createdAt.getTime());
-      timePassed /= 1000.0;
-      var lengthPassed = timePassed*speed;
-      var progress = this.data.locationLog.pathProgress + (lengthPassed/length);
-      if(progress > 1){
-        progress = 1;
-      }
-      if(progress < 0){
-        progress = 0;
-      }
-
-      var point = pathEl.getPointAtLength(length*progress);
-
-      return {
-        x: point.x,
-        y: point.y
-      };
-    }else{
-      console.error("ERROR: unknown location log type "+this.data.locationLog.type);
-      return {
-        x: 0,
-        y: 0
-      };
+      state: StateCalculator.calculate(this.props.machine.machineId, this.props.atTime)
     }
   },
   render(){
 
-    if(this.data.locationLog === undefined){
+    if(this.data.state.position === undefined){
       return <g></g>; // Nothing
     }
 
-    var point = this.getLocationPoint();
+    var point = this.data.state.position;
     return <g transform={ "translate("+point.x+","+point.y+")" }>
       <rect
         style={ styles.AGVStyle }

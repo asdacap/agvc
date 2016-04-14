@@ -26,6 +26,16 @@ if(Meteor.isServer){
   Meteor.publish("readings", function(machineId, reading, fromDate){
     return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
+  Meteor.publish("readingState", function(machineId, reading, atTime){
+    return Readings.find({
+      machineId: machineId,
+      type: reading,
+      createdAt: { $lte: atTime }
+    }, {
+      sort: { createdAt: -1 },
+      limit: 1
+    });
+  });
 }
 
 _.extend(Readings, {
@@ -35,6 +45,12 @@ _.extend(Readings, {
     battery: "Battery",
     outOfCircuit: "Out of circuit",
     online: "Online"
+  },
+  defaultValue: {
+    temperature: 0,
+    battery: 0,
+    outOfCircuit: false,
+    online: false
   },
   readingType: {
     temperature: Number,
