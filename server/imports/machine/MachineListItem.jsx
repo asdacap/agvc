@@ -1,6 +1,6 @@
 import React from 'react';
 import Readings from '../reading/Readings'
-
+import GlobalStates from '../global-state/GlobalStates';
 
 import {
   Dialog,
@@ -34,10 +34,16 @@ var styles = {
 };
 
 export default MachineListItem = React.createClass({
+  mixins: [ReactMeteorData],
   getInitialState(){
     return {
       openForm: false
     };
+  },
+  getMeteorData(){
+    return {
+      state: StateCalculator.calculate(this.props.machine.machineId, GlobalStates.getServerTime())
+    }
   },
   ping(){
     Meteor.call("sendCommand", this.props.machine.machineId, "ping");
@@ -68,7 +74,7 @@ export default MachineListItem = React.createClass({
             { Readings.availableReadings.map(function(reading){
               return <TableRow>
                 <TableRowColumn>{Readings.readingTitle[reading]}</TableRowColumn>
-                <TableRowColumn>{self.props.machine[reading]}</TableRowColumn>
+                <TableRowColumn>{self.data.state[reading].toString()}</TableRowColumn>
               </TableRow>;
               }) }
           </TableBody>
