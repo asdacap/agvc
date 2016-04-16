@@ -104,6 +104,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
       console.warn("Connection still exist for machineId "+machineId+" will ignore registration");
+      machinesConnection[machineId].close();
       return;
     }
 
@@ -140,6 +141,14 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       }
       self.driver.sendMessage(command.command);
     });
+  }
+
+  close(){
+    if(this.machineObj !== undefined && machinesConnection[this.machineObj.machineId] != this){
+      // Already closed
+      return;
+    }
+    this.onCLose();
   }
 
   onClose(){
