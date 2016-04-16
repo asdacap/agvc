@@ -50,6 +50,8 @@ if(Meteor.isServer){
 }
 
 // Ensure index for performance
-Meteor.startup(function(){
-  LocationLogs.rawCollection().ensureIndex({ createdAt: 1 }, {}, _ => _);
-});
+if(Meteor.isServer){
+  Meteor.startup(function(){
+    LocationLogs.rawCollection().ensureIndex({ createdAt: 1, machineId: 1 }, {}, _ => _);
+  });
+}

@@ -165,6 +165,8 @@ Machines.setReading = function(machineId, reading, value){
 }
 
 //// Ensure index for performance
-Meteor.startup(function(){
-  Readings.rawCollection().ensureIndex({ createdAt: 1 }, {}, _ => _);
-});
+if(Meteor.isServer){
+  Meteor.startup(function(){
+    Readings.rawCollection().ensureIndex({ createdAt: 1, type: 1, machineId: 1 }, {}, _ => _);
+  });
+}
