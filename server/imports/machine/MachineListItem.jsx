@@ -20,6 +20,7 @@ import {
   Styles
 } from 'material-ui';
 import { EditMachineForm } from './MachineForm';
+import ViewTime from '../client/ViewTime';
 
 var styles = {
   MachineListItem: {
@@ -42,7 +43,7 @@ export default MachineListItem = React.createClass({
   },
   getMeteorData(){
     return {
-      state: StateCalculator.calculate(this.props.machine.machineId, GlobalStates.getServerTime())
+      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
   },
   ping(){

@@ -4,14 +4,14 @@ import Machines from '../machine/Machines';
 import LocationLogs from './LocationLogs';
 import Map from './Map';
 import MachineView from './MachineView';
+import ViewTime from '../client/ViewTime';
 
 // Draw the map along with all the machines
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     var handle = Meteor.subscribe("machines");
-    var atTime = GlobalStates.getServerTime();
-    Chronos.liveUpdate(200);
+    var atTime = ViewTime.time;
 
     return {
       machines: Machines.find({}).fetch(),
