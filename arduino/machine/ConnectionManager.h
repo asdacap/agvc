@@ -33,15 +33,23 @@ namespace ConnectionManager{
     Serial.println(F("Done"));
   }
 
-  void sendData(String data){
+  void sendDataL(String data, bool logIt=true){
     if(connected()){
-      Serial.print(F("Sending data "));
-      Serial.println(data);
+      if(logIt){
+        Serial.print(F("Sending data "));
+        Serial.println(data);
+      }
       wifly.println(data);
     }else{
-      Serial.print(F("Cannot send due to no connection "));
-      Serial.println(data);
+      if(logIt){
+        Serial.print(F("Cannot send due to no connection "));
+        Serial.println(data);
+      }
     }
+  }
+
+  void sendData(String data){
+    sendDataL(data, true);
   }
 
   // Things to actually implement
@@ -71,15 +79,13 @@ namespace ConnectionManager{
     if(wifly.available()) {
       String data = wifly.readStringUntil('\n');
       if (data.length() > 0) {
-        Serial.print(F("Receive data: "));
-        Serial.println(data);
         if(data == F("identify") ){
           registerMachine();
         }else if(data.startsWith(F("p:"))){
-          // Its a ping from server. Send back the data
-          // Dont use sendData to avoid logging
-          wifly.println(data);
+          sendData(data);
         }else{
+          Serial.print(F("Receive data: "));
+          Serial.println(data);
           GlobalListener::onData(data);
         }
       }

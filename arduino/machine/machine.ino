@@ -60,7 +60,7 @@ void calculateLoopInterval(){
     long loopInterval = totalDuration/loopCount;
     totalDuration = 0;
     loopCount = 0;
-    ConnectionManager::sendData("loopInterval:"+String(loopInterval));
+    ConnectionManager::sendDataL("loopInterval:"+String(loopInterval), false);
   }
 }
 
