@@ -75,8 +75,13 @@ namespace ConnectionManager{
         Serial.println(data);
         if(data == F("identify") ){
           registerMachine();
+        }else if(data.startsWith(F("p:"))){
+          // Its a ping from server. Send back the data
+          // Dont use sendData to avoid logging
+          wifly.println(data);
+        }else{
+          GlobalListener::onData(data);
         }
-        GlobalListener::onData(data);
       }
     }
   }
@@ -91,14 +96,6 @@ namespace ConnectionManager{
   void loop(){
     loopTCPConnectivityCheck();
     listenReceive();
-
-    // Make sure the connection does not time out
-    static int oldCounter;
-    int newCounter = millis()/5000;
-    if(newCounter != oldCounter){
-      oldCounter = newCounter;
-      sendData("p");
-    }
   }
 }
 

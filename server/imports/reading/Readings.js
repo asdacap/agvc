@@ -54,9 +54,10 @@ if(Meteor.isServer){
 }
 
 _.extend(Readings, {
-  availableReadings: ["temperature", "battery", "online", "outOfCircuit"],
+  availableReadings: ["temperature", "battery", "online", "outOfCircuit", "latency"],
   readingTitle: {
     temperature: "Temperature",
+    latency: "Latency",
     battery: "Battery",
     outOfCircuit: "Out of circuit",
     online: "Online"
@@ -64,12 +65,14 @@ _.extend(Readings, {
   defaultValue: {
     temperature: 0,
     battery: 0,
+    latency: 0,
     outOfCircuit: false,
     online: false
   },
   readingType: {
     temperature: Number,
     battery: Number,
+    latency: Number,
     outOfCircuit: Boolean,
     online: Boolean
   }

@@ -123,6 +123,8 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
     // Send previous command.
     this.onMachineChanged(this.machineObj);
+
+    this.emit("connect", this.machineObj.machineId, this);
   }
 
   onMachineChanged(newDocument, oldDocument){
@@ -146,6 +148,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       Machines.markOffline(this.machineObj._id);
       machinesConnection[this.machineObj.machineId] = undefined;
     }
+    this.emit("close", this.machineObj.machineId, this);
     this.unBindRegisteredEvent();
   }
 

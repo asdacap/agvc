@@ -61,16 +61,7 @@ Meteor.methods({
     Machines.update(machine._id, { $set: machine } );
   },
   sendCommand(machineId, command, droppable){
-    if(droppable === undefined){
-      droppable = false;
-    }
-    var machine = Machines.findOne({machineId: machineId});
-
-    Machines.update(machine._id, { $push: { commandQueue: {
-      command: command,
-      droppable: droppable,
-      createdAt: new Date()
-    } } } );
+    Machines.sendCommand(machineId, command, droppable);
   }
 });
 
@@ -107,6 +98,18 @@ _.extend(Machines, {
     Machines.find(query).fetch().forEach(machine => {
       Machines.setReading(machine.machineId, "online", false);
     });
+  },
+  sendCommand(machineId, command, droppable){
+    if(droppable === undefined){
+      droppable = false;
+    }
+    var machine = Machines.findOne({machineId: machineId});
+
+    Machines.update(machine._id, { $push: { commandQueue: {
+      command: command,
+      droppable: droppable,
+      createdAt: new Date()
+    } } } );
   }
 });
 
