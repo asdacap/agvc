@@ -30,7 +30,7 @@ if(Meteor.isServer){
     event: "connect",
     callback: function(machineId, handler){
       let intervalHandle = Meteor.setInterval(_ => {
-        Machines.sendCommand(machineId, "p:"+(new Date().getTime()));
+        Machines.sendCommand(machineId, "p:"+(new Date().getTime()), true);
       }, PING_INTERVAL);
       let eventHandle = handler.on('key:p', value => {
         let latency = new Date().getTime() - value;

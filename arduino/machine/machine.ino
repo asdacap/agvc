@@ -5,6 +5,7 @@
 #include "rfid.h"
 #include "debounce.h"
 #include "states.h"
+#include "RateLimiter.h"
 
 HardwareSerial &wifiSerial = Serial1;
 
@@ -35,6 +36,31 @@ void reconfigure(){
   configureWifly(wifiSerial);
 }
 
+long totalDuration = 0;
+long prevTime = 0;
+int loopCount = 0;
+RateLimiter loopDurationLimiter(1000);
+
+void calculateLoopInterval(){
+  if(prevTime == 0){ // The loop just started
+    prevTime = millis();
+    return;
+  }
+
+  long duration = millis()-prevTime;
+  prevTime = millis();
+  totalDuration+=duration;
+  loopCount++;
+
+  if(loopDurationLimiter.isItOK()){
+    if(loopCount == 0) loopCount = 1;
+    long loopInterval = totalDuration/loopCount;
+    totalDuration = 0;
+    loopCount = 0;
+    ConnectionManager::sendData("loopInterval:"+String(loopInterval));
+  }
+}
+
 int mCount = 0;
 void loop() {
   // Blinking. Useful to detect hangs
@@ -51,6 +77,7 @@ void loop() {
   RFID::loop();
   LineFollowing::loop();
   loopCommand();
+  calculateLoopInterval();
 }
 
 namespace GlobalListener{
