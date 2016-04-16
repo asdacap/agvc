@@ -46,7 +46,34 @@ export default MachinePage = React.createClass({
   toggleNav(){
     this.refs.navPage.toggleNav();
   },
+  changePage(value){
+    FlowRouter.go('machine', { machineId: this.props.machineId, page: value });
+  },
   render() {
+
+    let page = "status";
+    if(this.props.page !== undefined
+      && _.contains(["status", "readings", "command_queue", "message_logs", "manual_control"], this.props.page)
+     ){
+       page = this.props.page;
+    }
+
+    let page_component = "";
+
+    if(this.data.ready){
+      if(page == "status"){
+        page_component = <MachineStatusTab machine={this.data.machine} />;
+      }else if(page == "readings"){
+        page_component = <ReadingsTab machine={this.data.machine} />;
+      }else if(page == "command_queue"){
+        page_component = <MachineCommandQueueTab machine={this.data.machine} />;
+      }else if(page == "message_logs"){
+        page_component = <MachineMessageLogTab machine={this.data.machine} />;
+      }else if(page == "manual_control"){
+        page_component = <ManualTab machine={this.data.machine} />;
+      }
+    }
+
     return <AppCanvas>
         <SideNavPage ref="navPage">
           <div>
@@ -54,23 +81,16 @@ export default MachinePage = React.createClass({
             {
               !this.data.ready ? <div style={styles.MachineLoading}>
                 <CircularProgress size={2}/>
-              </div> : <Tabs>
-                <Tab label="Status">
-                  <MachineStatusTab machine={this.data.machine} />
-                </Tab>
-                <Tab label="Readings">
-                  <ReadingsTab machine={this.data.machine} />
-                </Tab>
-                <Tab label="Command Queue">
-                  <MachineCommandQueueTab machine={this.data.machine} />
-                </Tab>
-                <Tab label="Message Logs">
-                  <MachineMessageLogTab machine={this.data.machine} />
-                </Tab>
-                <Tab label="Manual Control">
-                  <ManualTab machine={this.data.machine} />
-                </Tab>
-              </Tabs>
+              </div> : <div>
+                <Tabs value={page} onChange={this.changePage}>
+                  <Tab label="Status" value="status" />
+                  <Tab label="Readings" value="readings" />
+                  <Tab label="Command Queue" value="command_queue" />
+                  <Tab label="Message Logs" value="message_logs" />
+                  <Tab label="Manual Control" value="manual_control" />
+                </Tabs>
+                { page_component }
+              </div>
             }
           </div>
         </SideNavPage>

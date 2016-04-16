@@ -11,7 +11,7 @@ FlowRouter.route('/', {
   }
 });
 
-FlowRouter.route('/machine/:machineId', {
+FlowRouter.route('/machine/:machineId/:page?', {
   name: 'machine',
   action: function(params, queryParams) {
     mount(MachinePage, params);
