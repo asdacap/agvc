@@ -27,6 +27,7 @@ if(Meteor.isServer){
     return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
   Meteor.publish("readingState", function(machineId, reading, atTime){
+
     return Readings.find({
       machineId: machineId,
       type: reading,
@@ -35,6 +36,20 @@ if(Meteor.isServer){
       sort: { createdAt: -1 },
       limit: 1
     });
+
+    let self = this;
+    let readings = Readings.find({
+      machineId: machineId,
+      type: reading,
+      createdAt: { $lte: atTime }
+    }, {
+      sort: { createdAt: -1 },
+      limit: 1
+    }).fetch().forEach(function(doc){
+      self.added('readings', doc._id, doc);
+    });
+
+    self.ready();
   });
 }
 
@@ -97,3 +112,8 @@ Machines.setReading = function(machineId, reading, value){
   Machines.update({ machineId: machineId }, { $set: toSet } )
   Readings.insert({ machineId: machineId, type: reading, reading: value })
 }
+
+// Ensure index for performance
+Meteor.startup(function(){
+  Readings.rawCollection().ensureIndex({ createdAt: 1 }, {}, _ => _);
+});

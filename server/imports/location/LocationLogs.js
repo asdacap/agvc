@@ -48,3 +48,8 @@ if(Meteor.isServer){
     });
   })
 }
+
+// Ensure index for performance
+Meteor.startup(function(){
+  LocationLogs.rawCollection().ensureIndex({ createdAt: 1 }, {}, _ => _);
+});
