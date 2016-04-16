@@ -148,7 +148,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       // Already closed
       return;
     }
-    this.onCLose();
+    this.onClose();
   }
 
   onClose(){
