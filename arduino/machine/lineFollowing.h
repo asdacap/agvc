@@ -1,11 +1,7 @@
 #include "states.h"
+#include "MotorControl.h"
 
 namespace LineFollowing{
-
-  int RightEn = 5;
-  int RightDir= 4;
-  int LeftEn  = 6;
-  int LeftDir = 7;             //pin initialization for motor driver
 
   int pin_1   = A1;
   int pin_2   = A2;
@@ -29,10 +25,7 @@ namespace LineFollowing{
     //Serial.print(" ");
     //Serial.println(pwm_right);
 
-    digitalWrite(RightDir, pwm_right > 0 ? LOW : HIGH);
-    digitalWrite(LeftDir , pwm_left > 0 ? LOW : HIGH);
-    analogWrite (RightEn , abs(pwm_right));   //PWM Speed Control
-    analogWrite (LeftEn  , abs(pwm_left));
+    MotorControl::SmarterForward(pwm_left, pwm_right);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,21 +120,13 @@ namespace LineFollowing{
       States::clearOutOfCircuit();
     }
 
-    // Offset
-    int RIGHT_OFFSET = 40;
-    int LEFT_OFFSET = 0;
-
     // Apply it
-    SmarterForward(speedL[curDir]+LEFT_OFFSET, speedR[curDir]+RIGHT_OFFSET);
+    SmarterForward(speedL[curDir], speedR[curDir]);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   void setup()
   {
-    pinMode(RightEn , OUTPUT);
-    pinMode(RightDir, OUTPUT);
-    pinMode(LeftEn  , OUTPUT);
-    pinMode(LeftDir , OUTPUT);            //declare pins as OUTPUT for motor driver
     pinMode(pin_1 , INPUT);
     pinMode(pin_2 , INPUT);
     pinMode(pin_3 , INPUT);

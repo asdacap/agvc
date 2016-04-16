@@ -23,6 +23,7 @@ import MachineStatusTab from './MachineStatusTab';
 import MachineCommandQueueTab from './MachineCommandQueueTab';
 import MachineMessageLogTab from './MachineMessageLogTab';
 import ReadingsTab from './ReadingsTab';
+import ManualTab from './ManualTab';
 
 let styles = {
   MachineLoading: {
@@ -65,6 +66,9 @@ export default MachinePage = React.createClass({
                 </Tab>
                 <Tab label="Message Logs">
                   <MachineMessageLogTab machine={this.data.machine} />
+                </Tab>
+                <Tab label="Manual Control">
+                  <ManualTab machine={this.data.machine} />
                 </Tab>
               </Tabs>
             }

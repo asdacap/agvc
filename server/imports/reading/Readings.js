@@ -12,7 +12,8 @@ Readings.availableReadings = [
   "online",
   "outOfCircuit",
   "latency",
-  "loopInterval"
+  "loopInterval",
+  "manualMode"
 ];
 
 Readings.meta = {
@@ -46,7 +47,12 @@ Readings.meta = {
     defaultValue: false,
     type: Boolean
   },
-}
+  manualMode: {
+    title: "ManualMode",
+    defaultValue: false,
+    type: Boolean
+  }
+};
 
 //// Schemas
 var ReadingSchema = new SimpleSchema({
@@ -117,7 +123,7 @@ Machines.attachSchema(MachineSchema);
 
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  if(Readings.readingType[reading] == Boolean){
+  if(Readings.meta[reading].type == Boolean){
     // Assume it is already passed as boolean
   }else{
     value = parseInt(value, 0);

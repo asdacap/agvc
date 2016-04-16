@@ -6,6 +6,8 @@
 #include "debounce.h"
 #include "states.h"
 #include "RateLimiter.h"
+#include "ManualMode.h"
+#include "MotorControl.h"
 
 HardwareSerial &wifiSerial = Serial1;
 
@@ -30,6 +32,7 @@ void setup() {
 
   RFID::setup();
   LineFollowing::setup();
+  MotorControl::setup();
 }
 
 void reconfigure(){
@@ -75,7 +78,11 @@ void loop() {
 
   ConnectionManager::loop();
   RFID::loop();
-  LineFollowing::loop();
+  if(ManualMode::manualMode){
+    ManualMode::loop();
+  }else{
+    LineFollowing::loop();
+  }
   loopCommand();
   calculateLoopInterval();
 }
@@ -83,11 +90,12 @@ void loop() {
 namespace GlobalListener{
   void onConnect(){
     States::onConnect();
+    ManualMode::onConnect();
   }
   void onDisconnect(){
-    // Nothing yet
+    ManualMode::onDisconnect();
   }
   void onData(String s){
-    // Nothing yet
+    ManualMode::onCommand(s);
   }
 }
