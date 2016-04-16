@@ -31,12 +31,14 @@ if(Meteor.isServer){
       let intervalHandle = Meteor.setInterval(_ => {
         Machines.sendCommand(machineId, "p:"+(new Date().getTime()), true);
       }, Settings.ping_interval);
-      let eventHandle = handler.on('key:p', value => {
+      let pingCallback = value => {
         let latency = new Date().getTime() - value;
         Machines.setReading(machineId, 'latency', latency);
-      });
+      };
+      let eventHandle = handler.on('key:p', pingCallback);
       handler.on('close', _ => {
-
+        Meteor.clearInterval(intervalHandle);
+        handler.removeListener('key:p', pingCallback);
       })
     }
   })
