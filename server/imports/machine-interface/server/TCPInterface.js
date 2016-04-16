@@ -2,6 +2,7 @@
 import net from 'net';
 import split from 'split';
 import AGVMachineHandler from './AGVMachineHandler'
+import Settings from '../../Settings';
 
 // Handle listening to port
 var TCPListener = function(){

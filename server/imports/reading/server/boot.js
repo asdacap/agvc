@@ -1,8 +1,7 @@
 import Readings from '../Readings';
 import Machines from '../../machine/Machines';
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
-
-let PING_INTERVAL = 1000;
+import Settings from '../../Settings';
 
 // Hook machine interface to listen for reading update
 if(Meteor.isServer){
@@ -31,7 +30,7 @@ if(Meteor.isServer){
     callback: function(machineId, handler){
       let intervalHandle = Meteor.setInterval(_ => {
         Machines.sendCommand(machineId, "p:"+(new Date().getTime()), true);
-      }, PING_INTERVAL);
+      }, Settings.ping_interval);
       let eventHandle = handler.on('key:p', value => {
         let latency = new Date().getTime() - value;
         Machines.setReading(machineId, 'latency', latency);

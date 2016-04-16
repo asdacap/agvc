@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 import util from 'util';
 import Machines from '../../machine/Machines';
 import MessageLogs from '../../message-log/MessageLogs';
+import Settings from '../../Settings';
 
 // A mapping of machineId, driver and AGVMachineHandler
 var machinesConnection = {};
@@ -88,7 +89,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         self.driver.close();
         self.onClose();
       }
-    }, 10000);
+    }, Settings.data_sequence_timeout);
   }
 
   onKeyValueMatch(key, value){
@@ -134,7 +135,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     Machines.update(this.machineObj._id, { $set: { commandQueue: [] } });
 
     commands.forEach(function(command){
-      if(command.droppable && (new Date() - command.createdAt) > 10000){
+      if(command.droppable && (new Date() - command.createdAt) > Settings.dropppable_command_timeout){
         console.log("Droppable command "+command.command+" dropped");
       }
       self.driver.sendMessage(command.command);
