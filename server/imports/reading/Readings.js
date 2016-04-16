@@ -5,54 +5,50 @@ import Machines from '../machine/Machines';
 export default Readings = new Mongo.Collection("readings");
 Readings.attachBehaviour("timestampable");
 
-var ReadingSchema = new SimpleSchema({
-  type: {
-    type: String,
-    optional: false
+//// reading type metadata
+Readings.availableReadings = [
+  "temperature",
+  "battery",
+  "online",
+  "outOfCircuit",
+  "latency",
+  "loopInterval"
+];
+
+Readings.meta = {
+  temperature: {
+    title: "Temperature",
+    defaultValue: 0,
+    type: Number
   },
-  reading: {
-    type: "none", // None as some reading is of type boolean
-    optional: false
+  battery: {
+    title: "Battery",
+    defaultValue: 0,
+    type: Number
   },
-  machineId: {
-    type: String,
-    optional: false
-  }
-});
-
-Readings.attachSchema(ReadingSchema);
-
-if(Meteor.isServer){
-  Meteor.publish("readings", function(machineId, reading, fromDate){
-    return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
-  });
-  Meteor.publish("readingState", function(machineId, reading, atTime){
-
-    return Readings.find({
-      machineId: machineId,
-      type: reading,
-      createdAt: { $lte: atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    });
-
-    let self = this;
-    let readings = Readings.find({
-      machineId: machineId,
-      type: reading,
-      createdAt: { $lte: atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    }).fetch().forEach(function(doc){
-      self.added('readings', doc._id, doc);
-    });
-
-    self.ready();
-  });
+  latency: {
+    title: "Latency",
+    defaultValue: 0,
+    type: Number
+  },
+  loopInterval: {
+    title: "Loop Interval",
+    defaultValue: 0,
+    type: Number
+  },
+  online: {
+    title: "Online",
+    defaultValue: false,
+    type: Boolean
+  },
+  outOfCircuit: {
+    title: "Out of circuit",
+    defaultValue: false,
+    type: Boolean
+  },
 }
 
+/*
 _.extend(Readings, {
   availableReadings: [
     "temperature",
@@ -86,10 +82,62 @@ _.extend(Readings, {
     online: Boolean
   }
 })
+*/
 
+//// Schemas
+var ReadingSchema = new SimpleSchema({
+  type: {
+    type: String,
+    optional: false
+  },
+  reading: {
+    type: "none", // None as some reading is of type boolean
+    optional: false
+  },
+  machineId: {
+    type: String,
+    optional: false
+  }
+});
+
+Readings.attachSchema(ReadingSchema);
+
+//// Publications
+if(Meteor.isServer){
+  Meteor.publish("readings", function(machineId, reading, fromDate){
+    return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
+  });
+  Meteor.publish("readingState", function(machineId, reading, atTime){
+
+    return Readings.find({
+      machineId: machineId,
+      type: reading,
+      createdAt: { $lte: atTime }
+    }, {
+      sort: { createdAt: -1 },
+      limit: 1
+    });
+
+    let self = this;
+    let readings = Readings.find({
+      machineId: machineId,
+      type: reading,
+      createdAt: { $lte: atTime }
+    }, {
+      sort: { createdAt: -1 },
+      limit: 1
+    }).fetch().forEach(function(doc){
+      self.added('readings', doc._id, doc);
+    });
+
+    self.ready();
+  });
+}
+
+//// Attaching additional schemas to machine
 var MachineSchema = {}
 Readings.availableReadings.forEach(function(reading){
-  if(Readings.readingType[reading] == Boolean){
+  if(Readings.meta[reading].type == Boolean){
     MachineSchema[reading] = {
       type: Boolean,
       optional: false
@@ -103,16 +151,7 @@ Readings.availableReadings.forEach(function(reading){
 });
 Machines.attachSchema(MachineSchema);
 
-// Set default value
-Readings.availableReadings.forEach(function(reading){
-  if(Readings.readingType[reading] == Boolean){
-    Machines.defaultValue[reading] = false;
-  }else{
-    Machines.defaultValue[reading] = 0;
-  }
-});
-
-// Utility function to set readings
+//// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
   if(Readings.readingType[reading] == Boolean){
     // Assume it is already passed as boolean
@@ -125,7 +164,7 @@ Machines.setReading = function(machineId, reading, value){
   Readings.insert({ machineId: machineId, type: reading, reading: value })
 }
 
-// Ensure index for performance
+//// Ensure index for performance
 Meteor.startup(function(){
   Readings.rawCollection().ensureIndex({ createdAt: 1 }, {}, _ => _);
 });

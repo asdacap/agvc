@@ -127,7 +127,7 @@ export default ReadingHistoryChart = React.createClass({
         .y0(_ => 1000)
         .y1(d => y(d[1]));
 
-      if(Readings.readingType[this.props.reading] == Boolean){
+      if(Readings.meta[this.props.reading].type == Boolean){
         area = area.interpolate('step-after');
       }
 
@@ -145,7 +145,7 @@ export default ReadingHistoryChart = React.createClass({
         .orient("left")
         .scale(y);
 
-      if(Readings.readingType[this.props.reading] == Boolean){
+      if(Readings.meta[this.props.reading].type == Boolean){
         yAxis = yAxis.ticks(1);
       }
 

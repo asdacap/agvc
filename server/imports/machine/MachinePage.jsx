@@ -115,7 +115,7 @@ var MachineStatusTab = React.createClass({
         secondaryText = self.props.machine[reading].toString();
       }
       return <ListItem
-          primaryText={Readings.readingTitle[reading]} secondaryText={secondaryText} />;
+          primaryText={Readings.meta[reading].title} secondaryText={secondaryText} />;
     });
 
     return <div>
@@ -225,7 +225,7 @@ var ReadingsTab = function(props){
   var charts = Readings.availableReadings.map(function(reading){
     return <div className="col-lg-4 col-md-6 col-xs-12">
       <Paper style={styles.ChartStyle}>
-        <div>{Readings.readingTitle[reading]}</div>
+        <div>{Readings.meta[reading].title}</div>
         <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
       </Paper>
     </div>

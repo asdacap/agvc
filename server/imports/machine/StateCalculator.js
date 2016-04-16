@@ -103,7 +103,7 @@ export default StateCalculator = {
       if(readingValue !== undefined){
         readingValue = readingValue.reading;
       }else{
-        readingValue = Readings.defaultValue[reading]
+        readingValue = Readings.meta[reading].defaultValue;
       }
 
       state[reading] = readingValue;

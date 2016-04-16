@@ -3,12 +3,12 @@ import Machines from '../../machine/Machines';
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 import Settings from '../../Settings';
 
-// Hook machine interface to listen for reading update
 if(Meteor.isServer){
+  // Hook machine interface to listen for reading update
   Readings.availableReadings.forEach(function(reading){
     function callback(value, machineObj){
       if(machineObj === undefined) return;
-      if(Readings.readingType[reading] == Boolean){
+      if(Readings.meta[reading].type == Boolean){
         value = parseInt(value, 0);
         if(value){
           value = true;
