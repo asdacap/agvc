@@ -63,8 +63,8 @@ namespace ManualMode{
       Serial.print("Direction is ");
       Serial.println(direction);
     }
-    // Stop it if no command in 2 second
-    if(millis() - lastMoveCommand > 2000){
+    // Stop it if no command in 1 second
+    if(millis() - lastMoveCommand > 1000){
       direction = 0;
     }
 
