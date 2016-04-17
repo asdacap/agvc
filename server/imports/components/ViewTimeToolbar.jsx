@@ -11,6 +11,8 @@ import {
   ToolbarGroup
 } from 'material-ui';
 import MenuIcon from 'material-ui/lib/svg-icons/navigation/menu';
+import PlayIcon from 'material-ui/lib/svg-icons/av/play-arrow';
+import PauseIcon from 'material-ui/lib/svg-icons/av/pause';
 import ViewTime from '../client/ViewTime';
 import moment from 'moment';
 
@@ -135,13 +137,16 @@ let ViewTimeToolbar = React.createClass({
     if(this.data.mode == "live"){
       rightGroup = <ToolbarGroup float="right">
         <ToolbarTitle text={moment(this.data.viewTime).format('l LTS')} />
-        <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton}/>
+        <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton} primary={true}/>
       </ToolbarGroup>;
     }else{
       if(this.data.playing){
         rightGroup = <ToolbarGroup float="right">
           <ToolbarTitle text={moment(this.data.viewTime).format('l LTS')} />
-          <RaisedButton label={this.data.playing ? "Playing" : "Paused"} onTouchTap={this.togglePlay} style={styles.ToolbarButton}/>
+          <RaisedButton label={this.data.playing ? "Playing" : "Paused"}
+            icon={<PlayIcon />}
+            onTouchTap={this.togglePlay}
+            style={styles.ToolbarButton}/>
           <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton}/>
         </ToolbarGroup>;
       }else{
@@ -160,7 +165,10 @@ let ViewTimeToolbar = React.createClass({
             style={styles.SecondPickerTextField}
             onChange={this.setSecond}
             value={moment(this.data.viewTime).second()} />
-          <RaisedButton label={this.data.playing ? "Playing" : "Paused"} onTouchTap={this.togglePlay} style={styles.ToolbarButton}/>
+          <RaisedButton label={this.data.playing ? "Playing" : "Paused"}
+            icon={<PauseIcon />}
+            onTouchTap={this.togglePlay}
+            style={styles.ToolbarButton}/>
           <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton}/>
         </ToolbarGroup>;
       }
