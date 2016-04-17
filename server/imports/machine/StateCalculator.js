@@ -75,13 +75,53 @@ function calculateLocationPoint(locationLog, atTime){
   }
 }
 
+function calculateStatus(machineId, atTime){
+  // Set the default status and when it happened
+  let cStatus = "normal";
+  let cStatusTime = 0;
+
+  // First, check online
+  let onlineLog = Readings.getLastReadingLog("online", machineId, atTime);
+
+  // Ignore it if it is true
+  if(onlineLog !== undefined && onlineLog.value == true) onlineLog = undefined;
+  if(onlineLog !== undefined){
+    cStatus = "offline";
+    cStatusTime = onlineLog.createdAt.getTime();
+  }
+
+  // Next, check out of circuit
+  let outOfCircuitLog = Readings.getLastReadingLog("outOfCircuit", machineId, atTime);
+
+  // Ignore it if it is false
+  if(outOfCircuitLog !== undefined && outOfCircuitLog.value == false) outOfCircuitLog = undefined;
+  if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() > cStatusTime){
+    cStatus = "outOfCircuit";
+    cStatusTime = outOfCircuitLog.createdAt.getTime();
+  }
+
+  // Next, check manual mode
+  let manualModeLog = Readings.getLastReadingLog("manualMode", machineId, atTime);
+
+  // Ignore it if it is false
+  if(manualModeLog !== undefined && manualModeLog.value == false) manualModeLog = undefined;
+  if(manualModeLog !== undefined && manualModeLog.createdAt.getTime() > cStatusTime){
+    cStatus = "manualMode";
+    cSTatusTime = manualModeLog.createdAt.getTime();
+  }
+
+  return cStatus;
+};
+
 export default StateCalculator = {
   subscribe(machineId, atTime){
     // Subscribe to the data required to calculate the machine state at the time
-    Meteor.subscribe("location_logs", machineId, atTime);
+    let ready = true;
+    ready = ready && Meteor.subscribe("location_logs", machineId, atTime).ready();
     Readings.availableReadings.forEach(function(reading){
-      Meteor.subscribe("readingState", machineId, reading, atTime);
+      ready = ready && Meteor.subscribe("readingState", machineId, reading, atTime).ready();
     });
+    return ready;
   },
   calculate(machineId, atTime){
     // Attempt to calculate the state of the machine at the time
@@ -91,15 +131,7 @@ export default StateCalculator = {
     Readings.availableReadings.forEach(reading => {
 
       // Fetch the last one
-      var readingValue = Readings.findOne({
-        machineId: machineId,
-        createdAt: { $lte: atTime },
-        type: reading
-      }, {
-        sort: { createdAt: -1 },
-        limit: 1
-      });
-
+      var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
       if(readingValue !== undefined){
         readingValue = readingValue.reading;
       }else{
@@ -124,6 +156,9 @@ export default StateCalculator = {
     }else{
       state.position = calculateLocationPoint(lastLocation, atTime);
     }
+
+    // Then, the status one
+    state.status = calculateStatus(machineId, atTime);
 
     return state;
   }

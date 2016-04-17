@@ -19,18 +19,24 @@ export default MachineView = React.createClass({
   },
   getMeteorData(){
 
-    StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+    let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+
+    if(ready){
+      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+    }
+
     return {
+      ready: ready,
       state: StateCalculator.calculate(this.props.machine.machineId, this.props.atTime)
     }
   },
   render(){
 
-    if(this.data.state.position === undefined){
+    if(this.machineState == undefined || this.machineState.position === undefined){
       return <g></g>; // Nothing
     }
 
-    var point = this.data.state.position;
+    var point = this.machineState.position;
     return <g transform={ "translate("+point.x+","+point.y+")" }>
       <rect
         style={ styles.AGVStyle }
@@ -63,7 +69,7 @@ export default MachineView = React.createClass({
         d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
         id="path4138-9-2" />
 
-      <text fontFamily="Arial" fontSize="30" y="65" stroke="green" textAnchor="middle">{this.props.machine.machineId}</text>
+      <text fontFamily="Arial" fontSize="30" y="65" stroke="green" textAnchor="middle">{this.props.machine.machineId + this.machineState.status}</text>
     </g>; // Something
   }
 });

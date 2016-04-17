@@ -122,6 +122,20 @@ Machines.setReading = function(machineId, reading, value){
   Readings.insert({ machineId: machineId, type: reading, reading: value })
 }
 
+
+//// Utility function to get reading
+
+Readings.getLastReadingLog = function(reading, machineId, atTime){
+  return Readings.findOne({
+    machineId: machineId,
+    createdAt: { $lte: atTime },
+    type: reading
+  }, {
+    sort: { createdAt: -1 },
+    limit: 1
+  });
+};
+
 //// Ensure index for performance
 if(Meteor.isServer){
   Meteor.startup(function(){
