@@ -1,42 +1,18 @@
 import React from 'react';
 import {
-   FlatButton,
-   RaisedButton,
-   TextField,
-   TimePicker,
-   DatePicker,
-   Toolbar,
-   ToolbarTitle,
-   ToolbarGroup
-  } from 'material-ui';
+  AppBar,
+  FlatButton,
+  RaisedButton,
+  TextField,
+  TimePicker,
+  DatePicker,
+  Toolbar,
+  ToolbarTitle,
+  ToolbarGroup
+} from 'material-ui';
 import MenuIcon from 'material-ui/lib/svg-icons/navigation/menu';
 import ViewTime from '../client/ViewTime';
 import moment from 'moment';
-
-let styles = {
-  PickerRoot: {
-    display: "inline-block",
-    float: "left",
-    marginRight: "1ex"
-  },
-  PickerTextField: {
-    width: "6em",
-    fontSize: "120%"
-  },
-  TimeTextField: {
-    width: "4em",
-    fontSize: "120%"
-  },
-  SecondPickerTextField: {
-    marginRight: "1ex",
-    float: "left",
-    width: "2em",
-    fontSize: "120%"
-  },
-  ToolbarButton: {
-    marginRight: 0
-  }
-}
 
 let ViewTimeToolbar = React.createClass({
   mixins: [ReactMeteorData],
@@ -84,6 +60,10 @@ let ViewTimeToolbar = React.createClass({
   componentWillMount () {
     let newMuiTheme = this.state.muiTheme;
     newMuiTheme.textField.borderColor = "#4f4f4f";
+    newMuiTheme.toolbar.backgroundColor = newMuiTheme.appBar.color;
+    newMuiTheme.toolbar.height = newMuiTheme.appBar.height;
+    newMuiTheme.toolbar.iconColor = newMuiTheme.appBar.textColor;
+    newMuiTheme.textField.textColor = newMuiTheme.appBar.textColor;
 
     this.setState({
       muiTheme: newMuiTheme,
@@ -113,9 +93,44 @@ let ViewTimeToolbar = React.createClass({
     ViewTime.time = moment(ViewTime.time).second(newSecond).toDate();
   },
 
+  getStyles(){
+    let styles = {
+      PickerRoot: {
+        display: "inline-block",
+        float: "left",
+        height: "56px",
+        marginRight: "1ex"
+      },
+      BaseTextField: {
+        fontSize: "130%",
+        marginTop: "7px"
+      },
+      PickerTextField: {
+        width: "6em"
+      },
+      TimeTextField: {
+        width: "4em"
+      },
+      SecondPickerTextField: {
+        marginRight: "1ex",
+        float: "left",
+        width: "2em"
+      },
+      ToolbarButton: {
+        marginRight: 0
+      }
+    };
+
+    _.extend(styles.PickerTextField, styles.BaseTextField);
+    _.extend(styles.TimeTextField, styles.BaseTextField);
+    _.extend(styles.SecondPickerTextField, styles.BaseTextField);
+    return styles;
+  },
+
   render(){
 
     let rightGroup = null;
+    let styles = this.getStyles();
 
     if(this.data.mode == "live"){
       rightGroup = <ToolbarGroup float="right">
@@ -151,10 +166,9 @@ let ViewTimeToolbar = React.createClass({
       }
     }
 
-    return <Toolbar style={{ overflow: "hidden" }}>
-      <ToolbarGroup float="left" />
+    return <AppBar style={{ overflow: "hidden" }} title="Dashboard" onLeftIconButtonTouchTap={this.toggleNav}>
       {rightGroup}
-    </Toolbar>;
+    </AppBar>;
   }
 });
 

@@ -27,7 +27,6 @@ Dashboard = React.createClass({
     return <AppCanvas>
         <SideNavPage ref="navPage">
           <div>
-            <AppBar title="Dashboard" onLeftIconButtonTouchTap={this.toggleNav}/>
             <ViewTimeToolbar toggleNav={this.toggleNav} />
             <AllMachineMap />
             <MachineList />
