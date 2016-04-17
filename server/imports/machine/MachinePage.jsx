@@ -24,6 +24,7 @@ import MachineCommandQueueTab from './MachineCommandQueueTab';
 import MachineMessageLogTab from './MachineMessageLogTab';
 import ReadingsTab from './ReadingsTab';
 import ManualTab from './ManualTab';
+import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
 
 let styles = {
   MachineLoading: {
@@ -92,6 +93,7 @@ export default MachinePage = React.createClass({
                 { page_component }
               </div>
             }
+            <ResponseTimeIndicator />
           </div>
         </SideNavPage>
       </AppCanvas>;

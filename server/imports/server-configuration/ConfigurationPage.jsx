@@ -17,6 +17,7 @@ import SideNavPage from '../components/SideNavPage';
 import SystemConfiguration from './ServerConfiguration';
 import SerialList from '../arduino-configurator/SerialList';
 import Machines from '../machine/Machines';
+import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
 
 let styles = {
   arduinoConfiguration: {
@@ -255,6 +256,7 @@ export default ConfigurationPage = React.createClass({
               </Tab>
             </Tabs>
             <ServerConfigurationForm open={this.state.openForm} close={this.closeForm} />
+            <ResponseTimeIndicator />
           </div>
         </SideNavPage>
       </AppCanvas>;

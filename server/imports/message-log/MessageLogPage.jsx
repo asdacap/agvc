@@ -90,6 +90,7 @@ export default MessageLogPage = React.createClass({
                  })}
               </TableBody>
             </Table>
+            <ResponseTimeIndicator />
           </div>
         </SideNavPage>
       </AppCanvas>
