@@ -60,7 +60,7 @@ let ViewTimeToolbar = React.createClass({
   },
   //update theme here
   componentWillMount () {
-    let newMuiTheme = this.state.muiTheme;
+    let newMuiTheme = JSON.parse(JSON.stringify(this.state.muiTheme));
     newMuiTheme.textField.borderColor = "#4f4f4f";
     newMuiTheme.toolbar.backgroundColor = newMuiTheme.appBar.color;
     newMuiTheme.toolbar.height = newMuiTheme.appBar.height;
