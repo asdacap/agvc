@@ -11,7 +11,7 @@ Readings.availableReadings = [
   "battery",
   "online",
   "outOfCircuit",
-  "latency",
+  "responseTime",
   "loopInterval",
   "manualMode"
 ];
@@ -27,8 +27,8 @@ Readings.meta = {
     defaultValue: 0,
     type: Number
   },
-  latency: {
-    title: "Latency",
+  responseTime: {
+    title: "Response Time",
     defaultValue: 0,
     type: Number
   },

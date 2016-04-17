@@ -24,7 +24,7 @@ if(Meteor.isServer){
     });
   });
 
-  // For latency recording
+  // For responseTime recording
   AGVMachineHandler.registerEventHandler({
     event: "connect",
     callback: function(machineId, handler){
@@ -32,8 +32,8 @@ if(Meteor.isServer){
         Machines.sendCommand(machineId, "p:"+(new Date().getTime()), true);
       }, Settings.ping_interval);
       let pingCallback = value => {
-        let latency = new Date().getTime() - value;
-        Machines.setReading(machineId, 'latency', latency);
+        let responseTime = new Date().getTime() - value;
+        Machines.setReading(machineId, 'responseTime', responseTime);
       };
       let eventHandle = handler.on('key:p', pingCallback);
       handler.once('close', _ => {
