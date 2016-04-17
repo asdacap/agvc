@@ -1,7 +1,60 @@
 import React from 'react';
 import {
-  RaisedButton
+  RaisedButton,
+  FloatingActionButton
 } from 'material-ui';
+
+import HardwareKeyboardArrowDown from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-down';
+import HardwareKeyboardArrowUp from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-up';
+import HardwareKeyboardArrowLeft from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-left';
+import HardwareKeyboardArrowRight from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-right';
+
+let styles = {
+  OfflineNotice: {
+    marginTop: '100px',
+    fontSize: '200%'
+  },
+  ContainerBox: {
+    textAlign: 'center',
+    minHeight: '300px',
+    height: '100%',
+    position: 'relative',
+  },
+  InnerBox: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    marginTop: '-150px',
+    marginLeft: '-150px',
+    width: '300px',
+    height: '300px'
+  },
+  Buttons: {
+    ManualToggle: {
+      marginTop: '1ex'
+    },
+    Up: {
+      position: 'absolute',
+      top: '70px',
+      left: '125px'
+    },
+    Down: {
+      position: 'absolute',
+      top: '200px',
+      left: '125px'
+    },
+    Left: {
+      position: 'absolute',
+      top: '135px',
+      left: '50px'
+    },
+    Right: {
+      position: 'absolute',
+      top: '135px',
+      left: '200px'
+    },
+  }
+};
 
 export default ManualTab = React.createClass({
   enterManual(e){
@@ -79,19 +132,43 @@ export default ManualTab = React.createClass({
     let machineId = this.props.machine.machineId;
 
     if(!this.props.machine.online){
-      return <span>Machine is offline</span>;
+      return <div style={styles.ContainerBox}>
+        <div style={styles.InnerBox}>
+          <div style={styles.OfflineNotice}>Machine is offline</div>
+        </div>
+      </div>;
     }
     if(manual){
-      return <div>
-        <RaisedButton label="Manual On" onTouchTap={this.exitManual} />
-        <RaisedButton label="Up" onMouseDown={this.forward} onMouseUp={this.stop} onTouchStart={this.forward} onTouchEnd={this.stop}/>
-        <RaisedButton label="Down" onMouseDown={this.backward} onMouseUp={this.stop} onTouchStart={this.backward} onTouchEnd={this.stop}/>
-        <RaisedButton label="Right" onMouseDown={this.right} onMouseUp={this.stop} onTouchStart={this.right} onTouchEnd={this.stop}/>
-        <RaisedButton label="Left" onMouseDown={this.left} onMouseUp={this.stop} onTouchStart={this.left} onTouchEnd={this.stop}/>
+      return <div style={styles.ContainerBox}>
+        <div style={styles.InnerBox}>
+          <RaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
+          <FloatingActionButton label='Up' style={styles.Buttons.Up}
+            onMouseDown={this.forward} onMouseUp={this.stop}
+            onTouchStart={this.forward} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowUp />
+          </FloatingActionButton>
+          <FloatingActionButton label='Down' style={styles.Buttons.Down}
+            onMouseDown={this.backward} onMouseUp={this.stop}
+            onTouchStart={this.backward} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowDown />
+          </FloatingActionButton>
+          <FloatingActionButton label='Right' style={styles.Buttons.Right}
+            onMouseDown={this.right} onMouseUp={this.stop}
+            onTouchStart={this.right} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowRight />
+          </FloatingActionButton>
+          <FloatingActionButton label='Left' style={styles.Buttons.Left}
+            onMouseDown={this.left} onMouseUp={this.stop}
+            onTouchStart={this.left} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowLeft />
+          </FloatingActionButton>
+        </div>
       </div>
     }else{
-      return <div>
-        <RaisedButton label="Manual Off" onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
+      return <div style={styles.ContainerBox}>
+        <div style={styles.InnerBox}>
+          <RaisedButton style={styles.Buttons.ManualToggle} label="Manual Off" onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
+        </div>
       </div>
     }
   }
