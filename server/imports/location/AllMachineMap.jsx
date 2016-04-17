@@ -23,7 +23,7 @@ export default AllMachineMap = React.createClass({
       <rect x="-10000" y="-10000" width="30000" height="30000" fill="#EEEEEE" />
       <MapView />
       <g>
-        { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} /> ) }
+        { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
       </g>
     </svg>;
   }
@@ -32,6 +32,6 @@ export default AllMachineMap = React.createClass({
 // Draw the map
 var MapView = function(){
   return <g>
-    <g>{ Map.paths.map(p => <path d={p.svgPathD} stroke="black" strokeWidth="5" fill="none"/>) }</g>
+    <g>{ Map.paths.map((p,idx) => <path d={p.svgPathD} stroke="black" strokeWidth="5" fill="none" key={idx} />) }</g>
   </g>;
 };

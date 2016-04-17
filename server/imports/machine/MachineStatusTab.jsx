@@ -41,7 +41,7 @@ export default MachineStatusTab = React.createClass({
       if(self.props.machine[reading] !== undefined){
         secondaryText = self.props.machine[reading].toString();
       }
-      return <ListItem
+      return <ListItem key={reading}
           primaryText={Readings.meta[reading].title} secondaryText={secondaryText} />;
     });
 

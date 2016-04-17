@@ -51,10 +51,10 @@ export default MachineList = React.createClass({
   render(){
     return <div className="machine-lists">
       <div style={styles.MachineListBox}>
-        <div class="machines row">
+        <div className="machines row">
           { this.data.machines.map(function(item){
-            return <div className="col-lg-3 col-md-4 col-xs-12">
-              <MachineListItem machine={item} key={item._id}/>;
+            return <div className="col-lg-3 col-md-4 col-xs-12" key={item._id}>
+              <MachineListItem machine={item}/>;
             </div>;
           }) }
         </div>
