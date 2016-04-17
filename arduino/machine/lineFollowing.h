@@ -1,5 +1,6 @@
 #include "states.h"
 #include "MotorControl.h"
+#include "PID_v1.h"
 
 namespace LineFollowing{
 
@@ -62,46 +63,50 @@ namespace LineFollowing{
     S4
   };
 
+  double curDir = 0;
+  double outDir = 0;
+  double neutral = 0;
+  PID directionPID(&curDir, &outDir, &neutral, 0.95, 0.2, 0.03, DIRECT);
+
   void followline(){
 
-    int curDir = 0;
     if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
-      curDir = 0;
+      curDir = -4;
     }
 
     else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){  // 1  1  0  0  0
-      curDir = 1;
+      curDir = -3;
     }
 
     else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 0&& DS_4 == 0 && DS_5 == 0){  // 0  1  0  0  0
-      curDir = 2;
+      curDir = -2;
     }
 
     else if (DS_1 == 0 && DS_2 == 1 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  1  1  0  0
-      curDir = 3;
+      curDir = -1;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 0 && DS_5 == 0){  // 0  0  1  0  0
-      curDir = 4;
+      curDir = 0;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 1 && DS_4 == 1 && DS_5 == 0){  // 0  0  1  1  0
-      curDir = 5;
+      curDir = 1;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 0){  // 0  0  0  1  0
-      curDir = 6;
+      curDir = 2;
     }
 
     else if (DS_1 == 0 && DS_2 ==0 && DS_3 == 0 && DS_4 == 1 && DS_5 == 1){  // 0  0  0  1  1
-      curDir = 7;
+      curDir = 3;
     }
 
     else if (DS_1 == 0 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 1){  // 0  0  0  0  1
-      curDir = 8;
+      curDir = 4;
     }
     else if (DS_1 == 1 && DS_2 == 1 && DS_3 == 1 && DS_4 == 1 && DS_5 == 1){  // 1  1  1  1  1
-      curDir = 9;
+      curDir = 0;
     }
     else
     {
@@ -120,8 +125,28 @@ namespace LineFollowing{
       States::clearOutOfCircuit();
     }
 
+    curDir*=-1;
+    directionPID.Compute();
+
+
+    int baseL = 200;
+    int baseR = 200;
+
+    int multiplier = 80;
+    int diffRange = 200; // Maximum difference in motor speed
+
+    Serial.println("outDir is "+String(outDir));
+
+    if(outDir < 0){
+      baseL += outDir*multiplier;
+      baseR = min(baseR, baseL+diffRange);
+    }else{
+      baseR -= outDir*multiplier;
+      baseL = min(baseL, baseR+diffRange);
+    }
+
     // Apply it
-    SmarterForward(speedL[curDir], speedR[curDir]);
+    SmarterForward(baseL, baseR);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,6 +157,10 @@ namespace LineFollowing{
     pinMode(pin_3 , INPUT);
     pinMode(pin_4 , INPUT);
     pinMode(pin_5 , INPUT);         //declare pins as INPUT for sensors
+
+    directionPID.SetMode(AUTOMATIC);
+    directionPID.SetSampleTime(25);
+    directionPID.SetOutputLimits(-5,5);
   }
 
   void loop()

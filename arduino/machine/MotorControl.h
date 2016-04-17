@@ -16,7 +16,7 @@ namespace MotorControl{
   }
 
   // Offset
-  int RIGHT_OFFSET = 40;
+  int RIGHT_OFFSET = 20;
   int LEFT_OFFSET = 0;
   void SmarterForward(int pwm_left,int pwm_right){
 
