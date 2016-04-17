@@ -51,8 +51,12 @@ export default MachineList = React.createClass({
   render(){
     return <div className="machine-lists">
       <div style={styles.MachineListBox}>
-        <div class="machines">
-          { this.data.machines.map(function(item){ return <MachineListItem machine={item} key={item._id}/>; }) }
+        <div class="machines row">
+          { this.data.machines.map(function(item){
+            return <div className="col-lg-3 col-md-4 col-xs-12">
+              <MachineListItem machine={item} key={item._id}/>;
+            </div>;
+          }) }
         </div>
         <FloatingActionButton onClick={this.toggleForm} style={styles.AddMachineFloatingButton}>
           <ContentAdd />

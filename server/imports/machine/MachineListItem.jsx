@@ -24,7 +24,6 @@ import ViewTime from '../client/ViewTime';
 
 var styles = {
   MachineListItem: {
-    width: "300px",
     display: "inline-block",
     marginRight: "20px",
     marginBottom: "20px"
