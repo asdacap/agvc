@@ -52,6 +52,7 @@ if(Meteor.isServer){
 // Ensure index for performance
 if(Meteor.isServer){
   Meteor.startup(function(){
-    LocationLogs.rawCollection().ensureIndex({ createdAt: 1, machineId: 1 }, {}, _ => _);
+    LocationLogs.rawCollection().ensureIndex({ machineId: 1, createdAt: -1 }, {}, _ => _);
+    LocationLogs.rawCollection().ensureIndex({ machineId: 1, createdAt: 1 }, {}, _ => _);
   });
 }

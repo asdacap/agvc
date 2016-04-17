@@ -162,3 +162,8 @@ google's Material UI guidelines.
 The TCP server is embedded inside the Meteor server. At the start of the server,
 a TCP server is started at port 10000. The server also listen for any new command
 from mongodb.
+
+17 April 2016 3:30 PM: Fixed Performance issue in preview
+=========================================================
+
+Fixed performance issue with the preview. The problem is wrong index definition.
