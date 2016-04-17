@@ -33,7 +33,7 @@ var LocationLogSchema = {
 LocationLogs.attachSchema(LocationLogSchema);
 
 if(Meteor.isServer){
-  Meteor.publish("location_logs", function(machineId, atTime){
+  Meteor.publish("LocationLogs.forMachine", function(machineId, atTime){
     if(machineId === undefined || atTime === undefined){
       console.log("Location logs missing parameters");
       return null;

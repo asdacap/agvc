@@ -10,7 +10,7 @@ import ViewTime from '../client/ViewTime';
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
-    var handle = Meteor.subscribe("machines");
+    var handle = Meteor.subscribe("Machines");
     var atTime = ViewTime.time;
 
     return {

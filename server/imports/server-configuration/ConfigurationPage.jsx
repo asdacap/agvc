@@ -132,7 +132,7 @@ let ConfigureArduinoDialog = React.createClass({
     };
   },
   getMeteorData(){
-    Meteor.subscribe("machines");
+    Meteor.subscribe("Machines");
     return {
       machines: Machines.find({}).fetch()
     }

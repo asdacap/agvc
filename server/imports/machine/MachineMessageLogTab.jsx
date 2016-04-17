@@ -22,7 +22,7 @@ export default MachineMessageLogTab = React.createClass({
     return {};
   },
   getMeteorData(){
-    Meteor.subscribe("machineMessages", this.props.machine.machineId, this.limit.get());
+    Meteor.subscribe("MessageLogs.forMachine", this.props.machine.machineId, this.limit.get());
     return {
       messages: MessageLogs.find({ fromMachineId: this.props.machine.machineId }, { sort: { createdAt: -1 } }).fetch()
     }

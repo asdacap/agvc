@@ -38,7 +38,7 @@ export default MachinePage = React.createClass({
     machineId: React.PropTypes.string
   },
   getMeteorData(){
-    var handle = Meteor.subscribe("machine", this.props.machineId);
+    var handle = Meteor.subscribe("Machine", this.props.machineId);
     return {
       ready: handle.ready(),
       machine: Machines.findOne({ machineId: this.props.machineId })

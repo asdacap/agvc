@@ -66,10 +66,10 @@ Meteor.methods({
 });
 
 if(Meteor.isServer){
-  Meteor.publish("machines", function(){
+  Meteor.publish("Machines", function(){
     return Machines.find({});
   });
-  Meteor.publish("machine", function(machineId){
+  Meteor.publish("Machine", function(machineId){
     return Machines.find({ machineId });
   });
 }

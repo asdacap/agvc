@@ -39,7 +39,7 @@ export default MachineList = React.createClass({
     return { openForm };
   },
   getMeteorData(){
-    var handle = Meteor.subscribe("machines");
+    var handle = Meteor.subscribe("Machines");
     return {
       machines: Machines.find({}).fetch(),
       openForm: this.state.openForm.get()

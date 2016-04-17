@@ -117,9 +117,9 @@ export default StateCalculator = {
   subscribe(machineId, atTime){
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;
-    ready = ready && Meteor.subscribe("location_logs", machineId, atTime).ready();
+    ready = ready && Meteor.subscribe("MachineLogs.last", machineId, atTime).ready();
     Readings.availableReadings.forEach(function(reading){
-      ready = ready && Meteor.subscribe("readingState", machineId, reading, atTime).ready();
+      ready = ready && Meteor.subscribe("Readings.last", machineId, reading, atTime).ready();
     });
     return ready;
   },

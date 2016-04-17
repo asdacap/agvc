@@ -8,7 +8,7 @@ export default ResponseTimeIndicator = React.createClass({
 
     Chronos.liveUpdate(1000);
 
-    Meteor.subscribe("clientResponseTimes", Meteor.connection._lastSessionId);
+    Meteor.subscribe("ClientResponseTimes", Meteor.connection._lastSessionId);
 
     let record = ClientResponseTimes.findOne({ connectionId: Meteor.connection._lastSessionId });
     if(record !== undefined){

@@ -3,13 +3,13 @@
 GlobalStates = new Mongo.Collection('global_states');
 
 if(Meteor.isServer){
-  Meteor.publish("global_states", function(){
+  Meteor.publish("GlobalStates", function(){
     return GlobalStates.find({}); // Publish everything
   });
 }
 
 if(Meteor.isClient){
-  Meteor.subscribe('global_states'); // Subscribe to everything
+  Meteor.subscribe('GlobalStates'); // Subscribe to everything
 }
 
 export default GlobalStates;

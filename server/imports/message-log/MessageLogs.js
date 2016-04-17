@@ -36,10 +36,10 @@ Meteor.methods({
 });
 
 if(Meteor.isServer){
-  Meteor.publish("messages", function(limit){
+  Meteor.publish("MessageLogs", function(limit){
     return MessageLogs.find({}, { limit, sort: { createdAt: -1 } });
   });
-  Meteor.publish("machineMessages", function(machineId, limit){
+  Meteor.publish("MessageLogs.forMachine", function(machineId, limit){
     return MessageLogs.find({ fromMachineId: machineId }, { limit, sort: { createdAt: -1 } });
   });
 }

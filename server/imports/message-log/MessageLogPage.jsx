@@ -27,7 +27,7 @@ export default MessageLogPage = React.createClass({
     return {};
   },
   getMeteorData(){
-    Meteor.subscribe("messages", this.limit.get());
+    Meteor.subscribe("MessageLogs", this.limit.get());
     return {
       messages: MessageLogs.find({}, { sort: { createdAt: -1 } }).fetch()
     }

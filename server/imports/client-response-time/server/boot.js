@@ -52,10 +52,10 @@ Meteor.methods({
   }
 });
 
-Meteor.publish("clientResponseTimeLogs", function(connectionId){
+Meteor.publish("ClientResponseTimeLogs", function(connectionId){
   return ClientResponseTimeLogs.find({ connectionId: connectionId });
 });
 
-Meteor.publish("clientResponseTimes", function(connectionId){
+Meteor.publish("ClientResponseTimes", function(connectionId){
   return ClientResponseTimes.find({ connectionId: connectionId });
 });

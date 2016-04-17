@@ -74,10 +74,10 @@ Readings.attachSchema(ReadingSchema);
 
 //// Publications
 if(Meteor.isServer){
-  Meteor.publish("readings", function(machineId, reading, fromDate){
+  Meteor.publish("Readings.fromDate", function(machineId, reading, fromDate){
     return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
-  Meteor.publish("readingState", function(machineId, reading, atTime){
+  Meteor.publish("Readings.last", function(machineId, reading, atTime){
 
     let readings = Readings.find({
       machineId: machineId,

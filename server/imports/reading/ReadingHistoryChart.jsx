@@ -49,7 +49,7 @@ export default ReadingHistoryChart = React.createClass({
     if(newSubFromDate.diff(self.subFromDate, 'minutes') > 10){
       self.subFromDate = newSubFromDate;
     }
-    self.handle = Meteor.subscribe("readings",
+    self.handle = Meteor.subscribe("Readings.fromDate",
       self.props.machine.machineId,
       self.props.reading,
       self.subFromDate.toDate());
