@@ -103,6 +103,10 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
+      if(machinesConnection[machineId] === this){
+        // Already registered. Don't register again
+        return;
+      }
       machinesConnection[machineId].close();
     }
 
@@ -116,15 +120,17 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     machinesConnection[machineId] = this;
 
     Machines.markOnline(this.machineObj._id);
+    this.startCommandQueueObservation();
+    this.emit('connect', this.machineObj.machineId, this);
+  }
 
-    this.queueHandler = Machines.find({ machineId: machineId }).observe({
+  startCommandQueueObservation(){
+    this.queueHandler = Machines.find({ machineId: this.machineObj.machineId }, { pollingThrottleMs: 50 }).observe({
       changed: this.onMachineChanged
     });
 
     // Send previous command.
     this.onMachineChanged(this.machineObj);
-
-    this.emit("connect", this.machineObj.machineId, this);
   }
 
   onMachineChanged(newDocument, oldDocument){
@@ -137,6 +143,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       if(command.droppable && (new Date() - command.createdAt) > Settings.dropppable_command_timeout){
         console.log("Droppable command "+command.command+" dropped");
       }
+      console.log("send data "+command.command);
       self.driver.sendMessage(command.command);
     });
   }
@@ -152,7 +159,9 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   onClose(){
     console.log("Closing connection");
     if(this.machineObj !== undefined){
-      this.queueHandler.stop();
+      if(this.queueHandler !== undefined){
+        this.queueHandler.stop();
+      }
       Machines.markOffline(this.machineObj._id);
       machinesConnection[this.machineObj.machineId] = undefined;
     }

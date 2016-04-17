@@ -36,7 +36,7 @@ if(Meteor.isServer){
         Machines.setReading(machineId, 'latency', latency);
       };
       let eventHandle = handler.on('key:p', pingCallback);
-      handler.on('close', _ => {
+      handler.once('close', _ => {
         Meteor.clearInterval(intervalHandle);
         handler.removeListener('key:p', pingCallback);
       })
