@@ -125,7 +125,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   }
 
   startCommandQueueObservation(){
-    this.queueHandler = Machines.find({ machineId: this.machineObj.machineId }, { pollingThrottleMs: 50 }).observe({
+    this.queueHandler = Machines.find({ machineId: this.machineObj.machineId }, {}).observe({
       changed: this.onMachineChanged
     });
 
