@@ -4,7 +4,7 @@ import ClientResponseTimes from '../ClientResponseTimes';
 
 // Periodically create a log that the client will have to send back
 Meteor.onConnection(function(connection){
-  console.log("Doing on id "+connection.id);
+  console.log("Starting client point to client "+connection.id);
   // The thing that ping
   let intervalHandle = Meteor.setInterval(function(){
     ClientResponseTimeLogs.insert({ connectionId: connection.id });
