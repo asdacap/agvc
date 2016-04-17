@@ -3,6 +3,7 @@ import Readings from '../reading/Readings';
 import LocationLogs from '../location/LocationLogs';
 import Map from '../location/Map';
 import Point from 'point-at-length';
+import moment from 'moment';
 
 // Attempt to calculate the state of a machine
 // at a particular time.
@@ -115,11 +116,20 @@ function calculateStatus(machineId, atTime){
 
 export default StateCalculator = {
   subscribe(machineId, atTime){
+
+    // Subscribing only the last one is inefficent
+    // We are subscribing record for the whole minute
+    atTime = new Date(atTime.getTime());
+    atTime.setSeconds(0,0);
+    let toTime = moment(new Date(atTime.getTime())).add(1, 'minutes').toDate();
+
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;
-    ready = ready && Meteor.subscribe("MachineLogs.last", machineId, atTime).ready();
+    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime).ready();
+    ready = ready && Meteor.subscribe("LocationLogs.createdAtRange", machineId, atTime, toTime).ready();
     Readings.availableReadings.forEach(function(reading){
       ready = ready && Meteor.subscribe("Readings.last", machineId, reading, atTime).ready();
+      ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, reading, atTime, toTime).ready();
     });
     return ready;
   },

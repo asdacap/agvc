@@ -33,7 +33,7 @@ var LocationLogSchema = {
 LocationLogs.attachSchema(LocationLogSchema);
 
 if(Meteor.isServer){
-  Meteor.publish("LocationLogs.forMachine", function(machineId, atTime){
+  Meteor.publish("LocationLogs.last", function(machineId, atTime){
     if(machineId === undefined || atTime === undefined){
       console.log("Location logs missing parameters");
       return null;
@@ -46,7 +46,14 @@ if(Meteor.isServer){
       sort: { createdAt: -1 },
       limit: 1
     });
-  })
+  });
+
+  Meteor.publish("LocationLogs.createdAtRange", function(machineId, startTime, endTime){
+    return LocationLogs.find({
+      machineId: machineId,
+      createdAt: { $gte: startTime, $lte: endTime }
+    });
+  });
 }
 
 // Ensure index for performance

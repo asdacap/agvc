@@ -78,7 +78,6 @@ if(Meteor.isServer){
     return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
   });
   Meteor.publish("Readings.last", function(machineId, reading, atTime){
-
     let readings = Readings.find({
       machineId: machineId,
       type: reading,
@@ -86,6 +85,15 @@ if(Meteor.isServer){
     }, {
       sort: { createdAt: -1 },
       limit: 1
+    });
+
+    return readings;
+  });
+  Meteor.publish("Readings.createdAtRange", function(machineId, reading, fromTime, endTime){
+    let readings = Readings.find({
+      machineId: machineId,
+      type: reading,
+      createdAt: { $gte: fromTime, $lte: endTime }
     });
 
     return readings;
