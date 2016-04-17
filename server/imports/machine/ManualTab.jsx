@@ -14,22 +14,34 @@ export default ManualTab = React.createClass({
   },
   forward(e){
     e.preventDefault();
-    Meteor.call('manualForward', this.props.machine.machineId);
+    this.commandHandle = Meteor.setInterval(_ => {
+      Meteor.call('manualForward', this.props.machine.machineId);
+    }, 500);
   },
   backward(e){
     e.preventDefault();
-    Meteor.call('manualBackward', this.props.machine.machineId);
+    this.commandHandle = Meteor.setInterval(_ => {
+      Meteor.call('manualBackward', this.props.machine.machineId);
+    }, 500);
   },
   left(e){
     e.preventDefault();
-    Meteor.call('manualLeft', this.props.machine.machineId);
+    this.commandHandle = Meteor.setInterval(_ => {
+      Meteor.call('manualLeft', this.props.machine.machineId);
+    }, 500);
   },
   right(e){
     e.preventDefault();
-    Meteor.call('manualRight', this.props.machine.machineId);
+    this.commandHandle = Meteor.setInterval(_ => {
+      Meteor.call('manualRight', this.props.machine.machineId);
+    }, 500);
   },
   stop(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     Meteor.call('manualStop', this.props.machine.machineId);
   },
   render(){
