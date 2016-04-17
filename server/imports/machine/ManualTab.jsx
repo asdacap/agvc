@@ -6,32 +6,56 @@ import {
 export default ManualTab = React.createClass({
   enterManual(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     Meteor.call('enterManualMode', this.props.machine.machineId);
   },
   exitManual(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     Meteor.call('exitManualMode', this.props.machine.machineId);
   },
   forward(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     this.commandHandle = Meteor.setInterval(_ => {
       Meteor.call('manualForward', this.props.machine.machineId);
     }, 500);
   },
   backward(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     this.commandHandle = Meteor.setInterval(_ => {
       Meteor.call('manualBackward', this.props.machine.machineId);
     }, 500);
   },
   left(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     this.commandHandle = Meteor.setInterval(_ => {
       Meteor.call('manualLeft', this.props.machine.machineId);
     }, 500);
   },
   right(e){
     e.preventDefault();
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
     this.commandHandle = Meteor.setInterval(_ => {
       Meteor.call('manualRight', this.props.machine.machineId);
     }, 500);
@@ -43,6 +67,12 @@ export default ManualTab = React.createClass({
       this.commandHandle = undefined;
     }
     Meteor.call('manualStop', this.props.machine.machineId);
+  },
+  componentWillUnmount(){
+    if(this.commandHandle !== undefined){
+      Meteor.clearInterval(this.commandHandle);
+      this.commandHandle = undefined;
+    }
   },
   render(){
     let manual = this.props.machine.manualMode;
