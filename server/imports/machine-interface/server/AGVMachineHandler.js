@@ -103,9 +103,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   registerMachineId(machineId){
     if(machinesConnection[machineId] !== undefined){
-      console.warn("Connection still exist for machineId "+machineId+" will ignore registration");
       machinesConnection[machineId].close();
-      return;
     }
 
     this.machineObj = Machines.findOne({ machineId: machineId });
