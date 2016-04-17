@@ -143,7 +143,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       if(command.droppable && (new Date() - command.createdAt) > Settings.dropppable_command_timeout){
         console.log("Droppable command "+command.command+" dropped");
       }
-      console.log("send data "+command.command);
+      //console.log("send data "+command.command);
       self.driver.sendMessage(command.command);
     });
   }
