@@ -85,7 +85,7 @@ function calculateStatus(machineId, atTime){
   let onlineLog = Readings.getLastReadingLog("online", machineId, atTime);
 
   // Ignore it if it is true
-  if(onlineLog !== undefined && onlineLog.value == true) onlineLog = undefined;
+  if(onlineLog !== undefined && onlineLog.reading == true) onlineLog = undefined;
   if(onlineLog !== undefined){
     cStatus = "offline";
     cStatusTime = onlineLog.createdAt.getTime();
@@ -95,7 +95,7 @@ function calculateStatus(machineId, atTime){
   let outOfCircuitLog = Readings.getLastReadingLog("outOfCircuit", machineId, atTime);
 
   // Ignore it if it is false
-  if(outOfCircuitLog !== undefined && outOfCircuitLog.value == false) outOfCircuitLog = undefined;
+  if(outOfCircuitLog !== undefined && outOfCircuitLog.reading == false) outOfCircuitLog = undefined;
   if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() > cStatusTime){
     cStatus = "outOfCircuit";
     cStatusTime = outOfCircuitLog.createdAt.getTime();
@@ -105,7 +105,7 @@ function calculateStatus(machineId, atTime){
   let manualModeLog = Readings.getLastReadingLog("manualMode", machineId, atTime);
 
   // Ignore it if it is false
-  if(manualModeLog !== undefined && manualModeLog.value == false) manualModeLog = undefined;
+  if(manualModeLog !== undefined && manualModeLog.reading == false) manualModeLog = undefined;
   if(manualModeLog !== undefined && manualModeLog.createdAt.getTime() > cStatusTime){
     cStatus = "manualMode";
     cSTatusTime = manualModeLog.createdAt.getTime();
