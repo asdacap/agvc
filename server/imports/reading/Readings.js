@@ -117,6 +117,11 @@ Readings.availableReadings.forEach(function(reading){
 });
 Machines.attachSchema(MachineSchema);
 
+//// Setting default valies
+Readings.availableReadings.forEach(function(reading){
+  Machines.defaultValue[reading] = Readings.meta[reading].defaultValue;
+});
+
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
   if(Readings.meta[reading].type == Boolean){

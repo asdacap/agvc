@@ -1,1 +1,2 @@
 import './ManualMode';
+import './SendSettings';

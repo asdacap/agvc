@@ -16,25 +16,62 @@ import {
   TextField,
   FloatingActionButton
 } from 'material-ui';
+import { MachineSchema } from './Machines';
+import Machines from './Machines';
 
 var MachineFormCommon = {
-  onMachineIdChange(e){
-    this.setState({ machineId: e.target.value }, this.checkValid);
-  },
-  checkValid(){
-    this.setState({ machineIdErrorText: ""});
-
-    var valid = true;
-    if(this.state.machineId.trim() === ""){
-      this.setState({ machineIdErrorText: "machineId must be specified"});
-      valid = false;
+  mixins: [ReactMeteorData],
+  getMeteorData(){
+    return {
+      invalidKeys: this.validationContext.invalidKeys()
     }
-
-    return valid;
+  },
+  reset(){
+    this.setState(_.extend({}, this.props.machine));
+  },
+  validate(){
+    let obj = _.extend({}, this.state);
+    this.schema.clean(obj);
+    return this.validationContext.validate(obj);
+  },
+  onFieldChange(fieldName){
+    let self = this;
+    return function(e){
+      let newState = {};
+      newState[fieldName] = e.target.value;
+      self.setState(newState, _ => self.validate());
+    };
+  },
+  close(){
+    this.reset();
+    this.props.close();
   },
   renderForm(){
-    return <form onSubmit={this.onSubmit}>
-      <TextField value={this.state.machineId} onChange={this.onMachineIdChange} errorText={this.state.machineIdErrorText} floatingLabelText="Machine ID"/>
+    return <form onSubmit={this.onSubmit} style={{ overflow: "auto", height: "300px" }}>
+      <TextField value={this.state.machineId}
+        onChange={this.onFieldChange("machineId")}
+        errorText={this.validationContext.keyErrorMessage("machineId")}
+        floatingLabelText="Machine ID"/><br />
+      <TextField value={this.state.motorBaseSpeed}
+        onChange={this.onFieldChange("motorBaseSpeed")}
+        errorText={this.validationContext.keyErrorMessage("motorBaseSpeed")}
+        floatingLabelText="Motor Base Speed"/><br />
+      <TextField value={this.state.motorLROffset}
+        onChange={this.onFieldChange("motorLROffset")}
+        errorText={this.validationContext.keyErrorMessage("motorLROffset")}
+        floatingLabelText="Motor Left Right Offset"/><br />
+      <TextField value={this.state.PID_Kp}
+        onChange={this.onFieldChange("PID_Kp")}
+        errorText={this.validationContext.keyErrorMessage("PID_Kp")}
+        floatingLabelText="PID Kp"/><br />
+      <TextField value={this.state.PID_Ki}
+        onChange={this.onFieldChange("PID_Ki")}
+        errorText={this.validationContext.keyErrorMessage("PID_Ki")}
+        floatingLabelText="PID Ki"/><br />
+      <TextField value={this.state.PID_Kd}
+        onChange={this.onFieldChange("PID_Kd")}
+        errorText={this.validationContext.keyErrorMessage("PID_Kd")}
+        floatingLabelText="PID Kd"/>
     </form>;
   },
   render(){
@@ -43,7 +80,7 @@ var MachineFormCommon = {
       <FlatButton
         label="Cancel"
         secondary={true}
-        onClick={this.props.close}
+        onClick={this.close}
         />,
       <FlatButton
         label="Submit"
@@ -65,19 +102,24 @@ var MachineFormCommon = {
 
 var EditMachineForm = React.createClass(_.extend({
   getInitialState(){
-    return {
-      machineId: this.props.machine.machineId
-    };
+    this.schema = MachineSchema;
+    this.validationContext = this.schema.namedContext("machineFormCommon");
+    return _.extend({}, this.props.machine);
   },
   onSubmit(e){
     e.preventDefault();
 
-    if(!this.checkValid()) return;
+    if(!this.validate()) return;
 
-    Meteor.call("editMachine",{
-      _id: this.props.machine._id,
-      machineId: this.state.machineId
+    let props = {
+      _id: this.props.machine._id
+    };
+
+    ["machineId", "motorBaseSpeed", "motorLROffset", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+      props[field] = this.state[field];
     });
+
+    Meteor.call("editMachine",props);
 
     this.props.close();
   },
@@ -88,18 +130,22 @@ var EditMachineForm = React.createClass(_.extend({
 
 var CreateMachineForm = React.createClass(_.extend({
   getInitialState(){
-    return {
-      machineId: ""
-    };
+    this.schema = MachineSchema;
+    this.validationContext = this.schema.namedContext("machineFormCommon");
+    return _.extend({}, Machines.defaultValue);
   },
   onSubmit(e){
     e.preventDefault();
 
-    if(!this.checkValid()) return;
+    if(!this.validate()) return;
 
-    Meteor.call("addMachine",{
-      machineId: this.state.machineId
+    let props = {};
+
+    ["machineId", "motorBaseSpeed", "motorLROffset", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+      props[field] = this.state[field];
     });
+
+    Meteor.call("addMachine",props);
 
     this.props.close();
   },

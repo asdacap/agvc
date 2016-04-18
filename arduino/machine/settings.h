@@ -12,16 +12,12 @@
   //extern String SERVER_IP;
   //extern String SERVER_PORT;
   //extern String TCP_CONNECT_DELAY; // Delay between tcp connection attempt.
-
-  extern void reconfigure();
-
   int LED = 22;
   int LED2 = 23;
   int LED3 = 24;
   int LED4 = 25;
   int BUTTON = 26;
 
-  extern String MACHINE_ID;
 
   struct{
     char wifiSSID[51];
@@ -30,8 +26,18 @@
     char machineId[51];
     int serverPort;
     int tcpConnectDelay;
+    int motorBaseSpeed;
+    int motorLROffset;
+    double PID_Kp;
+    double PID_Ki;
+    double PID_Kd;
     int version;
   } Settings;
+
+extern void reconfigure();
+extern String MACHINE_ID;
+
+namespace Setting{
 
   int MAGIC_VERSION = 123;
 
@@ -52,6 +58,11 @@
       strcpy(Settings.machineId, "ABC");
       Settings.serverPort = 10000;
       Settings.tcpConnectDelay = 5;
+      Settings.motorBaseSpeed = 200;
+      Settings.motorLROffset = 0;
+      Settings.PID_Kp = 0.95;
+      Settings.PID_Ki = 0.3;
+      Settings.PID_Kd = 0.03;
       Settings.version = MAGIC_VERSION;
       saveSettings();
     }
@@ -102,5 +113,29 @@
       Serial.println(String(F("Unknown command "))+command);
     }
   }
+
+  bool onWifiCommand(String command){
+    if(command == F("saveSettings")){
+      saveSettings();
+      return true;
+    }else if(command.startsWith(F("motorBaseSpeed:"))){
+      Settings.motorBaseSpeed = command.substring(15).toInt();
+      return true;
+    }else if(command.startsWith(F("motorLROffset:"))){
+      Settings.motorLROffset = command.substring(14).toInt();
+      return true;
+    }else if(command.startsWith(F("PID_Kp:"))){
+      Settings.PID_Kp = command.substring(7).toFloat();
+      return true;
+    }else if(command.startsWith(F("PID_Ki:"))){
+      Settings.PID_Ki = command.substring(7).toFloat();
+      return true;
+    }else if(command.startsWith(F("PID_Kd:"))){
+      Settings.PID_Kd = command.substring(7).toFloat();
+      return true;
+    }
+    return false;
+  }
+}
 
 #endif

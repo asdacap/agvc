@@ -36,6 +36,29 @@ var MachineSchema = {
     type: Date,
     optional: true
   },
+  motorBaseSpeed: {
+    type: Number,
+    optional: false
+  },
+  motorLROffset: {
+    type: Number,
+    optional: false
+  },
+  PID_Kp: {
+    type: Number,
+    decimal: true,
+    optional: false
+  },
+  PID_Ki: {
+    type: Number,
+    decimal: true,
+    optional: false
+  },
+  PID_Kd: {
+    type: Number,
+    decimal: true,
+    optional: false
+  },
   commandQueue: {
     type: [MachineCommandSchema]
   }
@@ -45,7 +68,15 @@ var MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
 Machines.defaultValue = {
-  commandQueue: []
+  commandQueue: [],
+  motorBaseSpeed: 200,
+  motorLROffset: 0,
+  PID_Kp: 0.95,
+  PID_Ki: 0.2,
+  PID_Kd: 0.03,
+  online: false,
+  onlineOnServer: 0,
+  onlineAt: new Date(0)
 }
 
 Meteor.methods({
@@ -57,7 +88,6 @@ Meteor.methods({
     Machines.remove({machineId: machineId});
   },
   editMachine(machine){
-    _.extend(machine, Machines.defaultValue);
     Machines.update(machine._id, { $set: machine } );
   },
   sendCommand(machineId, command, droppable){
@@ -114,3 +144,4 @@ _.extend(Machines, {
 });
 
 export default Machines;
+export { MachineSchema };

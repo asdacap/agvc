@@ -1,3 +1,4 @@
+#include "settings.h"
 
 #ifndef MOTOR_CONTROL
 #define MOTOR_CONTROL
@@ -16,9 +17,15 @@ namespace MotorControl{
   }
 
   // Offset
-  int RIGHT_OFFSET = 20;
-  int LEFT_OFFSET = 0;
   void SmarterForward(int pwm_left,int pwm_right){
+    int RIGHT_OFFSET = 0;
+    int LEFT_OFFSET = 0;
+
+    if(Settings.motorLROffset > 0){
+      RIGHT_OFFSET += Settings.motorLROffset;
+    }else{
+      LEFT_OFFSET -= Settings.motorLROffset;
+    }
 
     if(pwm_left == 0 && pwm_right == 0){
     }else{

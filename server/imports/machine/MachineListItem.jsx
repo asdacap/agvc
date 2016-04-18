@@ -57,6 +57,9 @@ export default MachineListItem = React.createClass({
   closeEdit(){
     this.setState({ openForm: false });
   },
+  sendSetting(){
+    Meteor.call("sendMachineSetting", this.props.machine.machineId);
+  },
   render(){
     let self = this;
 
@@ -85,6 +88,7 @@ export default MachineListItem = React.createClass({
         <FlatButton label="Ping" onClick={this.ping}/>
         <FlatButton label="Delete" onClick={this.delete}/>
         <FlatButton label="Edit" onClick={this.edit}/>
+        <FlatButton label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
         <FlatButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})}/>
       </CardActions>
     </Card>;

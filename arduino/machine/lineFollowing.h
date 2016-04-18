@@ -126,11 +126,12 @@ namespace LineFollowing{
     }
 
     curDir*=-1;
+    directionPID.SetTunings(Settings.PID_Kp, Settings.PID_Ki, Settings.PID_Kd);
     directionPID.Compute();
 
 
-    int baseL = 200;
-    int baseR = 200;
+    int baseL = Settings.motorBaseSpeed;
+    int baseR = Settings.motorBaseSpeed;
 
     int multiplier = 80;
     int diffRange = 200; // Maximum difference in motor speed

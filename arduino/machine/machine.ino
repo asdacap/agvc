@@ -14,7 +14,7 @@ HardwareSerial &wifiSerial = Serial1;
 void setup() {
   Serial.begin(9600);
   Serial.println(F("Setting up..."));
-  loadSettings();
+  Setting::loadSettings();
   // Just in case
   for(int i=0; i<14; i++){
     pinMode(i, INPUT);
@@ -83,7 +83,7 @@ void loop() {
   }else{
     LineFollowing::loop();
   }
-  loopCommand();
+  Setting::loopCommand();
   calculateLoopInterval();
 }
 
@@ -96,6 +96,10 @@ namespace GlobalListener{
     ManualMode::onDisconnect();
   }
   void onData(String s){
-    ManualMode::onCommand(s);
+    bool handled = ManualMode::onCommand(s);
+    if(!handled) handled = Setting::onWifiCommand(s);
+    if(!handled){
+      Serial.println("Command not handled : "+s);
+    }
   }
 }
