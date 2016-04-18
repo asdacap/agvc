@@ -5,3 +5,12 @@ body{
   margin: 0;
   font-family: 'Roboto', sans-serif;
 }
+
+.readingChartAxis path{
+  stroke: #000;
+  fill: none;
+}
+
+.readingChartAxis line{
+  stroke: #000;
+}

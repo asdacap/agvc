@@ -18,17 +18,10 @@ import { AppCanvas,
   } from 'material-ui';
 import d3 from 'd3';
 import moment from 'moment';
+import Dimensions from 'react-dimensions';
+import Color from 'color';
 
-var styles = {
-  MachineLoading: {
-    textAlign: "center"
-  },
-  AxisStyle: {
-    fontSize: "200%"
-  }
-}
-
-export default ReadingHistoryChart = React.createClass({
+let ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object,
@@ -64,32 +57,35 @@ export default ReadingHistoryChart = React.createClass({
       }).fetch()
     }
   },
-  resize(){
-    var newWidth = ReactDOM.findDOMNode(this).offsetWidth;
-    if(this.state.chartWidth != newWidth){
-      this.setState({ chartWidth: newWidth });
-    }
-  },
   componentDidMount(){
-    var self = this;
-    self.resize();
-    setTimeout(function(){
-      self.resize();
-    },100);
-    window.addEventListener('resize', this.resize);
-
     this.drawD3Chart();
   },
   componentDidUpdate(){
-    var self = this;
-    setTimeout(function(){
-      self.resize();
-    },100);
-
     this.drawD3Chart();
   },
   componentWillUnmount(){
     window.removeEventListener('resize', this.resize);
+  },
+  getWidth(){
+    return this.props.containerWidth;
+  },
+  getHeight(){
+    return 300;
+  },
+  getRightMargin(){
+    return 40;
+  },
+  getBottomMargin(){
+    return 20;
+  },
+  getTopMargin(){
+    return 20;
+  },
+  getChartWidth(){
+    return this.getWidth() - this.getRightMargin();
+  },
+  getChartHeight(){
+    return this.getHeight() - this.getBottomMargin() - this.getTopMargin();
   },
   drawD3Chart(){
     if(this.data.ready){
@@ -106,12 +102,12 @@ export default ReadingHistoryChart = React.createClass({
       var x = d3.time.scale()
         .clamp(true)
         .domain(timeDomain)
-        .range([0, 1000]);
+        .range([0, this.getChartWidth()]);
 
       var y = d3.scale.linear()
         .clamp(true)
         .domain([0, _.max(values)])
-        .range([1000, 0]);
+        .range([this.getChartHeight(), 0]);
 
       /*
       var area = d3Shape.area()
@@ -124,16 +120,25 @@ export default ReadingHistoryChart = React.createClass({
       var area = d3.svg.area()
         .x0(d => x(d[0]))
         .x1(d => x(d[0]))
-        .y0(_ => 1000)
+        .y0(_ => this.getChartHeight())
         .y1(d => y(d[1]));
+
+      var line = d3.svg.line()
+        .x(d => x(d[0]))
+        .y(d => y(d[1]));
 
       if(Readings.meta[this.props.reading].type == Boolean){
         area = area.interpolate('step-after');
+        lin = lin.interpolate('step-after');
       }
 
       d3.select(this.refs.area)
         .datum(data)
         .attr("d", area);
+
+      d3.select(this.refs.line)
+        .datum(data)
+        .attr("d", line);
 
       var xAxis = d3.svg.axis()
         .scale(x);
@@ -142,7 +147,7 @@ export default ReadingHistoryChart = React.createClass({
         .call(xAxis);
 
       var yAxis = d3.svg.axis()
-        .orient("left")
+        .orient("right")
         .scale(y);
 
       if(Readings.meta[this.props.reading].type == Boolean){
@@ -153,15 +158,42 @@ export default ReadingHistoryChart = React.createClass({
         .call(yAxis);
     }
   },
+  getStyles(){
+    var styles = {
+      MachineLoading: {
+        textAlign: "center"
+      },
+      AxisStyle: {
+        fontSize: "100%"
+      },
+      Area: {
+        fill: "#ff6262"
+      },
+      Line: {
+        stroke: "#ff6262",
+        strokeWidth: "3px"
+      }
+    };
+
+    let color = new Color(styles.Area.fill);
+    color = color.darken('0.5');
+    styles.Line.stroke = color.rgbString();
+
+
+    return styles;
+  },
   render(){
 
+    let styles = this.getStyles();
+
     if(this.data.ready){
-      return <svg ref="svg" svg width="100%" height={300} viewBox="0 0 1050 1070" preserveAspectRatio="none">
-        <g transform="translate(50,20)">
-          <path ref="area" stroke="#000000" fill="#ff0000"></path>
+      return <svg ref="svg" height={300} width="100%">
+        <g transform={"translate(0,"+this.getTopMargin()+")"}>
+          <path ref="area" style={styles.Area}></path>
+          <path ref="line" style={styles.Line}></path>
         </g>
-        <g ref="xAxis" style={styles.AxisStyle} transform="translate(50,1020)" />
-        <g ref="yAxis" style={styles.AxisStyle} transform="translate(50,20)" />
+        <g className="readingChartAxis" ref="xAxis" style={styles.AxisStyle} transform={"translate(0,"+(this.getChartHeight()+this.getTopMargin())+")"} />
+        <g className="readingChartAxis" ref="yAxis" style={styles.AxisStyle} transform={"translate("+this.getChartWidth()+","+this.getTopMargin()+")"} />
       </svg>;
     }else{
       return <CircularProgress size={2}/>
@@ -169,3 +201,5 @@ export default ReadingHistoryChart = React.createClass({
 
   }
 });
+
+export default Dimensions()(ReadingHistoryChart);

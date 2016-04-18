@@ -14,7 +14,8 @@ var styles = {
     marginLeft: "0.5em"
   },
   ChartContainerStyle: {
-    padding: "1em"
+    padding: "1em",
+    paddingLeft: "0.5em"
   }
 }
 

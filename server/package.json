@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "color": "^0.11.1",
     "d3": "^3.5.16",
     "is-running": "^2.0.0",
     "material-ui": "^0.14.4",
@@ -19,6 +20,7 @@
     "react-addons-test-utils": "^0.14.0",
     "react-addons-transition-group": "^0.14.0",
     "react-addons-update": "^0.14.0",
+    "react-dimensions": "^1.0.2",
     "react-dom": "^0.14.8",
     "react-mounter": "^1.2.0",
     "serialport-js": "^0.2.1",
