@@ -7,12 +7,12 @@
 namespace States{
   bool outOfCircuit = false;
 
-
+  Debounce<String> outOfCircuitDebouncer(ConnectionManager::sendData, 10000);
   void sendOutOfCircuitStatus(){
     if(outOfCircuit){
-      ConnectionManager::sendData("outOfCircuit:1");
+      outOfCircuitDebouncer.call("outOfCircuit:1", 2);
     }else{
-      ConnectionManager::sendData("outOfCircuit:0");
+      outOfCircuitDebouncer.call("outOfCircuit:0", 1);
     }
   }
 
@@ -29,12 +29,12 @@ namespace States{
 
   bool obstructed = false;
 
-  Debounce<String> obstructedDebouncer(ConnectionManager::sendData, 1000);
+  Debounce<String> obstructedDebouncer(ConnectionManager::sendData, 10000);
   void sendObstructedStatus(){
     if(obstructed){
-      obstructedDebouncer.call("obstructed:1");
+      obstructedDebouncer.call("obstructed:1", 2);
     }else{
-      obstructedDebouncer.call("obstructed:0");
+      obstructedDebouncer.call("obstructed:0", 1);
     }
   }
 
