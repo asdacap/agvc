@@ -9,6 +9,7 @@ import { EditMachineForm } from './MachineForm'
 
 var styles = {
   ButtonWithMargin: {
+    marginTop: "0.5em",
     marginLeft: "0.5em"
   }
 }
@@ -31,6 +32,9 @@ export default MachineStatusTab = React.createClass({
   closeEdit(){
     this.setState({ openForm: false });
   },
+  sendSetting(){
+    Meteor.call("sendMachineSetting", this.props.machine.machineId);
+  },
   goHistoryPage(reading){
     FlowRouter.go('readingHistory', { machineId: this.props.machine.machineId, reading: reading });
   },
@@ -46,13 +50,14 @@ export default MachineStatusTab = React.createClass({
     });
 
     return <div>
+      <RaisedButton style={styles.ButtonWithMargin} label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
+      <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
+      <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
       <List>
         <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
         {listItems}
         <ListItem primaryText="JSON" secondaryText={JSON.stringify(this.props.machine)} />
       </List>
-      <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
-      <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
       <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
     </div>;
   }

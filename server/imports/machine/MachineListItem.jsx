@@ -10,6 +10,7 @@ import {
   CardActions,
   CardTitle,
   FlatButton,
+  RaisedButton,
   Table,
   TableHeader,
   TableRow,
@@ -21,10 +22,10 @@ import {
 } from 'material-ui';
 import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
+import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 
 var styles = {
   MachineListItem: {
-    display: "inline-block",
     marginRight: "20px",
     marginBottom: "20px"
   },
@@ -35,30 +36,10 @@ var styles = {
 
 export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
-  getInitialState(){
-    return {
-      openForm: false
-    };
-  },
   getMeteorData(){
     return {
       state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
-  },
-  ping(){
-    Meteor.call("sendCommand", this.props.machine.machineId, "ping");
-  },
-  delete(){
-    Meteor.call("deleteMachine", this.props.machine.machineId);
-  },
-  edit(){
-    this.setState({ openForm: true });
-  },
-  closeEdit(){
-    this.setState({ openForm: false });
-  },
-  sendSetting(){
-    Meteor.call("sendMachineSetting", this.props.machine.machineId);
   },
   render(){
     let self = this;
@@ -69,9 +50,11 @@ export default MachineListItem = React.createClass({
     }
 
     return <Card style={styles.MachineListItem}>
-      <CardTitle title={this.props.machine.machineId} subtitle={this.props.machine.online ? "Online" : "Offline"} subtitleColor={subtitleColor}/>
-      <CardText>
-        Readings:
+      <CardTitle title={this.props.machine.machineId}
+         subtitle={this.data.state.status} subtitleColor={subtitleColor}
+         actAsExpander={true}
+         showExpandableButton={true}/>
+      <CardText expandable={true}>
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
@@ -82,14 +65,9 @@ export default MachineListItem = React.createClass({
               }) }
           </TableBody>
         </Table>
-        <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </CardText>
       <CardActions>
-        <FlatButton label="Ping" onClick={this.ping}/>
-        <FlatButton label="Delete" onClick={this.delete}/>
-        <FlatButton label="Edit" onClick={this.edit}/>
-        <FlatButton label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
-        <FlatButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})}/>
+        <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
       </CardActions>
     </Card>;
   }

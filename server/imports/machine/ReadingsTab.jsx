@@ -13,6 +13,10 @@ var styles = {
   ReadingTab: {
     Content: {
       padding: "1ex"
+    },
+    ChartPaper: {
+      padding: "1ex",
+      marginBottom: "1ex"
     }
   }
 };
@@ -20,7 +24,7 @@ var styles = {
 export default ReadingsTab = function(props){
   var charts = Readings.availableReadings.map(function(reading){
     return <div className="col-lg-4 col-md-6 col-xs-12" key={reading}>
-      <Paper style={styles.ChartStyle}>
+      <Paper style={styles.ReadingTab.ChartPaper}>
         <div>{Readings.meta[reading].title}</div>
         <ReadingHistoryChart machine={props.machine} reading={reading} key={reading} />
       </Paper>
