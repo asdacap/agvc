@@ -31,38 +31,6 @@ namespace LineFollowing{
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  int S0 = -100;
-  int S1 = -50;
-  int S2 = 0;
-  int S3 = 50;
-  int S4 = 100;
-
-  int speedL[10] = {
-    S0,
-    S1,
-    S2,
-    S3,
-    S4,
-    S4,
-    S4,
-    S4,
-    S4,
-    S4
-  };
-
-  int speedR[10] = {
-    S4,
-    S4,
-    S4,
-    S4,
-    S4,
-    S3,
-    S2,
-    S1,
-    S0,
-    S4
-  };
-
   double curDir = 0;
   double outDir = 0;
   double neutral = 0;
