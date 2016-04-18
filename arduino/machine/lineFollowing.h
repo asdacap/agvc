@@ -1,6 +1,7 @@
 #include "states.h"
 #include "MotorControl.h"
 #include "PID_v1.h"
+#include "RateLimiter.h"
 
 namespace LineFollowing{
 
@@ -10,6 +11,8 @@ namespace LineFollowing{
   int pin_4   = A4;
   int pin_5   = A5;
   int pin_cal = 8;  //pin initialization for sensors
+
+  int OBSTACLE_SENSOR = 24;
 
   int DS_1 = 0;
   int DS_2 = 0;
@@ -36,7 +39,20 @@ namespace LineFollowing{
   double neutral = 0;
   PID directionPID(&curDir, &outDir, &neutral, 0.95, 0.2, 0.03, DIRECT);
 
+  bool obstructed = false;
+  RateLimiter obstacleLimiter(1000);
+
   void followline(){
+
+    if(digitalRead(OBSTACLE_SENSOR) == LOW){
+      States::setObstructed();
+      obstructed = true;
+      MotorControl::SmarterForward(0,0);
+      return;
+    }else if(obstructed){
+      States::clearObstructed();
+      obstructed = false;
+    }
 
     if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
       curDir = -4;
@@ -130,6 +146,8 @@ namespace LineFollowing{
     directionPID.SetMode(AUTOMATIC);
     directionPID.SetSampleTime(25);
     directionPID.SetOutputLimits(-5,5);
+
+    pinMode(OBSTACLE_SENSOR, INPUT);
   }
 
   void loop()

@@ -11,41 +11,34 @@ import moment from 'moment';
 function calculateLastInterruptedTime(locationLog, atTime){
   let finalTime = atTime;
 
-  // Check the first time it is out of circuit
-  let outOfCircuitLog = Readings.findOne({
-    type: "outOfCircuit",
-    machineId: locationLog.machineId,
-    reading: true,
-    createdAt: {
-      $gte: locationLog.createdAt,
-      $lte: atTime
+  let whatToLookFor = [
+    ["outOfCircuit", true],
+    ["manualMode", true],
+    ["obstructed", true]
+  ]
+
+  whatToLookFor.forEach((readingVal) => {
+    let reading = readingVal[0];
+    let value = readingVal[1];
+
+    // Check the first time it is out of circuit
+    let readingLog = Readings.findOne({
+      type: reading,
+      machineId: locationLog.machineId,
+      reading: value,
+      createdAt: {
+        $gte: locationLog.createdAt,
+        $lte: atTime
+      }
+    }, {
+      sort: { createdAt: 1 },
+      limit: 1
+    });
+
+    if(readingLog !== undefined && readingLog.createdAt.getTime() < finalTime.getTime()){
+      finalTime = readingLog.createdAt;
     }
-  }, {
-    sort: { createdAt: 1 },
-    limit: 1
   });
-
-  if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() < finalTime.getTime()){
-    finalTime = outOfCircuitLog.createdAt;
-  }
-
-  // Check the first time it is in manual mode
-  let manualModeLog = Readings.findOne({
-    type: "manualMode",
-    machineId: locationLog.machineId,
-    reading: true,
-    createdAt: {
-      $gte: locationLog.createdAt,
-      $lte: atTime
-    }
-  }, {
-    sort: { createdAt: 1 },
-    limit: 1
-  });
-
-  if(manualModeLog !== undefined && manualModeLog.createdAt.getTime() < finalTime.getTime()){
-    finalTime = manualModeLog.createdAt;
-  }
 
   return finalTime;
 }
@@ -158,6 +151,16 @@ function calculateStatus(machineId, atTime){
   if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() > cStatusTime){
     cStatus = "outOfCircuit";
     cStatusTime = outOfCircuitLog.createdAt.getTime();
+  }
+
+  // Next, check obstructed
+  let obstructedLog = Readings.getLastReadingLog("obstructed", machineId, atTime);
+
+  // Ignore it if it is false
+  if(obstructedLog !== undefined && obstructedLog.reading == false) obstructedLog = undefined;
+  if(obstructedLog !== undefined && obstructedLog.createdAt.getTime() > cStatusTime){
+    cStatus = "obstructed";
+    cSTatusTime = obstructedLog.createdAt.getTime();
   }
 
   // Next, check manual mode

@@ -13,6 +13,7 @@ Readings.availableReadings = [
   "outOfCircuit",
   "responseTime",
   "loopInterval",
+  "obstructed",
   "manualMode"
 ];
 
@@ -44,6 +45,11 @@ Readings.meta = {
   },
   outOfCircuit: {
     title: "Out of circuit",
+    defaultValue: false,
+    type: Boolean
+  },
+  obstructed: {
+    title: "Obstructed",
     defaultValue: false,
     type: Boolean
   },
