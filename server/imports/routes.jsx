@@ -11,6 +11,14 @@ FlowRouter.route('/', {
   }
 });
 
+FlowRouter.route('/machine/:machineId/status/:reading', {
+  name: 'machineReading',
+  action: function(params, queryParams) {
+    params['page'] = 'status';
+    mount(MachinePage, params);
+  }
+});
+
 FlowRouter.route('/machine/:machineId/:page?', {
   name: 'machine',
   action: function(params, queryParams) {

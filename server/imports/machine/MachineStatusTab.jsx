@@ -6,13 +6,51 @@ import {
     RaisedButton
   } from 'material-ui';
 import { EditMachineForm } from './MachineForm'
+import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 
 var styles = {
   ButtonWithMargin: {
     marginTop: "0.5em",
     marginLeft: "0.5em"
+  },
+  ChartContainerStyle: {
+    padding: "1em"
   }
 }
+
+let ReadingChartListItem = React.createClass({
+  getInitialState(){
+    return {
+      open: false
+    }
+  },
+  toggle(){
+    this.setState({ open: !this.state.open });
+  },
+  render(){
+    let reading = this.props.reading;
+    let secondaryText = "";
+    if(this.props.machine[reading] !== undefined){
+      secondaryText = this.props.machine[reading].toString();
+    }
+
+    if(this.state.open){
+      return <ListItem primaryText={Readings.meta[reading].title}
+        secondaryText={secondaryText}
+        onTouchTap={this.toggle} >
+        <div style={styles.ChartContainerStyle}>
+          <ReadingHistoryChart machine={this.props.machine} reading={reading} />
+        </div>
+      </ListItem>;
+    }else{
+      return <ListItem primaryText={Readings.meta[reading].title}
+        secondaryText={secondaryText}
+        onTouchTap={this.toggle} >
+      </ListItem>;
+
+    }
+  }
+});
 
 export default MachineStatusTab = React.createClass({
   getInitialState(){
@@ -41,12 +79,7 @@ export default MachineStatusTab = React.createClass({
   render(){
     var self = this;
     var listItems = Readings.availableReadings.map(function(reading){
-      var secondaryText = "";
-      if(self.props.machine[reading] !== undefined){
-        secondaryText = self.props.machine[reading].toString();
-      }
-      return <ListItem key={reading}
-          primaryText={Readings.meta[reading].title} secondaryText={secondaryText} />;
+      return <ReadingChartListItem machine={self.props.machine} reading={reading} />;
     });
 
     return <div>

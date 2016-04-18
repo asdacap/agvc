@@ -22,7 +22,6 @@ import Machines from './Machines';
 import MachineStatusTab from './MachineStatusTab';
 import MachineCommandQueueTab from './MachineCommandQueueTab';
 import MachineMessageLogTab from './MachineMessageLogTab';
-import ReadingsTab from './ReadingsTab';
 import ManualTab from './ManualTab';
 import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
 
@@ -64,8 +63,6 @@ export default MachinePage = React.createClass({
     if(this.data.ready){
       if(page == "status"){
         page_component = <MachineStatusTab machine={this.data.machine} />;
-      }else if(page == "readings"){
-        page_component = <ReadingsTab machine={this.data.machine} />;
       }else if(page == "command_queue"){
         page_component = <MachineCommandQueueTab machine={this.data.machine} />;
       }else if(page == "message_logs"){
@@ -84,8 +81,7 @@ export default MachinePage = React.createClass({
                 <CircularProgress size={2}/>
               </div> : <div>
                 <Tabs value={page} onChange={this.changePage}>
-                  <Tab label="Status" value="status" />
-                  <Tab label="Readings" value="readings" />
+                  <Tab label="Status" value="status" reading={this.props.reading} />
                   <Tab label="Command Queue" value="command_queue" />
                   <Tab label="Message Logs" value="message_logs" />
                   <Tab label="Manual Control" value="manual_control" />
