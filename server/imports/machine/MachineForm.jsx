@@ -48,30 +48,44 @@ var MachineFormCommon = {
   },
   renderForm(){
     return <form onSubmit={this.onSubmit} style={{ overflow: "auto", height: "300px" }}>
-      <TextField value={this.state.machineId}
-        onChange={this.onFieldChange("machineId")}
-        errorText={this.validationContext.keyErrorMessage("machineId")}
-        floatingLabelText="Machine ID"/><br />
-      <TextField value={this.state.motorBaseSpeed}
-        onChange={this.onFieldChange("motorBaseSpeed")}
-        errorText={this.validationContext.keyErrorMessage("motorBaseSpeed")}
-        floatingLabelText="Motor Base Speed"/><br />
-      <TextField value={this.state.motorLROffset}
-        onChange={this.onFieldChange("motorLROffset")}
-        errorText={this.validationContext.keyErrorMessage("motorLROffset")}
-        floatingLabelText="Motor Left Right Offset"/><br />
-      <TextField value={this.state.PID_Kp}
-        onChange={this.onFieldChange("PID_Kp")}
-        errorText={this.validationContext.keyErrorMessage("PID_Kp")}
-        floatingLabelText="PID Kp"/><br />
-      <TextField value={this.state.PID_Ki}
-        onChange={this.onFieldChange("PID_Ki")}
-        errorText={this.validationContext.keyErrorMessage("PID_Ki")}
-        floatingLabelText="PID Ki"/><br />
-      <TextField value={this.state.PID_Kd}
-        onChange={this.onFieldChange("PID_Kd")}
-        errorText={this.validationContext.keyErrorMessage("PID_Kd")}
-        floatingLabelText="PID Kd"/>
+      <div className="row">
+        <div className="col-sm-12 col-md-6">
+          <TextField value={this.state.machineId}
+            onChange={this.onFieldChange("machineId")}
+            errorText={this.validationContext.keyErrorMessage("machineId")}
+            floatingLabelText="Machine ID"/><br />
+          <TextField value={this.state.motorBaseSpeed}
+            onChange={this.onFieldChange("motorBaseSpeed")}
+            errorText={this.validationContext.keyErrorMessage("motorBaseSpeed")}
+            floatingLabelText="Motor Base Speed"/><br />
+          <TextField value={this.state.motorLROffset}
+            onChange={this.onFieldChange("motorLROffset")}
+            errorText={this.validationContext.keyErrorMessage("motorLROffset")}
+            floatingLabelText="Motor Left Right Offset"/><br />
+          <TextField value={this.state.motorPIDMultiplier}
+            onChange={this.onFieldChange("motorPIDMultiplier")}
+            errorText={this.validationContext.keyErrorMessage("motorPIDMultiplier")}
+            floatingLabelText="Motor PID Multiplier"/><br />
+        </div>
+        <div className="col-sm-12 col-md-6">
+          <TextField value={this.state.motorDiffRange}
+            onChange={this.onFieldChange("motorDiffRange")}
+            errorText={this.validationContext.keyErrorMessage("motorDiffRange")}
+            floatingLabelText="Motor Diff Range"/><br />
+          <TextField value={this.state.PID_Kp}
+            onChange={this.onFieldChange("PID_Kp")}
+            errorText={this.validationContext.keyErrorMessage("PID_Kp")}
+            floatingLabelText="PID Kp"/><br />
+          <TextField value={this.state.PID_Ki}
+            onChange={this.onFieldChange("PID_Ki")}
+            errorText={this.validationContext.keyErrorMessage("PID_Ki")}
+            floatingLabelText="PID Ki"/><br />
+          <TextField value={this.state.PID_Kd}
+            onChange={this.onFieldChange("PID_Kd")}
+            errorText={this.validationContext.keyErrorMessage("PID_Kd")}
+            floatingLabelText="PID Kd"/>
+        </div>
+      </div>
     </form>;
   },
   render(){
@@ -115,7 +129,7 @@ var EditMachineForm = React.createClass(_.extend({
       _id: this.props.machine._id
     };
 
-    ["machineId", "motorBaseSpeed", "motorLROffset", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+    ["machineId", "motorBaseSpeed", "motorLROffset", "motorPIDMultiplier", "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
       props[field] = this.state[field];
     });
 
@@ -141,7 +155,7 @@ var CreateMachineForm = React.createClass(_.extend({
 
     let props = {};
 
-    ["machineId", "motorBaseSpeed", "motorLROffset", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+    ["machineId", "motorBaseSpeed", "motorLROffset", "motorPIDMultiplier", "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
       props[field] = this.state[field];
     });
 

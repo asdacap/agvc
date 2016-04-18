@@ -101,8 +101,8 @@ namespace LineFollowing{
     int baseL = Settings.motorBaseSpeed;
     int baseR = Settings.motorBaseSpeed;
 
-    int multiplier = 80;
-    int diffRange = 200; // Maximum difference in motor speed
+    int multiplier = Settings.motorPIDMultiplier;
+    int diffRange = Settings.motorDiffRange; // Maximum difference in motor speed
 
     Serial.println("outDir is "+String(outDir));
 

@@ -28,6 +28,8 @@
     int tcpConnectDelay;
     int motorBaseSpeed;
     int motorLROffset;
+    int motorPIDMultiplier;
+    int motorDiffRange;
     double PID_Kp;
     double PID_Ki;
     double PID_Kd;
@@ -60,6 +62,8 @@ namespace Setting{
       Settings.tcpConnectDelay = 5;
       Settings.motorBaseSpeed = 200;
       Settings.motorLROffset = 0;
+      Settings.motorPIDMultiplier = 80;
+      Settings.motorDiffRange = 200;
       Settings.PID_Kp = 0.95;
       Settings.PID_Ki = 0.3;
       Settings.PID_Kd = 0.03;
@@ -123,6 +127,12 @@ namespace Setting{
       return true;
     }else if(command.startsWith(F("motorLROffset:"))){
       Settings.motorLROffset = command.substring(14).toInt();
+      return true;
+    }else if(command.startsWith(F("motorPIDMultiplier:"))){
+      Settings.motorPIDMultiplier = command.substring(19).toInt();
+      return true;
+    }else if(command.startsWith(F("motorDiffRange:"))){
+      Settings.motorDiffRange = command.substring(15).toInt();
       return true;
     }else if(command.startsWith(F("PID_Kp:"))){
       Settings.PID_Kp = command.substring(7).toFloat();

@@ -44,6 +44,14 @@ var MachineSchema = {
     type: Number,
     optional: false
   },
+  motorPIDMultiplier: {
+    type: Number,
+    optional: false
+  },
+  motorDiffRange: {
+    type: Number,
+    optional: false
+  },
   PID_Kp: {
     type: Number,
     decimal: true,
@@ -70,6 +78,8 @@ Machines.attachSchema(MachineSchema);
 Machines.defaultValue = {
   commandQueue: [],
   motorBaseSpeed: 200,
+  motorPIDMultiplier: 80,
+  motorDiffRange: 200,
   motorLROffset: 0,
   PID_Kp: 0.95,
   PID_Ki: 0.2,
