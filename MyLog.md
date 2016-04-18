@@ -167,3 +167,21 @@ from mongodb.
 =========================================================
 
 Fixed performance issue with the preview. The problem is wrong index definition.
+
+18 April
+========
+
+So, today is largely UI stuff. We have indicator icon in the main map now.
+Some layout changes in the MachinePage. Some layout change in MachineListItem.
+The ReadingHistoryChart now looked better.
+
+In addition to that, some arduino setting are now settable through wifi. Those
+settings are mainly about the Motor and some variables for the PID controller used
+for the line following algorithm.
+
+Another addition is the addition of infrared obstacle sensor. It does not seems
+to work on every surface, but I rather use it then an untrasonic one due to the
+difficulty in programming it. Because of this, a new reading 'obstructed' is added.
+
+Tomorrow, our main agenda is to once and for all fix the connection issue bugging
+the serverside. 
