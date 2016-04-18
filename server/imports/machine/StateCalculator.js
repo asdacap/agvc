@@ -5,6 +5,51 @@ import Map from '../location/Map';
 import Point from 'point-at-length';
 import moment from 'moment';
 
+
+// Calculate the last time this locationLog is interrupted
+// Used by calculateLocationPoint to know if the path ended prematurely
+function calculateLastInterruptedTime(locationLog, atTime){
+  let finalTime = atTime;
+
+  // Check the first time it is out of circuit
+  let outOfCircuitLog = Readings.findOne({
+    type: "outOfCircuit",
+    machineId: locationLog.machineId,
+    reading: true,
+    createdAt: {
+      $gte: locationLog.createdAt,
+      $lte: atTime
+    }
+  }, {
+    sort: { createdAt: 1 },
+    limit: 1
+  });
+
+  if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() < finalTime.getTime()){
+    finalTime = outOfCircuitLog.createdAt;
+  }
+
+  // Check the first time it is in manual mode
+  let manualModeLog = Readings.findOne({
+    type: "manualMode",
+    machineId: locationLog.machineId,
+    reading: true,
+    createdAt: {
+      $gte: locationLog.createdAt,
+      $lte: atTime
+    }
+  }, {
+    sort: { createdAt: 1 },
+    limit: 1
+  });
+
+  if(manualModeLog !== undefined && manualModeLog.createdAt.getTime() < finalTime.getTime()){
+    finalTime = manualModeLog.createdAt;
+  }
+
+  return finalTime;
+}
+
 // Attempt to calculate the state of a machine
 // at a particular time.
 // The state would be the readings and position
@@ -45,10 +90,24 @@ function calculateLocationPoint(locationLog, atTime){
     }
 
     var speed = path.machineSpeed;
-    var timePassed = (atTime.getTime() - locationLog.createdAt.getTime());
+
+    // final time calculation
+    // In case an event happen between the start of the log
+    // and finalTime (which is current time),
+    // Truncate the finalTime to that time
+    let finalTime = calculateLastInterruptedTime(locationLog, atTime);
+
+    // Back to our calculation
+    let timePassed = (finalTime - locationLog.createdAt.getTime());
     timePassed /= 1000.0;
-    var lengthPassed = timePassed*speed;
-    var progress = locationLog.pathProgress + (lengthPassed/length);
+    let lengthPassed = timePassed*speed;
+
+    if(locationLog.pathDirection == 1){
+      var progress = locationLog.pathProgress + (lengthPassed/length);
+    }else{
+      // Reversed direction
+      var progress = locationLog.pathProgress - (lengthPassed/length);
+    }
     if(progress > 1){
       progress = 1;
     }
