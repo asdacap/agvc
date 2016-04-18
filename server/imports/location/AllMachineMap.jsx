@@ -19,8 +19,10 @@ export default AllMachineMap = React.createClass({
     }
   },
   render(){
-    return <svg width="100%" height="500px" viewBox="0 0 1000 1000">
+    return <svg width="100%" height="500px" viewBox="0 0 1200 900">
       <rect x="-10000" y="-10000" width="30000" height="30000" fill="#EEEEEE" />
+      <rect x="-10000" y="-10000" width="10000" height="30000" fill="#d6d6d6" />
+      <rect x="1200" y="-10000" width="10000" height="30000" fill="#d6d6d6" />
       <MapView />
       <g>
         { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
