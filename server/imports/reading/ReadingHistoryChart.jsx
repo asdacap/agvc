@@ -100,12 +100,12 @@ let ReadingHistoryChart = React.createClass({
       var timeDomain = [this.data.fromTime.toDate(), toTime.toDate()];
 
       var x = d3.time.scale()
-        .clamp(true)
+        .clamp(false)
         .domain(timeDomain)
         .range([0, this.getChartWidth()]);
 
       var y = d3.scale.linear()
-        .clamp(true)
+        .clamp(false)
         .domain([0, _.max(values)])
         .range([this.getChartHeight(), 0]);
 
@@ -118,8 +118,7 @@ let ReadingHistoryChart = React.createClass({
       */
 
       var area = d3.svg.area()
-        .x0(d => x(d[0]))
-        .x1(d => x(d[0]))
+        .x(d => x(d[0]))
         .y0(_ => this.getChartHeight())
         .y1(d => y(d[1]));
 
@@ -129,7 +128,7 @@ let ReadingHistoryChart = React.createClass({
 
       if(Readings.meta[this.props.reading].type == Boolean){
         area = area.interpolate('step-after');
-        lin = lin.interpolate('step-after');
+        line = line.interpolate('step-after');
       }
 
       d3.select(this.refs.area)
@@ -171,7 +170,8 @@ let ReadingHistoryChart = React.createClass({
       },
       Line: {
         stroke: "#ff6262",
-        strokeWidth: "3px"
+        strokeWidth: "2px",
+        fill: "transparent"
       }
     };
 
