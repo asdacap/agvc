@@ -126,7 +126,6 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     console.log("Registering connection for machine "+machineId);
     machinesConnection[machineId] = this;
 
-    Machines.markOnline(this.machineObj._id);
     this.startCommandQueueObservation();
     this.emit('register', this.machineObj.machineId, this);
   }
@@ -172,7 +171,6 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         this.queueHandler.stop();
       }
       machinesConnection[this.machineObj.machineId] = undefined;
-      Machines.markOffline(this.machineObj._id);
       this.emit("unregister", this.machineObj.machineId, this);
       this.machineObj = undefined;
     }
