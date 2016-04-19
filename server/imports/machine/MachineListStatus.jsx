@@ -12,6 +12,7 @@ import {
   CardActions,
   CardTitle,
   FlatButton,
+  RaisedButton,
   Table,
   TableHeader,
   TableRow,
@@ -29,10 +30,13 @@ var styles = {
   },
   MachineListBox: {
     padding: "10px"
+  },
+  MachineListPanel: {
+    padding: "1ex"
   }
 }
 
-export default MachineList = React.createClass({
+export default MachineListStatus = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
     var openForm = new ReactiveVar(false);
@@ -48,8 +52,14 @@ export default MachineList = React.createClass({
   toggleForm(){
     this.state.openForm.set(!this.data.openForm);
   },
+  goToCharts(){
+    FlowRouter.go("dashboardChart")
+  },
   render(){
     return <div className="machine-lists">
+      <div style={styles.MachineListPanel}>
+        <RaisedButton label="Reading Charts" onTouchTap={this.goToCharts}/>
+      </div>
       <div style={styles.MachineListBox}>
         <div className="machines row">
           { this.data.machines.map(function(item){

@@ -23,6 +23,7 @@ import {
 import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
 import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 
 var styles = {
   MachineListItem: {
@@ -40,8 +41,12 @@ var styles = {
   }
 };
 
-export default MachineListItem = React.createClass({
+export default MachineListChartItem = React.createClass({
   mixins: [ReactMeteorData],
+  propTypes: {
+    machine: React.PropTypes.object.isRequired,
+    reading: React.PropTypes.string.isRequired
+  },
   getMeteorData(){
     return {
       state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
@@ -58,28 +63,12 @@ export default MachineListItem = React.createClass({
       titleStyle.backgroundColor = styles.CardHeaderBackgroundOnStatus[this.data.state.status];
     }
 
-    return <Card style={styles.MachineListItem} initiallyExpanded={true}>
-      <CardTitle title={this.props.machine.machineId}
+    return <Card style={styles.MachineListItem}>
+      <CardHeader title={this.props.machine.machineId}
          subtitle={this.data.state.status}
-         actAsExpander={true}
-         style={titleStyle}
-         showExpandableButton={true}/>
-       <CardText expandable={true}>
-        <Table selectable={false} height={ styles.Table.height }>
-          <TableBody displayRowCheckbox={false}>
-            { Readings.availableReadings.map(function(reading){
-              let value = self.data.state[reading].toString();
-              if(Readings.meta[reading].unit !== undefined){
-                value = value + " " + Readings.meta[reading].unit;
-              }
-
-              return <TableRow key={reading}>
-                <TableRowColumn>{Readings.meta[reading].title}</TableRowColumn>
-                <TableRowColumn>{value}</TableRowColumn>
-              </TableRow>;
-              }) }
-          </TableBody>
-        </Table>
+         style={titleStyle}/>
+      <CardText>
+        <ReadingHistoryChart machine={this.props.machine} reading={this.props.reading} />
       </CardText>
       <CardActions>
         <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
