@@ -33,22 +33,26 @@ Readings.meta = {
     title: "Temperature",
     defaultValue: 0,
     transformer: temperatureValueTransformer,
+    unit: "c",
     type: Number
   },
   battery: {
     title: "Battery",
     defaultValue: 0,
     transformer: batteryValueTransformer,
+    unit: "V",
     type: Number
   },
   responseTime: {
     title: "Response Time",
     defaultValue: 0,
+    unit: "ms",
     type: Number
   },
   loopInterval: {
     title: "Loop Interval",
     defaultValue: 0,
+    unit: "ms",
     type: Number
   },
   online: {

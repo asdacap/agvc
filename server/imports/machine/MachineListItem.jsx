@@ -58,9 +58,14 @@ export default MachineListItem = React.createClass({
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
+              let value = self.data.state[reading].toString();
+              if(Readings.meta[reading].unit !== undefined){
+                value = value + " " + Readings.meta[reading].unit;
+              }
+
               return <TableRow key={reading}>
                 <TableRowColumn>{Readings.meta[reading].title}</TableRowColumn>
-                <TableRowColumn>{self.data.state[reading].toString()}</TableRowColumn>
+                <TableRowColumn>{value}</TableRowColumn>
               </TableRow>;
               }) }
           </TableBody>

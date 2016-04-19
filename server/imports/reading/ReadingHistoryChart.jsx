@@ -75,7 +75,7 @@ let ReadingHistoryChart = React.createClass({
     return 300;
   },
   getRightMargin(){
-    return 40;
+    return 60;
   },
   getBottomMargin(){
     return 20;
@@ -151,8 +151,20 @@ let ReadingHistoryChart = React.createClass({
         .orient("right")
         .scale(y);
 
+      if(Readings.meta[this.props.reading].unit !== undefined){
+        var yAxisFormat = y.tickFormat(10);
+        yAxis.tickFormat(num => yAxisFormat(num)+" "+Readings.meta[this.props.reading].unit);
+      }
+
       if(Readings.meta[this.props.reading].type == Boolean){
         yAxis = yAxis.ticks(1);
+        yAxis.tickFormat(num => {
+          if(num == 1){
+            return "true";
+          }else{
+            return "false";
+          }
+        });
       }
 
       d3.select(this.refs.yAxis)
