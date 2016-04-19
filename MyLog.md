@@ -184,4 +184,53 @@ to work on every surface, but I rather use it then an untrasonic one due to the
 difficulty in programming it. Because of this, a new reading 'obstructed' is added.
 
 Tomorrow, our main agenda is to once and for all fix the connection issue bugging
-the serverside. 
+the serverside.
+
+19 April
+========
+
+According to `git log`, there is about 25 commit today. Starting with the connection
+handler now should be fixed. The issue seems to be that when arduino disconnect,
+it does not have the chance to tell the server that it is now disconnected. So,
+several days ago I made a 'ping' every second which now also double as the measurement
+of response time between server and arduino. However, the cleanup of of the connection
+for some reason is quite unpredictable. Likely that is just because of my incopetency.
+But it probably have something to do with some stuff in nodejs not running syncronously
+and the fact that after a call to `socket.end`, the connection can still receive data.
+I soon realize that I need to use `socket.destroy` instead which the documentation said,
+should only be used as a last resort.
+
+Later commit is about refactor and finally the status tab of the machine page is now
+using the ViewTime. Later on I integrated ViewTime with the ReadingHistoryChart which
+basically allow replaying of chart of readings recorded before. Some significant amount
+of time went modifying this thing.
+
+Today the voltage sensor and temperature sensor arrived. Unfortunately the temperature
+sensor is faulty. I can't get it to work. Some guy from the internet also have a similar
+issue, which was solved by buying another sensor from another guy. Its something about
+uncalibrated sensor. The voltage sensor (more like a board of resistor) works nicely.
+We can now get a nice graph of voltage from the battery. However, the voltage reading
+drops as soon as the AGV is turned on and drop further when it is moving. An
+understandable, but sadly unpredicted phenomena. This means, predicting the battery life
+from the voltage reading alone may not be a very good idea.
+
+Several more UI change was implemented. The readings now can have `unit` assigned to
+them. Meaning the response time is now marked as 'ms' for miliseconds. A nice touch.
+The machine card header now change color depending on the status of the machine.
+A class that complement ViewTime is added called FasterViewTime which aid with making
+smoother animation. Unfortunately the map is now significantly more CPU taxing. A
+proper animation approximation would be a better idea.
+
+Aside from the occational bugfix, more UI changes was implemented in the MachinePage.
+A map is now shown on the left side of the screen and will move to the top when the
+screen width is too limited. A similar panel is also avalable in the manualMode tab,
+The layout uses flex layout which may have some compatibility issue if I forget to
+put polyfill. I actually tried to do this for a couple of hour not realizing that
+dumping the JSON to a ListItem is the reason it behaves strangely.
+
+As a sidenote, I checked the client response when disabling websocket or the websocket's
+compression. With no websocket, the response time is about 50ms. Websocket with
+no compression's response time is about 4 to 15ms, Websocket with compression is
+about 4 to 10 ms. The different between Websocket compression or not is harder
+to predict, but it seems to have a consistent advantage. Without websocket, it is
+likely using HTTP long polling which shows a consistently worst performance.
