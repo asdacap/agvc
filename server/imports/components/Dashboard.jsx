@@ -27,7 +27,7 @@ Dashboard = React.createClass({
     return <AppCanvas>
         <SideNavPage ref="navPage">
           <div>
-            <ViewTimeToolbar toggleNav={this.toggleNav} />
+            <ViewTimeToolbar title="Dashboard" toggleNav={this.toggleNav} />
             <AllMachineMap />
             <MachineList />
             <ResponseTimeIndicator />

@@ -176,7 +176,14 @@ let ViewTimeToolbar = React.createClass({
       }
     }
 
-    return <AppBar style={{ overflow: "hidden" }} title="Dashboard" onLeftIconButtonTouchTap={this.toggleNav}>
+    let title = this.props.title;
+    if(title === undefined){
+      title = "Dashboard";
+    }
+
+    return <AppBar style={{ overflow: "hidden" }}
+      title={title}
+      onLeftIconButtonTouchTap={this.toggleNav}>
       {rightGroup}
     </AppBar>;
   }

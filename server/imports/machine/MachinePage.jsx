@@ -24,6 +24,7 @@ import MachineCommandQueueTab from './MachineCommandQueueTab';
 import MachineMessageLogTab from './MachineMessageLogTab';
 import ManualTab from './ManualTab';
 import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
+import ViewTimeToolbar from '../components/ViewTimeToolbar';
 
 let styles = {
   MachineLoading: {
@@ -75,7 +76,7 @@ export default MachinePage = React.createClass({
     return <AppCanvas>
         <SideNavPage ref="navPage">
           <div>
-            <AppBar title={this.props.machineId} onLeftIconButtonTouchTap={this.toggleNav}/>
+            <ViewTimeToolbar title={this.props.machineId} toggleNav={this.toggleNav} />
             {
               !this.data.ready ? <div style={styles.MachineLoading}>
                 <CircularProgress size={2}/>

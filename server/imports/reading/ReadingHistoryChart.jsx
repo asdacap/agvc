@@ -20,6 +20,7 @@ import d3 from 'd3';
 import moment from 'moment';
 import Dimensions from 'react-dimensions';
 import Color from 'color';
+import ViewTime from '../client/ViewTime';
 
 let ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
@@ -36,9 +37,8 @@ let ReadingHistoryChart = React.createClass({
   },
   getMeteorData(){
     var self = this;
-    Chronos.liveUpdate(100);
 
-    var newSubFromDate = moment().subtract(1, 'minutes');
+    var newSubFromDate = moment(ViewTime.time).subtract(1, 'minutes');
     if(newSubFromDate.diff(self.subFromDate, 'minutes') > 10){
       self.subFromDate = newSubFromDate;
     }

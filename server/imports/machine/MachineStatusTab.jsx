@@ -7,6 +7,7 @@ import {
   } from 'material-ui';
 import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
+import ViewTime from '../client/ViewTime';
 
 var styles = {
   ButtonWithMargin: {
@@ -31,8 +32,8 @@ let ReadingChartListItem = React.createClass({
   render(){
     let reading = this.props.reading;
     let secondaryText = "";
-    if(this.props.machine[reading] !== undefined){
-      secondaryText = this.props.machine[reading].toString();
+    if(this.props.value !== undefined){
+      secondaryText = this.props.value.toString();
     }
 
     if(this.state.open){
@@ -54,6 +55,13 @@ let ReadingChartListItem = React.createClass({
 });
 
 export default MachineStatusTab = React.createClass({
+  mixins: [ReactMeteorData],
+  getMeteorData(){
+    StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+    return {
+      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
+    }
+  },
   getInitialState(){
     return {
       openForm: false
@@ -80,7 +88,7 @@ export default MachineStatusTab = React.createClass({
   render(){
     var self = this;
     var listItems = Readings.availableReadings.map(function(reading){
-      return <ReadingChartListItem machine={self.props.machine} reading={reading} />;
+      return <ReadingChartListItem machine={self.props.machine} reading={reading} value={self.data.state[reading]} key={reading}/>;
     });
 
     return <div>
