@@ -27,11 +27,12 @@ namespace MotorControl{
       LEFT_OFFSET -= Settings.motorLROffset;
     }
 
-    if(pwm_left == 0 && pwm_right == 0){
-    }else{
-      pwm_left += LEFT_OFFSET;
-      pwm_right += RIGHT_OFFSET;
-    }
+    if(pwm_left > 0) pwm_left += RIGHT_OFFSET;
+    else pwm_left -= RIGHT_OFFSET;
+
+    if(pwm_right > 0) pwm_right += LEFT_OFFSET;
+    else pwm_right -= LEFT_OFFSET;
+
     digitalWrite(RightDir, pwm_right > 0 ? LOW : HIGH);
     digitalWrite(LeftDir , pwm_left > 0 ? LOW : HIGH);
     analogWrite (RightEn , abs(pwm_right));   //PWM Speed Control

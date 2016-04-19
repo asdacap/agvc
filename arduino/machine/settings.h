@@ -90,6 +90,15 @@ namespace Setting{
       Serial.println(String(F("serverPort:")) + String(Settings.serverPort));
       Serial.println(String(F("tcpConnectDelay:")) + String(Settings.tcpConnectDelay));
       Serial.println(String(F("machineId:")) + String(Settings.machineId));
+
+      Serial.println(String(F("motorBaseSpeed:")) + String(Settings.motorBaseSpeed));
+      Serial.println(String(F("motorLROffset:")) + String(Settings.motorLROffset));
+      Serial.println(String(F("motorPIDMultiplier:")) + String(Settings.motorPIDMultiplier));
+      Serial.println(String(F("motorDiffRange:")) + String(Settings.motorDiffRange));
+      Serial.println(String(F("PID_Kp:")) + String(Settings.PID_Kp));
+      Serial.println(String(F("PID_Ki:")) + String(Settings.PID_Ki));
+      Serial.println(String(F("PID_Kd:")) + String(Settings.PID_Kd));
+
       Serial.println(String(F("version:")) + String(Settings.version));
     }else if(command.startsWith(F("wifiSSID:"))){
       String value = command.substring(9);
