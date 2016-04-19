@@ -94,8 +94,10 @@ namespace LineFollowing{
     }
     else
     {
-      States::setOutOfCircuit();
-      SmarterForward(0,0);
+      if(millis() - lastForward > 2000){
+        States::setOutOfCircuit();
+        SmarterForward(0,0);
+      }
       return;
     }
 
