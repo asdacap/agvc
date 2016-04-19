@@ -12,6 +12,12 @@ Readings.availableReadings.forEach(function(reading){
       }else{
         value = false;
       }
+    }else if(Readings.meta[reading].type == Number){
+      value = parseInt(value, 0);
+    }
+
+    if(Readings.meta[reading].transformer !== undefined){
+      value = Readings.meta[reading].transformer(value);
     }
     Machines.setReading(machineObj.machineId, reading, value);
   }

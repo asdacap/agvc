@@ -17,6 +17,13 @@ Readings.availableReadings = [
   "manualMode"
 ];
 
+// Battery value needs to be transformed a little bit
+function batteryValueTransformer(value){
+  value = value*(25.0/1024.0);
+  return value;
+}
+
+
 Readings.meta = {
   temperature: {
     title: "Temperature",
@@ -26,6 +33,7 @@ Readings.meta = {
   battery: {
     title: "Battery",
     defaultValue: 0,
+    transformer: batteryValueTransformer,
     type: Number
   },
   responseTime: {
@@ -117,6 +125,7 @@ Readings.availableReadings.forEach(function(reading){
   }else{
     MachineSchema[reading] = {
       type: Number,
+      decimal: true,
       optional: false
     };
   }
@@ -130,11 +139,6 @@ Readings.availableReadings.forEach(function(reading){
 
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  if(Readings.meta[reading].type == Boolean){
-    // Assume it is already passed as boolean
-  }else{
-    value = parseInt(value, 0);
-  }
   var toSet = {};
   toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )

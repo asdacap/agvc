@@ -8,6 +8,7 @@
 #include "RateLimiter.h"
 #include "ManualMode.h"
 #include "MotorControl.h"
+#include "Sensors.h"
 
 HardwareSerial &wifiSerial = Serial1;
 
@@ -33,6 +34,7 @@ void setup() {
   RFID::setup();
   LineFollowing::setup();
   MotorControl::setup();
+  Sensors::setup();
 }
 
 void reconfigure(){
@@ -84,6 +86,7 @@ void loop() {
     LineFollowing::loop();
   }
   Setting::loopCommand();
+  Sensors::loop();
   calculateLoopInterval();
 }
 
