@@ -30,7 +30,7 @@ let ReadingHistoryChart = React.createClass({
     reading: React.PropTypes.string
   },
   getInitialState(){
-    var self = this;
+    let self = this;
     self.subFromDate = moment().subtract(1, 'minutes');
     self.fasterViewTime = new FasterViewTime(50);
     return {
@@ -38,24 +38,36 @@ let ReadingHistoryChart = React.createClass({
     }
   },
   getMeteorData(){
-    var self = this;
+    let self = this;
 
-    var newSubFromDate = moment(self.fasterViewTime.time).subtract(1, 'minutes');
-    if(newSubFromDate.diff(self.subFromDate, 'minutes') > 10){
-      self.subFromDate = newSubFromDate;
-    }
-    self.handle = Meteor.subscribe("Readings.fromDate",
+    let currentTime = self.fasterViewTime.time;
+    let fromTime = moment(currentTime).subtract(1, 'minutes');
+    let toTime = moment(currentTime);
+
+    let subFromTime = new Date(fromTime.toDate().getTime());
+    let subToTime = new Date(moment(toTime).add(1, 'minutes').toDate().getTime());
+    subFromTime.setSeconds(0,0);
+    subToTime.setSeconds(0,0);
+
+    self.handle = Meteor.subscribe("Readings.createdAtRange",
       self.props.machine.machineId,
       self.props.reading,
-      self.subFromDate.toDate());
+      subFromTime,
+      subToTime);
 
     return {
-      fromTime: moment().subtract(1, 'minutes'),
+      fromTime: fromTime,
+      toTime: toTime,
       ready: self.handle.ready(),
       readings: Readings.find({
         machineId: this.props.machine.machineId,
         type: this.props.reading,
-        createdAt: { $gt: self.subFromDate.toDate() }
+        createdAt: {
+          $gte: fromTime.toDate(),
+          $lte: toTime.toDate()
+        }
+      }, {
+        sort: { createdAt: 1 }
       }).fetch()
     }
   },
@@ -91,40 +103,47 @@ let ReadingHistoryChart = React.createClass({
   },
   drawD3Chart(){
     if(this.data.ready){
-      var data = this.data.readings.map(d => [d.createdAt, d.reading]);
-      var lastval = this.props.machine[this.props.reading];
-      var firstval = (data[0] !== undefined ? data[0][1] : lastval);
-      var toTime = moment();
+      let fromTime = this.data.fromTime;
+      let toTime = this.data.toTime;
+
+      let data = this.data.readings.map(d => [d.createdAt, d.reading]);
+      data = data.filter(d => d[0].getTime() <= toTime.toDate().getTime() && d[0].getTime() >= fromTime.toDate().getTime() );
+
+      let lastval = this.props.machine[this.props.reading];
+      if(data.length > 0){
+        lastval = data[data.length-1][1];
+      }
+      let firstval = (data[0] !== undefined ? data[0][1] : lastval);
       data.unshift([this.data.fromTime.toDate(), firstval]);
       data.push([toTime.toDate(), lastval]);
 
-      var values = data.map(d => d[1]);
-      var timeDomain = [this.data.fromTime.toDate(), toTime.toDate()];
+      let values = data.map(d => d[1]);
+      let timeDomain = [fromTime.toDate(), toTime.toDate()];
 
-      var x = d3.time.scale()
-        .clamp(false)
+      let x = d3.time.scale()
+        .clamp(true)
         .domain(timeDomain)
         .range([0, this.getChartWidth()]);
 
-      var y = d3.scale.linear()
-        .clamp(false)
+      let y = d3.scale.linear()
+        .clamp(true)
         .domain([0, _.max(values)])
         .range([this.getChartHeight(), 0]);
 
       /*
-      var area = d3Shape.area()
+      let area = d3Shape.area()
       .x0(d => x(d.createdAt))
       .x1(d => x(d.createdAt))
       .y0(_ => 1000)
       .y1(d => y(d.reading));
       */
 
-      var area = d3.svg.area()
+      let area = d3.svg.area()
         .x(d => x(d[0]))
         .y0(_ => this.getChartHeight())
         .y1(d => y(d[1]));
 
-      var line = d3.svg.line()
+      let line = d3.svg.line()
         .x(d => x(d[0]))
         .y(d => y(d[1]));
 
@@ -141,18 +160,18 @@ let ReadingHistoryChart = React.createClass({
         .datum(data)
         .attr("d", line);
 
-      var xAxis = d3.svg.axis()
+      let xAxis = d3.svg.axis()
         .scale(x);
 
       d3.select(this.refs.xAxis)
         .call(xAxis);
 
-      var yAxis = d3.svg.axis()
+      let yAxis = d3.svg.axis()
         .orient("right")
         .scale(y);
 
       if(Readings.meta[this.props.reading].unit !== undefined){
-        var yAxisFormat = y.tickFormat(10);
+        let yAxisFormat = y.tickFormat(10);
         yAxis.tickFormat(num => yAxisFormat(num)+" "+Readings.meta[this.props.reading].unit);
       }
 
@@ -172,7 +191,7 @@ let ReadingHistoryChart = React.createClass({
     }
   },
   getStyles(){
-    var styles = {
+    let styles = {
       MachineLoading: {
         textAlign: "center"
       },

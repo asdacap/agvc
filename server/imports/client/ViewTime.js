@@ -94,11 +94,13 @@ class FasterViewTime{
       this.dep.changed();
     });
     Meteor.setInterval(_ => {
+      if(ViewTime.mode == "replay" && ViewTime.playing == false) return;
       this.dep.changed();
     }, interval);
   }
   get time(){
     this.dep.depend();
+    if(ViewTime.mode == "replay" && ViewTime.playing == false) return this.updatedTime;
     let offset = new Date().getTime() - this.lastUpdate.getTime();
     return new Date(this.updatedTime.getTime()+offset);
   }
