@@ -20,7 +20,6 @@ import SideNavPage from '../components/SideNavPage';
 import { MachineOnlineText } from './common'
 import Machines from './Machines';
 import MachineStatusTab from './MachineStatusTab';
-import MachineCommandQueueTab from './MachineCommandQueueTab';
 import MachineMessageLogTab from './MachineMessageLogTab';
 import ManualTab from './ManualTab';
 import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
@@ -54,7 +53,7 @@ export default MachinePage = React.createClass({
 
     let page = "status";
     if(this.props.page !== undefined
-      && _.contains(["status", "readings", "command_queue", "message_logs", "manual_control"], this.props.page)
+      && _.contains(["status", "message_logs", "manual_control"], this.props.page)
      ){
        page = this.props.page;
     }
@@ -64,8 +63,6 @@ export default MachinePage = React.createClass({
     if(this.data.ready){
       if(page == "status"){
         page_component = <MachineStatusTab machine={this.data.machine} />;
-      }else if(page == "command_queue"){
-        page_component = <MachineCommandQueueTab machine={this.data.machine} />;
       }else if(page == "message_logs"){
         page_component = <MachineMessageLogTab machine={this.data.machine} />;
       }else if(page == "manual_control"){
@@ -83,7 +80,6 @@ export default MachinePage = React.createClass({
               </div> : <div>
                 <Tabs value={page} onChange={this.changePage}>
                   <Tab label="Status" value="status" reading={this.props.reading} />
-                  <Tab label="Command Queue" value="command_queue" />
                   <Tab label="Message Logs" value="message_logs" />
                   <Tab label="Manual Control" value="manual_control" />
                 </Tabs>

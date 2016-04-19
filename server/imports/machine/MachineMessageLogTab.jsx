@@ -55,6 +55,16 @@ export default MachineMessageLogTab = React.createClass({
   render(){
     return (
       <div>
+        { this.props.machine.commandQueue.length > 0 ? "Command Queue" : "" }
+        <Table selectable={false}>
+          <TableBody displayRowCheckbox={false}>
+            { this.props.machine.commandQueue.map(function(command, idx){
+              return <TableRow key={idx}>
+                <TableRowColumn>{command.command}</TableRowColumn>
+              </TableRow>;
+            }) }
+          </TableBody>
+        </Table>
         <FlatButton onClick={this.clearMessageLog} label="Clear" />&nbsp;
         <FlatButton onClick={this.addMessageLog} label="Click to add" />&nbsp;
         <Table>
