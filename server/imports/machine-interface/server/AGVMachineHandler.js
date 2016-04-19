@@ -26,10 +26,13 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.queueHandler = undefined;
 
     this.bindRegisteredEvent();
-    this.incomingQueue = [];
+    this.incomingQueue = []; // Pending incoming message when its not registered
 
-    this.driver.sendMessage("identify");
-    this.dataSeq = 0;
+    this.driver.sendMessage("identify"); // Tell it to indentify itself
+    this.dataSeq = 0; // Used for the timeout timer
+    this.closed = false; // So that it won't close twice
+
+    this.emit("connect"); // Its connected
   }
 
   bindRegisteredEvent(){
@@ -47,10 +50,11 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   onData(data){
     this.dataSeq = this.dataSeq+1;
     this.checkDataSequenceTimeout(this.dataSeq);
-    if(data == "p") return;
     console.log("Got data "+data);
 
     if(data == "") return;
+
+    // Record into message logs
     if(this.machineObj === undefined){
       MessageLogs.insert({ text: data });
     }else{
@@ -58,14 +62,17 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     }
 
     if(this.machineObj === undefined){
-      var keyValueMatch = data.match(/([^:]+):([^:]+)/);
+      // If it is not registered...
+      let keyValueMatch = data.match(/([^:]+):([^:]+)/);
       if(keyValueMatch !== null && keyValueMatch[1] == "machineId"){ // Its a registration
         this.onKeyValueMatch(keyValueMatch[1], keyValueMatch[2]);
 
         if(this.machineObj !== undefined){
+          // Its registered. Cool, here are your messages...
           this.incomingQueue.forEach(dat => this.onData(dat));
           this.incomingQueue = [];
         }else{
+          // Still not registered?
           this.incomingQueue.push(data);
         }
       }else{
@@ -73,7 +80,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         this.driver.sendMessage("identify"); // Please tell me who are you...
       }
     }else{
-      var keyValueMatch = data.match(/([^:]+):([^:]+)/);
+      let keyValueMatch = data.match(/([^:]+):([^:]+)/);
       if(keyValueMatch !== null){
         this.onKeyValueMatch(keyValueMatch[1], keyValueMatch[2]);
       }
@@ -85,9 +92,8 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   checkDataSequenceTimeout(seq){
     let self = this;
     setTimeout(function(){
-      if(seq == self.dataSeq){
-        self.driver.close();
-        self.onClose();
+      if(seq == self.dataSeq){ // After all this time. Still the same packet?
+        self.close();
       }
     }, Settings.data_sequence_timeout);
   }
@@ -107,6 +113,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         // Already registered. Don't register again
         return;
       }
+      console.warn("Another registered connection exist. Closing...");
       machinesConnection[machineId].close();
     }
 
@@ -121,9 +128,10 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
     Machines.markOnline(this.machineObj._id);
     this.startCommandQueueObservation();
-    this.emit('connect', this.machineObj.machineId, this);
+    this.emit('register', this.machineObj.machineId, this);
   }
 
+  // This is where it listen to new command from the machine commandQueue
   startCommandQueueObservation(){
     this.queueHandler = Machines.find({ machineId: this.machineObj.machineId }, {}).observe({
       changed: this.onMachineChanged
@@ -133,6 +141,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.onMachineChanged(this.machineObj);
   }
 
+  // Listen to new command from the commandQueue on the machine object
   onMachineChanged(newDocument, oldDocument){
     var self = this;
     if(newDocument.commandQueue.length === 0) return;
@@ -142,6 +151,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     commands.forEach(function(command){
       if(command.droppable && (new Date() - command.createdAt) > Settings.dropppable_command_timeout){
         console.log("Droppable command "+command.command+" dropped");
+        return;
       }
       //console.log("send data "+command.command);
       self.driver.sendMessage(command.command);
@@ -149,23 +159,24 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   }
 
   close(){
-    if(this.machineObj !== undefined && machinesConnection[this.machineObj.machineId] != this){
-      // Already closed
-      return;
-    }
-    this.onClose();
+    if(this.closed) return;
+    this.driver.close();
   }
 
   onClose(){
+    if(this.closed) return;
+    this.closed = true;
     console.log("Closing connection");
     if(this.machineObj !== undefined){
       if(this.queueHandler !== undefined){
         this.queueHandler.stop();
       }
-      Machines.markOffline(this.machineObj._id);
       machinesConnection[this.machineObj.machineId] = undefined;
+      Machines.markOffline(this.machineObj._id);
+      this.emit("unregister", this.machineObj.machineId, this);
+      this.machineObj = undefined;
     }
-    this.emit("close", this.machineObj.machineId, this);
+    this.emit("disconnect");
     this.unBindRegisteredEvent();
   }
 

@@ -1,19 +1,28 @@
 
 var net = require('net');
-var frame = require('frame-stream');
+var split = require('split');
 var prompt = require('prompt');
 
 var socket = net.connect(10000);
-var outFrame = frame.encode();
-outFrame.pipe(socket);
+var splitted = socket.pipe(split());
+
+socket.write("machineId:ABC\n");
+
+splitted.on("data", function(data){
+  console.log("Got data "+data);
+  socket.write(data+"\n");
+});
+
 
 prompt.start();
 
 function getMessage(){
   prompt.get(['message'], function(err, result){
     var message = result.message;
-    console.log("Sending message "+message);
-    outFrame.write(message);
+    if(message !== undefined){
+      console.log("Sending message "+message);
+      socket.write(message+"\n");
+    }
     getMessage();
   });
 }

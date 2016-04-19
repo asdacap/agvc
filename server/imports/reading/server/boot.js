@@ -26,7 +26,7 @@ if(Meteor.isServer){
 
   // For responseTime recording
   AGVMachineHandler.registerEventHandler({
-    event: "connect",
+    event: "register",
     callback: function(machineId, handler){
       let intervalHandle = Meteor.setInterval(_ => {
         Machines.sendCommand(machineId, "p:"+(new Date().getTime()), true);
@@ -36,7 +36,7 @@ if(Meteor.isServer){
         Machines.setReading(machineId, 'responseTime', responseTime);
       };
       let eventHandle = handler.on('key:p', pingCallback);
-      handler.once('close', _ => {
+      handler.once("unregister", _ => {
         Meteor.clearInterval(intervalHandle);
         handler.removeListener('key:p', pingCallback);
       })

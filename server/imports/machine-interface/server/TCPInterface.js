@@ -36,7 +36,7 @@ var SocketHandler = function(socket){
 
 _.extend(SocketHandler.prototype, {
   close(){
-    this.socket.end();
+    this.socket.destroy();
   },
   onClose(){
     console.log("Socket close");
@@ -46,8 +46,8 @@ _.extend(SocketHandler.prototype, {
     console.log("Socket end");
     this.machineHandler.onClose();
   },
-  onError(){
-    console.log("connection error");
+  onError(e){
+    console.log("Connection error "+e);
   },
   sendMessage(message){
     this.socket.write(message+"\n");
