@@ -23,11 +23,16 @@ function batteryValueTransformer(value){
   return value;
 }
 
+// Temperature value also need to be transformed
+function temperatureValueTransformer(value){
+  return value*0.48828125;
+}
 
 Readings.meta = {
   temperature: {
     title: "Temperature",
     defaultValue: 0,
+    transformer: temperatureValueTransformer,
     type: Number
   },
   battery: {

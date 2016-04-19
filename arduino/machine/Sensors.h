@@ -16,9 +16,19 @@ namespace Sensors{
     }
   }
 
+  int TEMPERATURE_SENSOR = 1;
+  RateLimiter temperatureRateLimiter(1000);
+
+  void loopTemperatureSensor(){
+    if(temperatureRateLimiter.isItOK()){
+      int value = analogRead(TEMPERATURE_SENSOR);
+      ConnectionManager::sendData("temperature:"+String(value));
+    }
+  }
 
   void loop(){
     loopBatterySensor();
+    loopTemperatureSensor();
   }
 
   void setup(){
