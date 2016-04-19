@@ -80,7 +80,7 @@ let ReadingChartListItem = React.createClass({
   }
 });
 
-export default MachineStatusTab = React.createClass({
+let ReadingList = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
@@ -88,6 +88,18 @@ export default MachineStatusTab = React.createClass({
       state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
   },
+  render(){
+    let self = this;
+    var listItems = Readings.availableReadings.map(function(reading){
+      return <ReadingChartListItem machine={self.props.machine} reading={reading} value={self.data.state[reading]} key={reading}/>;
+    });
+    return <List>
+      {listItems}
+    </List>;
+  }
+});
+
+export default MachineStatusTab = React.createClass({
   getInitialState(){
     return {
       openForm: false
@@ -108,14 +120,8 @@ export default MachineStatusTab = React.createClass({
   sendSetting(){
     Meteor.call("sendMachineSetting", this.props.machine.machineId);
   },
-  goHistoryPage(reading){
-    FlowRouter.go('readingHistory', { machineId: this.props.machine.machineId, reading: reading });
-  },
   render(){
     var self = this;
-    var listItems = Readings.availableReadings.map(function(reading){
-      return <ReadingChartListItem machine={self.props.machine} reading={reading} value={self.data.state[reading]} key={reading}/>;
-    });
     return <div style={styles.TopContainer}>
       <MediaQuery query='(min-width: 700px)'>
         <div style={styles.MapContainerLeft}>
@@ -131,10 +137,12 @@ export default MachineStatusTab = React.createClass({
         <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
         <List>
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
-          {listItems}
         </List>
+        <ReadingList machine={this.props.machine} />
         <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </div>
     </div>;
   }
 });
+
+export { ReadingList };

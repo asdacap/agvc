@@ -3,6 +3,8 @@ import {
   RaisedButton,
   FloatingActionButton
 } from 'material-ui';
+import { ReadingList } from './MachineStatusTab';
+import MediaQuery from 'react-responsive';
 
 import HardwareKeyboardArrowDown from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-down';
 import HardwareKeyboardArrowUp from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-up';
@@ -14,11 +16,9 @@ let styles = {
     marginTop: '100px',
     fontSize: '200%'
   },
+
   ContainerBox: {
-    textAlign: 'center',
-    minHeight: '300px',
-    height: '100%',
-    position: 'relative',
+    display: 'flex'
   },
   InnerBox: {
     position: 'absolute',
@@ -29,6 +29,17 @@ let styles = {
     width: '300px',
     height: '300px'
   },
+  LeftBox: {
+    flex: '0 0 300px'
+  },
+  RightBox: {
+    flex: '1 0 auto',
+    position: 'relative',
+    width: '300px',
+    minHeight: '300px',
+    backgroundColor: '#CCCCCC'
+  },
+
   Buttons: {
     ManualToggle: {
       marginTop: '1ex'
@@ -131,45 +142,52 @@ export default ManualTab = React.createClass({
     let manual = this.props.machine.manualMode;
     let machineId = this.props.machine.machineId;
 
+    let innerBox = null;
+
     if(!this.props.machine.online){
-      return <div style={styles.ContainerBox}>
-        <div style={styles.InnerBox}>
-          <div style={styles.OfflineNotice}>Machine is offline</div>
-        </div>
+      innerBox = <div style={styles.InnerBox}>
+        <div style={styles.OfflineNotice}>Machine is offline</div>
+      </div>;
+    }else if(manual){
+      innerBox = <div style={styles.InnerBox}>
+        <RaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
+        <FloatingActionButton label='Up' style={styles.Buttons.Up}
+          onMouseDown={this.forward} onMouseUp={this.stop}
+          onTouchStart={this.forward} onTouchEnd={this.stop}>
+          <HardwareKeyboardArrowUp />
+        </FloatingActionButton>
+        <FloatingActionButton label='Down' style={styles.Buttons.Down}
+          onMouseDown={this.backward} onMouseUp={this.stop}
+          onTouchStart={this.backward} onTouchEnd={this.stop}>
+          <HardwareKeyboardArrowDown />
+        </FloatingActionButton>
+        <FloatingActionButton label='Right' style={styles.Buttons.Right}
+          onMouseDown={this.right} onMouseUp={this.stop}
+          onTouchStart={this.right} onTouchEnd={this.stop}>
+          <HardwareKeyboardArrowRight />
+        </FloatingActionButton>
+        <FloatingActionButton label='Left' style={styles.Buttons.Left}
+          onMouseDown={this.left} onMouseUp={this.stop}
+          onTouchStart={this.left} onTouchEnd={this.stop}>
+          <HardwareKeyboardArrowLeft />
+        </FloatingActionButton>
+      </div>;
+    }else{
+      innerBox = <div style={styles.InnerBox}>
+        <RaisedButton style={styles.Buttons.ManualToggle} label='Manual Off' onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
       </div>;
     }
-    if(manual){
-      return <div style={styles.ContainerBox}>
-        <div style={styles.InnerBox}>
-          <RaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
-          <FloatingActionButton label='Up' style={styles.Buttons.Up}
-            onMouseDown={this.forward} onMouseUp={this.stop}
-            onTouchStart={this.forward} onTouchEnd={this.stop}>
-            <HardwareKeyboardArrowUp />
-          </FloatingActionButton>
-          <FloatingActionButton label='Down' style={styles.Buttons.Down}
-            onMouseDown={this.backward} onMouseUp={this.stop}
-            onTouchStart={this.backward} onTouchEnd={this.stop}>
-            <HardwareKeyboardArrowDown />
-          </FloatingActionButton>
-          <FloatingActionButton label='Right' style={styles.Buttons.Right}
-            onMouseDown={this.right} onMouseUp={this.stop}
-            onTouchStart={this.right} onTouchEnd={this.stop}>
-            <HardwareKeyboardArrowRight />
-          </FloatingActionButton>
-          <FloatingActionButton label='Left' style={styles.Buttons.Left}
-            onMouseDown={this.left} onMouseUp={this.stop}
-            onTouchStart={this.left} onTouchEnd={this.stop}>
-            <HardwareKeyboardArrowLeft />
-          </FloatingActionButton>
+
+    return <div style={styles.ContainerBox}>
+      <MediaQuery query='(min-width: 700px)'>
+        <div style={styles.LeftBox}>
+          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
+          <ReadingList machine={this.props.machine} />
         </div>
+      </MediaQuery>
+      <div style={styles.RightBox}>
+        {innerBox}
       </div>
-    }else{
-      return <div style={styles.ContainerBox}>
-        <div style={styles.InnerBox}>
-          <RaisedButton style={styles.Buttons.ManualToggle} label="Manual Off" onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
-        </div>
-      </div>
-    }
+    </div>;
   }
 });
