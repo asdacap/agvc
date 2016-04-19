@@ -7,29 +7,41 @@ import MachineView from './MachineView';
 import ViewTime from '../client/ViewTime';
 import { FasterViewTime } from '../client/ViewTime';
 
+let styles = {
+  MapStyles: {
+    minWidth: "300px",
+    minHeight: "225px",
+    height: "100%",
+    flex: "1 0 auto"
+  }
+}
+
 // Draw the map along with all the machines
-export default AllMachineMap = React.createClass({
+export default SingleMachineMap = React.createClass({
+  propTypes: {
+    machineId: React.PropTypes.string.isRequired
+  },
   mixins: [ReactMeteorData],
   getInitialState(){
     this.fasterViewTime = new FasterViewTime(100);
     return {};
   },
   getMeteorData(){
-    var handle = Meteor.subscribe("Machines");
+    var handle = Meteor.subscribe("Machine", this.props.machineId);
     var atTime = this.fasterViewTime.time;
 
     return {
-      machines: Machines.find({}).fetch(),
+      machine: Machines.findOne({ machineId: this.props.machineId }),
       time: atTime
     }
   },
   render(){
-    return <svg width="100%" height="500px" viewBox="0 0 1200 900">
+    return <svg style={styles.MapStyles} viewBox="0 0 1200 900">
       <rect x="-10000" y="-10000" width="30000" height="30000" fill="#d6d6d6" />
       <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
       <MapView />
       <g>
-        { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
+        <MachineView machine={this.data.machine} atTime={this.data.time} />
       </g>
     </svg>;
   }
