@@ -31,6 +31,12 @@ var styles = {
   },
   Table: {
     height: "200px"
+  },
+  CardHeaderBackgroundOnStatus: {
+    offline: "#ffdd29",
+    outOfCircuit: "#ffdd29",
+    obstructed: "#ffdd29",
+    manualMode: "#299fff",
   }
 };
 
@@ -44,15 +50,19 @@ export default MachineListItem = React.createClass({
   render(){
     let self = this;
 
-    let subtitleColor = Styles.Colors.lightBlack;
-    if(this.props.machine.online){
-      subtitleColor = Styles.Colors.lightGreenA400;
+    let titleStyle = {
+      backgroundColor: "#ffffff"
+    };
+
+    if(styles.CardHeaderBackgroundOnStatus[this.data.state.status] !== undefined){
+      titleStyle.backgroundColor = styles.CardHeaderBackgroundOnStatus[this.data.state.status];
     }
 
     return <Card style={styles.MachineListItem}>
       <CardTitle title={this.props.machine.machineId}
-         subtitle={this.data.state.status} subtitleColor={subtitleColor}
+         subtitle={this.data.state.status}
          actAsExpander={true}
+         style={titleStyle}
          showExpandableButton={true}/>
       <CardText expandable={true}>
         <Table selectable={false} height={ styles.Table.height }>
