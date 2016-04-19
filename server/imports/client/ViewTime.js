@@ -1,6 +1,7 @@
 import GlobalStates from '../global-state/GlobalStates';
+import Settings from '../Settings';
 
-var updateInterval = 200;
+var updateInterval = Settings.viewtime_update_interval;
 
 // This class handle the viewTime.
 // the viewTime store the time the view should be showing right now
@@ -83,6 +84,27 @@ class ViewTimeClass {
   }
 }
 
+class FasterViewTime{
+  constructor(interval){
+    this.interval = interval;
+    this.dep = new Tracker.Dependency();
+    Meteor.autorun(_ => {
+      this.lastUpdate = new Date();
+      this.updatedTime = ViewTime.time;
+      this.dep.changed();
+    });
+    Meteor.setInterval(_ => {
+      this.dep.changed();
+    }, interval);
+  }
+  get time(){
+    this.dep.depend();
+    let offset = new Date().getTime() - this.lastUpdate.getTime();
+    return new Date(this.updatedTime.getTime()+offset);
+  }
+}
+
 let ViewTime = new ViewTimeClass();
 
 export default ViewTime;
+export { FasterViewTime };

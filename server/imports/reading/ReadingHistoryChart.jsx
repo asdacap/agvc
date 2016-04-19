@@ -21,6 +21,7 @@ import moment from 'moment';
 import Dimensions from 'react-dimensions';
 import Color from 'color';
 import ViewTime from '../client/ViewTime';
+import { FasterViewTime } from '../client/ViewTime';
 
 let ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
@@ -31,6 +32,7 @@ let ReadingHistoryChart = React.createClass({
   getInitialState(){
     var self = this;
     self.subFromDate = moment().subtract(1, 'minutes');
+    self.fasterViewTime = new FasterViewTime(50);
     return {
       chartWidth: 200
     }
@@ -38,7 +40,7 @@ let ReadingHistoryChart = React.createClass({
   getMeteorData(){
     var self = this;
 
-    var newSubFromDate = moment(ViewTime.time).subtract(1, 'minutes');
+    var newSubFromDate = moment(self.fasterViewTime.time).subtract(1, 'minutes');
     if(newSubFromDate.diff(self.subFromDate, 'minutes') > 10){
       self.subFromDate = newSubFromDate;
     }

@@ -5,13 +5,18 @@ import LocationLogs from './LocationLogs';
 import Map from './Map';
 import MachineView from './MachineView';
 import ViewTime from '../client/ViewTime';
+import { FasterViewTime } from '../client/ViewTime';
 
 // Draw the map along with all the machines
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
+  getInitialState(){
+    this.fasterViewTime = new FasterViewTime(50);
+    return {};
+  },
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
-    var atTime = ViewTime.time;
+    var atTime = this.fasterViewTime.time;
 
     return {
       machines: Machines.find({}).fetch(),
