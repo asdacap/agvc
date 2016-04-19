@@ -11,7 +11,7 @@ import { FasterViewTime } from '../client/ViewTime';
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
-    this.fasterViewTime = new FasterViewTime(50);
+    this.fasterViewTime = new FasterViewTime(100);
     return {};
   },
   getMeteorData(){
