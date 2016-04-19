@@ -7,15 +7,6 @@ import MachineView from './MachineView';
 import ViewTime from '../client/ViewTime';
 import { FasterViewTime } from '../client/ViewTime';
 
-let styles = {
-  MapStyles: {
-    minWidth: "300px",
-    minHeight: "225px",
-    height: "100%",
-    flex: "1 0 auto"
-  }
-}
-
 // Draw the map along with all the machines
 export default SingleMachineMap = React.createClass({
   propTypes: {
@@ -36,7 +27,11 @@ export default SingleMachineMap = React.createClass({
     }
   },
   render(){
-    return <svg style={styles.MapStyles} viewBox="0 0 1200 900">
+
+    let style = this.props.style;
+    if(style === undefined) style = {};
+
+    return <svg viewBox="0 0 1200 900" style={style}>
       <rect x="-10000" y="-10000" width="30000" height="30000" fill="#d6d6d6" />
       <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
       <MapView />

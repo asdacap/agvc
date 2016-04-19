@@ -9,6 +9,7 @@ import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 import ViewTime from '../client/ViewTime';
 import SingleMachineMap from '../location/SingleMachineMap';
+import MediaQuery from 'react-responsive';
 
 var styles = {
   ButtonWithMargin: {
@@ -19,9 +20,25 @@ var styles = {
     padding: "1em",
     paddingLeft: "0.5em"
   },
-  MapContainerStyle: {
+  TopContainer: {
     display: "flex",
+  },
+  MapContainerLeft: {
+    flex: "0 0 auto",
+    display: "flex",
+    flexWrap: "wrap",
+    width: "300px",
     flexDirection: "column"
+  },
+  LeftMap: {
+    flex: "1 0 auto",
+  },
+  StatusContainer: {
+    flex: "1 1 auto",
+  },
+  TopMap: {
+    maxHeight: "300px",
+    width: "100%",
   }
 }
 
@@ -99,19 +116,22 @@ export default MachineStatusTab = React.createClass({
     var listItems = Readings.availableReadings.map(function(reading){
       return <ReadingChartListItem machine={self.props.machine} reading={reading} value={self.data.state[reading]} key={reading}/>;
     });
-
-    return <div className="row">
-      <div className="col-xs-12 col-sm-3" style={styles.MapContainerStyle}>
-        <SingleMachineMap machineId={this.props.machine.machineId} />
-      </div>
-      <div className="col-xs-12 col-sm-9">
+    return <div style={styles.TopContainer}>
+      <MediaQuery query='(min-width: 700px)'>
+        <div style={styles.MapContainerLeft}>
+          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
+        </div>
+      </MediaQuery>
+      <div style={styles.StatusContainer}>
+        <MediaQuery query='(max-width: 700px)'>
+          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
+        </MediaQuery>
         <RaisedButton style={styles.ButtonWithMargin} label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
         <List>
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
           {listItems}
-          <ListItem primaryText="JSON" secondaryText={JSON.stringify(this.props.machine)} />
         </List>
         <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </div>
