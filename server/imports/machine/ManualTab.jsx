@@ -27,10 +27,11 @@ let styles = {
     marginTop: '-150px',
     marginLeft: '-150px',
     width: '300px',
-    height: '300px'
+    height: '300px',
+    textAlign: 'center'
   },
   LeftBox: {
-    flex: '0 0 300px'
+    flex: '0 0 500px'
   },
   RightBox: {
     flex: '1 0 auto',
@@ -179,7 +180,7 @@ export default ManualTab = React.createClass({
     }
 
     return <div style={styles.ContainerBox}>
-      <MediaQuery query='(min-width: 700px)'>
+      <MediaQuery query='(min-width: 800px)'>
         <div style={styles.LeftBox}>
           <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
           <ReadingList machine={this.props.machine} />
