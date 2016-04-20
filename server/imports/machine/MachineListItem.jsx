@@ -37,7 +37,8 @@ var styles = {
     outOfCircuit: "#ffdd29",
     obstructed: "#ffdd29",
     manualMode: "#299fff",
-  }
+  },
+  badValueColor: "#ffdd29"
 };
 
 export default MachineListItem = React.createClass({
@@ -68,12 +69,19 @@ export default MachineListItem = React.createClass({
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
-              let value = self.data.state[reading].toString();
+              let rawValue = self.data.state[reading];
+              let value = rawValue.toString();
               if(Readings.meta[reading].unit !== undefined){
                 value = value + " " + Readings.meta[reading].unit;
               }
 
-              return <TableRow key={reading}>
+              // Show alert if bad value
+              let style = {};
+              if(!Readings.isGoodReading(reading, rawValue)){
+                style.backgroundColor = styles.badValueColor;
+              }
+
+              return <TableRow key={reading} style={style}>
                 <TableRowColumn>{Readings.meta[reading].title}</TableRowColumn>
                 <TableRowColumn>{value}</TableRowColumn>
               </TableRow>;

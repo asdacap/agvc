@@ -13,6 +13,7 @@ import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 import ViewTime from '../client/ViewTime';
 import SingleMachineMap from '../location/SingleMachineMap';
 import MediaQuery from 'react-responsive';
+import Readings from '../reading/Readings'
 
 var styles = {
   ButtonWithMargin: {
@@ -44,7 +45,8 @@ var styles = {
   },
   Expanded: {
     backgroundColor: "#e7e7e7"
-  }
+  },
+  badValueColor: "#ffdd29"
 }
 
 let ReadingChartListItem = React.createClass({
@@ -72,9 +74,16 @@ let ReadingChartListItem = React.createClass({
       }
     }
 
+    // Show alert if bad value
+    let listItemStyle = {};
+    if(!Readings.isGoodReading(reading, this.props.value)){
+      listItemStyle.backgroundColor = styles.badValueColor;
+    }
+
     if(this.state.open){
       return <div style={styles.Expanded}>
         <ListItem primaryText={Readings.meta[reading].title}
+          style={listItemStyle}
           secondaryText={secondaryText}
           onTouchTap={this.toggle} >
         </ListItem>
@@ -92,6 +101,7 @@ let ReadingChartListItem = React.createClass({
       </div>;
     }else{
       return <ListItem primaryText={Readings.meta[reading].title}
+        style={listItemStyle}
         secondaryText={secondaryText}
         onTouchTap={this.toggle} >
       </ListItem>;

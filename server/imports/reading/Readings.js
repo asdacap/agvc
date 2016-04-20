@@ -68,12 +68,14 @@ Readings.meta = {
     title: "Battery",
     defaultValue: 0,
     transformer: batteryValueTransformer,
+    badLow: 6,
     unit: "V",
     type: Number
   },
   responseTime: {
     title: "Response Time",
     defaultValue: 0,
+    badHigh: 100,
     unit: "ms",
     type: Number
   },
@@ -86,16 +88,19 @@ Readings.meta = {
   online: {
     title: "Online",
     defaultValue: false,
+    badLow: false,
     type: Boolean
   },
   outOfCircuit: {
     title: "Out of circuit",
     defaultValue: false,
+    badHigh: true,
     type: Boolean
   },
   obstructed: {
     title: "Obstructed",
     defaultValue: false,
+    badHigh: true,
     type: Boolean
   },
   manualMode: {
@@ -187,7 +192,6 @@ Machines.setReading = function(machineId, reading, value){
 
 
 //// Utility function to get reading
-
 Readings.getLastReadingLog = function(reading, machineId, atTime){
   return Readings[reading].findOne({
     machineId: machineId,
@@ -197,3 +201,12 @@ Readings.getLastReadingLog = function(reading, machineId, atTime){
     limit: 1
   });
 };
+
+//// Utility function to see if the reading value is outside the 'good' range
+Readings.isGoodReading = function(reading, value){
+  let badHigh = Readings.meta[reading].badHigh;
+  let badLow = Readings.meta[reading].badLow;
+  if(value >= badHigh) return false;
+  if(value <= badLow) return false;
+  return true;
+}
