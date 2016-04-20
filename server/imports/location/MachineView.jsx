@@ -117,6 +117,17 @@ let MachineViewAnimator = React.createClass({
   },
   componentDidMount(){
     this.stillAlive = true;
+    let container = this.refs.container;
+    let repositionContainer = _ => {
+      let position = this.calculatePosition();
+      if(position != undefined){
+        container.setAttribute("transform", "translate("+position.x+","+position.y+")");
+      }
+      if(this.stillAlive){
+        setTimeout(repositionContainer, Settings.machine_view_render_timeout);
+      }
+    }
+    setTimeout(repositionContainer, Settings.machine_view_render_timeout);
   },
   componentWillUnmount(){
     this.stillAlive = false;
@@ -183,13 +194,7 @@ let MachineViewAnimator = React.createClass({
       }
     }
 
-    Meteor.setTimeout(_ => {
-      if(this.stillAlive){
-        this.forceUpdate();
-      }
-    }, Settings.machine_view_render_timeout);
-
-    return <g style={styles.container} transform={ "translate("+position.x+","+position.y+")" }>
+    return <g style={styles.container} ref="container" transform={ "translate("+position.x+","+position.y+")" }>
       <NoRerenderContainer fill={robotFill}>
         <RobotDrawing/>
       </NoRerenderContainer>
