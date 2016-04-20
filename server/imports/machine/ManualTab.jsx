@@ -183,7 +183,7 @@ export default ManualTab = React.createClass({
       <MediaQuery query='(min-width: 800px)'>
         <div style={styles.LeftBox}>
           <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
-          <ReadingList machine={this.props.machine} />
+          <ReadingList machine={this.props.machine} expandable={false}/>
         </div>
       </MediaQuery>
       <div style={styles.RightBox}>

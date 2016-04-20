@@ -29,6 +29,11 @@ let ReadingHistoryChart = React.createClass({
     machine: React.PropTypes.object,
     reading: React.PropTypes.string
   },
+  getDefaultProps(){
+    return {
+      range: "minute"
+    };
+  },
   getInitialState(){
     let self = this;
     self.subFromDate = moment().subtract(1, 'minutes');
@@ -40,8 +45,23 @@ let ReadingHistoryChart = React.createClass({
   getMeteorData(){
     let self = this;
 
-    let currentTime = self.fasterViewTime.time;
-    let fromTime = moment(currentTime).subtract(1, 'minutes');
+    let currentTime = "";
+    if(this.props.range == "minute"){
+      currentTime = self.fasterViewTime.time;
+    }else{
+      // The rest have a too high resolution for this to see any difference
+      currentTime = ViewTime.time;
+    }
+    let fromTime = moment(currentTime);
+
+    if(this.props.range == "minute"){
+      fromTime = fromTime.subtract(1, 'minutes');
+    }else if(this.props.range == "10minute"){
+      fromTime = fromTime.subtract(10, 'minutes');
+    }else if(this.props.range == "hour"){
+      fromTime = fromTime.subtract(1, 'hours');
+    }
+
     let toTime = moment(currentTime);
 
     let subFromTime = new Date(fromTime.toDate().getTime());

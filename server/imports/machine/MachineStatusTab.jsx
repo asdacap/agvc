@@ -3,7 +3,10 @@ import {
     List,
     ListItem,
     FlatButton,
-    RaisedButton
+    RaisedButton,
+    SelectField,
+    MenuItem,
+    Paper
   } from 'material-ui';
 import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
@@ -18,7 +21,6 @@ var styles = {
   },
   ChartContainerStyle: {
     padding: "1em",
-    paddingLeft: "0.5em"
   },
   TopContainer: {
     display: "flex",
@@ -39,17 +41,25 @@ var styles = {
   TopMap: {
     maxHeight: "300px",
     width: "100%",
+  },
+  Expanded: {
+    backgroundColor: "#e7e7e7"
   }
 }
 
 let ReadingChartListItem = React.createClass({
   getInitialState(){
     return {
-      open: false
+      open: false,
+      range: "minute"
     }
   },
   toggle(){
+    if(!this.props.expandable) return;
     this.setState({ open: !this.state.open });
+  },
+  handleRangeChange(e, idx, value){
+    this.setState({ range: value });
   },
   render(){
     let reading = this.props.reading;
@@ -63,13 +73,23 @@ let ReadingChartListItem = React.createClass({
     }
 
     if(this.state.open){
-      return <ListItem primaryText={Readings.meta[reading].title}
-        secondaryText={secondaryText}
-        onTouchTap={this.toggle} >
+      return <div style={styles.Expanded}>
+        <ListItem primaryText={Readings.meta[reading].title}
+          secondaryText={secondaryText}
+          onTouchTap={this.toggle} >
+        </ListItem>
         <div style={styles.ChartContainerStyle}>
-          <ReadingHistoryChart machine={this.props.machine} reading={reading} />
+          <SelectField value={this.state.range}
+            floatingLabelText="Readng period"
+            underlineStyle={{ borderColor: "#000000" }}
+            onChange={this.handleRangeChange}>
+            <MenuItem value="minute" primaryText="1 minute" />
+            <MenuItem value="10minute" primaryText="10 minute" />
+            <MenuItem value="hour" primaryText="1 hour" />
+          </SelectField>
+          <ReadingHistoryChart machine={this.props.machine} reading={reading} range={this.state.range}/>
         </div>
-      </ListItem>;
+      </div>;
     }else{
       return <ListItem primaryText={Readings.meta[reading].title}
         secondaryText={secondaryText}
@@ -88,10 +108,20 @@ let ReadingList = React.createClass({
       state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
   },
+  getDefaultProps(){
+    return {
+      expandable: true
+    };
+  },
   render(){
     let self = this;
     var listItems = Readings.availableReadings.map(function(reading){
-      return <ReadingChartListItem machine={self.props.machine} reading={reading} value={self.data.state[reading]} key={reading}/>;
+      return <ReadingChartListItem
+        machine={self.props.machine}
+        reading={reading}
+        expandable={self.props.expandable}
+        value={self.data.state[reading]}
+        key={reading}/>;
     });
     return <List>
       {listItems}

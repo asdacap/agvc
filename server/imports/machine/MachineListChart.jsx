@@ -39,7 +39,7 @@ var styles = {
   },
   StatusButton: {
   },
-  SelectReadingField: {
+  SelectField: {
     marginLeft: "1ex",
     marginBottom: "-8px",
     verticalAlign: "bottom"
@@ -57,6 +57,7 @@ export default MachineListStatus = React.createClass({
     var openForm = new ReactiveVar(false);
     return {
       openForm,
+      range: "minute"
     };
   },
   getMeteorData(){
@@ -75,26 +76,39 @@ export default MachineListStatus = React.createClass({
   handleReadingChange(e, idx, value){
     FlowRouter.go("dashboardChart", { reading: value });
   },
+  handleRangeChange(e, idx, value){
+    this.setState({ range: value });
+  },
   render(){
     let self = this;
     return <div className="machine-lists">
       <div style={styles.MachineListPanel}>
         <RaisedButton label="Statuses" onTouchTap={this.goToCharts} style={styles.StatusButton}/>
         <SelectField value={this.props.reading}
+          floatingLabelText="Reading Type"
           onChange={this.handleReadingChange}
-          style={styles.SelectReadingField}>
+          style={styles.SelectField}>
           {
             Readings.availableReadings.map(reading => {
               return <MenuItem value={reading} primaryText={Readings.meta[reading].title} key={reading}/>;
             })
           }
         </SelectField>
+          <SelectField value={this.state.range}
+            floatingLabelText="Readng period"
+            underlineStyle={{ borderColor: "#000000" }}
+            onChange={self.handleRangeChange}
+            style={styles.SelectField}>
+            <MenuItem value="minute" primaryText="1 minute" />
+            <MenuItem value="10minute" primaryText="10 minute" />
+            <MenuItem value="hour" primaryText="1 hour" />
+          </SelectField>
       </div>
       <div style={styles.MachineListBox}>
         <div className="machines row">
           { this.data.machines.map(function(item){
-            return <div className="col-lg-3 col-md-4 col-xs-12" key={item._id}>
-              <MachineListChartItem machine={item} reading={self.props.reading}/>
+            return <div className="col-lg-4 col-md-6 col-xs-12" key={item._id}>
+              <MachineListChartItem machine={item} reading={self.props.reading} range={self.state.range}/>
             </div>;
           }) }
         </div>

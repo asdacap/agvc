@@ -45,6 +45,7 @@ export default MachineListChartItem = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object.isRequired,
+    range: React.PropTypes.string.isRequired,
     reading: React.PropTypes.string.isRequired
   },
   getMeteorData(){
@@ -68,7 +69,7 @@ export default MachineListChartItem = React.createClass({
          subtitle={this.data.state.status}
          style={titleStyle}/>
       <CardText>
-        <ReadingHistoryChart machine={this.props.machine} reading={this.props.reading} />
+        <ReadingHistoryChart machine={this.props.machine} reading={this.props.reading} range={this.props.range}/>
       </CardText>
       <CardActions>
         <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
