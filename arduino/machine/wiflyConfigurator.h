@@ -37,6 +37,7 @@ void configureWifly(T &wifiSerial){
   sendAndPrintResult("set sys iofunc 0x40", wifiSerial);
   sendAndPrintResult("set comm open 0", wifiSerial);
   sendAndPrintResult("set comm close 0", wifiSerial);
+  sendAndPrintResult("set comm match 10", wifiSerial);
   sendAndPrintResult("save", wifiSerial);
   sendAndPrintResult("exit", wifiSerial);
 
