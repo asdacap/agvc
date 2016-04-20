@@ -249,3 +249,6 @@ issue minimongo. I guess realtime update came at a cost.
 
 I've splitted each reading type into its own collection. With that I can combine some
 subscription. Unfortunately, no change in client cpu usage can be seen.
+
+It turns out, the major cause of the 28ms loop interval is the RFID reader having a
+timeout of 25ms. Reduced that by half. Now the loop interval is 16ms.

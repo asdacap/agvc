@@ -16,6 +16,10 @@ namespace RFID{
     while (!Serial);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
     SPI.begin();			// Init SPI bus
     mfrc522.PCD_Init();		// Init MFRC522
+
+    // Reduce timeout
+    mfrc522.PCD_WriteRegister(mfrc522.TReloadRegH, 0x01);
+    mfrc522.PCD_WriteRegister(mfrc522.TReloadRegL, 0xF4);
   }
 
   /**
