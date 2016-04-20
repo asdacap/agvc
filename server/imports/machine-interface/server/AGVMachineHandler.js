@@ -84,6 +84,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       if(keyValueMatch !== null){
         this.onKeyValueMatch(keyValueMatch[1], keyValueMatch[2]);
       }
+      this.emit("dataReceived", data, this.machineObj.machineId, this);
     }
 
   }
@@ -154,6 +155,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       }
       //console.log("send data "+command.command);
       self.driver.sendMessage(command.command);
+      self.emit("commandSent", command.command, self.machineObj.machineId, this);
     });
   }
 

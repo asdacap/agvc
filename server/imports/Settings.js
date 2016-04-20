@@ -7,6 +7,7 @@ Settings = {
   client_ping_interval: 1000,
   viewtime_update_interval: 200,
   use_bigger_map: true,
+  bandwidth_record_interval: 1000,
   machine_view_render_timeout: 50
 };
 

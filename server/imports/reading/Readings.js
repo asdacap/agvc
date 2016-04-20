@@ -13,6 +13,8 @@ Readings.availableReadings = [
   "responseTime",
   "loopInterval",
   "obstructed",
+  "sentDataRate",
+  "receivedDataRate",
   "manualMode"
 ];
 
@@ -83,6 +85,18 @@ Readings.meta = {
     title: "Loop Interval",
     defaultValue: 0,
     unit: "ms",
+    type: Number
+  },
+  sentDataRate: {
+    title: "Sent Data Rate:",
+    defaultValue: 0,
+    unit: "B/s",
+    type: Number
+  },
+  receivedDataRate: {
+    title: "Received Data Rate:",
+    defaultValue: 0,
+    unit: "B/s",
     type: Number
   },
   online: {
