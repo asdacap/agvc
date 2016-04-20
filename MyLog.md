@@ -246,3 +246,6 @@ However, even after the animation, the cpu usage is still high. I suspect the
 culprit is minimongo or the publish/subscribe cycle that runs every 200 milisecond.
 The subscription already had been tuned to run every minute. So its probably an
 issue minimongo. I guess realtime update came at a cost.
+
+I've splitted each reading type into its own collection. With that I can combine some
+subscription. Unfortunately, no change in client cpu usage can be seen.

@@ -51,9 +51,9 @@ let ReadingHistoryChart = React.createClass({
 
     self.handle = Meteor.subscribe("Readings.createdAtRange",
       self.props.machine.machineId,
-      self.props.reading,
       subFromTime,
-      subToTime);
+      subToTime,
+      self.props.reading);
 
     return {
       fromTime: fromTime,

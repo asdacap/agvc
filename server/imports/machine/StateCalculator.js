@@ -188,10 +188,8 @@ export default StateCalculator = {
     let ready = true;
     ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("LocationLogs.createdAtRange", machineId, atTime, toTime).ready();
-    Readings.availableReadings.forEach(function(reading){
-      ready = ready && Meteor.subscribe("Readings.last", machineId, reading, atTime).ready();
-      ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, reading, atTime, toTime).ready();
-    });
+    ready = ready && Meteor.subscribe("Readings.last", machineId, atTime).ready();
+    ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
     return ready;
   },
   calculate(machineId, atTime){

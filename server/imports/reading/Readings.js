@@ -110,24 +110,48 @@ if(Meteor.isServer){
   Meteor.publish("Readings.fromDate", function(machineId, reading, fromDate){
     return Readings[reading].find({ machineId: machineId, createdAt: { $gt: fromDate } });
   });
-  Meteor.publish("Readings.last", function(machineId, reading, atTime){
-    let readings = Readings[reading].find({
-      machineId: machineId,
-      createdAt: { $lte: atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    });
+  Meteor.publish("Readings.last", function(machineId, atTime, reading){
+    if(reading !== undefined){
+      let readings = Readings[reading].find({
+        machineId: machineId,
+        createdAt: { $lte: atTime }
+      }, {
+        sort: { createdAt: -1 },
+        limit: 1
+      });
 
-    return readings;
+      return readings;
+    }else{
+      return Readings.availableReadings.map(reading => {
+        return Readings[reading].find({
+          machineId: machineId,
+          createdAt: { $lte: atTime }
+        }, {
+          sort: { createdAt: -1 },
+          limit: 1
+        });
+      });
+    }
   });
-  Meteor.publish("Readings.createdAtRange", function(machineId, reading, fromTime, endTime){
-    let readings = Readings[reading].find({
-      machineId: machineId,
-      createdAt: { $gte: fromTime, $lte: endTime }
-    });
+  Meteor.publish("Readings.createdAtRange", function(machineId, fromTime, endTime, reading){
+    if(reading !== undefined){
+      console.log("Individual reading "+machineId+" ft "+fromTime.toString()+" "+endTime.toString()+" "+reading);
+      let readings = Readings[reading].find({
+        machineId: machineId,
+        createdAt: { $gte: fromTime, $lte: endTime }
+      });
 
-    return readings;
+      return readings;
+    }else{
+      return Readings.availableReadings.map(reading => {
+        let readings = Readings[reading].find({
+          machineId: machineId,
+          createdAt: { $gte: fromTime, $lte: endTime }
+        });
+
+        return readings;
+      });
+    }
   });
 }
 
@@ -157,6 +181,7 @@ Readings.availableReadings.forEach(function(reading){
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
   var toSet = {};
+  console.log("Setting value "+value);
   toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )
   Readings[reading].insert({ machineId: machineId, value: value })
