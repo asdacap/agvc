@@ -8,16 +8,16 @@ Meteor.methods({
     Machines.sendCommand(machineId, "exitManual");
   },
   manualLeft(machineId){
-    Machines.sendCommand(machineId, "manualLeft");
+    Machines.sendCommand(machineId, "manualLeft", true);
   },
   manualRight(machineId){
-    Machines.sendCommand(machineId, "manualRight");
+    Machines.sendCommand(machineId, "manualRight", true);
   },
   manualForward(machineId){
-    Machines.sendCommand(machineId, "manualForward");
+    Machines.sendCommand(machineId, "manualForward", true);
   },
   manualBackward(machineId){
-    Machines.sendCommand(machineId, "manualBackward");
+    Machines.sendCommand(machineId, "manualBackward", true);
   },
   manualStop(machineId){
     Machines.sendCommand(machineId, "manualStop");
