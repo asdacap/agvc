@@ -33,6 +33,7 @@ void configureWifly(T &wifiSerial){
   sendAndPrintResult("set ip host " + String(Settings.serverHost), wifiSerial);
   sendAndPrintResult("set ip remote " + String(Settings.serverPort), wifiSerial);
   sendAndPrintResult("set sys autoconn "+ String(Settings.tcpConnectDelay), wifiSerial);
+  sendAndPrintResult("set ip flags 0x6", wifiSerial);
   sendAndPrintResult("save", wifiSerial);
   sendAndPrintResult("exit", wifiSerial);
 

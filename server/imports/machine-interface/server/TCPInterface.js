@@ -32,6 +32,7 @@ var SocketHandler = function(socket){
   this.splitted.on('data', this.machineHandler.onData);
   this.socket.on('close', this.onClose);
   this.socket.on('end', this.onEnd);
+  this.socket.setNoDelay(true);
 }
 
 _.extend(SocketHandler.prototype, {

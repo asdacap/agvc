@@ -252,3 +252,6 @@ subscription. Unfortunately, no change in client cpu usage can be seen.
 
 It turns out, the major cause of the 28ms loop interval is the RFID reader having a
 timeout of 25ms. Reduced that by half. Now the loop interval is 16ms.
+
+Explicitly setting nodelay on the TCP socket on server and arduino did not improve
+the response time.
