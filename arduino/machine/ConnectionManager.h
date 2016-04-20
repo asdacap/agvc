@@ -1,5 +1,4 @@
 #include "settings.h"
-#include "wifi_hq/WiFlyHQ.h"
 #include "GlobalListener.h"
 
 #ifndef CONNECTION_MANAGER
@@ -16,8 +15,10 @@ namespace ConnectionManager{
   bool handshaking = false;
   bool webSocketAvailable = false;
   SerialType *serial;
-  WiFly wifly;
   int loopcount = 0;
+
+  int CONNECTED_IN = 26;
+  int CONNECTED_LED = 28;
 
   bool connected();
   void onTCPConnected();
@@ -28,9 +29,9 @@ namespace ConnectionManager{
     ConnectionManager::serial = serial;
     Serial.println(F("Assigned"));
     serial->begin(9600);
-    Serial.println(F("Begin"));
-    wifly.begin(serial, &Serial);
-    Serial.println(F("Done"));
+
+    pinMode(CONNECTED_IN, INPUT);
+    pinMode(CONNECTED_LED, OUTPUT);
   }
 
   void sendDataL(String data, bool logIt=true){
@@ -39,7 +40,7 @@ namespace ConnectionManager{
         Serial.print(F("Sending data "));
         Serial.println(data);
       }
-      wifly.println(data);
+      serial->println(data);
     }else{
       if(logIt){
         Serial.print(F("Cannot send due to no connection "));
@@ -52,9 +53,9 @@ namespace ConnectionManager{
     sendDataL(data, true);
   }
 
-  // Things to actually implement
-  bool connected(){ return wifly.isConnected(); }
-  bool stop(){ return wifly.close(); }
+  bool connected(){
+    return digitalRead(CONNECTED_IN) == HIGH;
+  }
 
   // Delegates to stream
   size_t write(uint8_t d) { return serial->write(d); }
@@ -76,8 +77,8 @@ namespace ConnectionManager{
 
   void listenReceive(){
     if(!connected()) return;
-    if(wifly.available()) {
-      String data = wifly.readStringUntil('\n');
+    if(serial->available()){
+      String data = serial->readStringUntil('\n');
       if (data.length() > 0) {
         if(data == F("identify") ){
           registerMachine();
@@ -94,14 +95,16 @@ namespace ConnectionManager{
 
   void registerMachine(){
     Serial.println(F("Sending registration..."));
-    wifly.print(F("machineId:"));
-    wifly.println(Settings.machineId);
+    serial->print(F("machineId:"));
+    serial->println(Settings.machineId);
     GlobalListener::onConnect();
   }
 
   void loop(){
     loopTCPConnectivityCheck();
     listenReceive();
+
+    digitalWrite(CONNECTED_LED, digitalRead(CONNECTED_IN));
   }
 }
 
