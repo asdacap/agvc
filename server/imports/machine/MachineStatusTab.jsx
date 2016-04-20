@@ -67,7 +67,14 @@ let ReadingChartListItem = React.createClass({
     let reading = this.props.reading;
     let secondaryText = "";
     if(this.props.value !== undefined){
-      secondaryText = this.props.value.toString();
+      secondaryText = this.props.value;
+
+      if(Readings.meta[reading].formatter !== undefined){
+        secondaryText = Readings.meta[reading].formatter(secondaryText);
+      }
+
+      // Making sure its string
+      secondaryText = secondaryText.toString();
 
       if(Readings.meta[reading].unit !== undefined){
         secondaryText = secondaryText + " " + Readings.meta[reading].unit;

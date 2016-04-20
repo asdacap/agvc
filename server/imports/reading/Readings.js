@@ -1,6 +1,7 @@
 // This file needs to be loaded first
 
 import Machines from '../machine/Machines';
+import d3 from 'd3';
 
 export default Readings = {};
 
@@ -64,6 +65,7 @@ Readings.meta = {
     defaultValue: 0,
     transformer: temperatureValueTransformer,
     unit: "c",
+    formatter: d3.format(".2f"),
     type: Number
   },
   battery: {
@@ -72,6 +74,7 @@ Readings.meta = {
     transformer: batteryValueTransformer,
     badLow: 6,
     unit: "V",
+    formatter: d3.format(".2f"),
     type: Number
   },
   responseTime: {
@@ -91,12 +94,14 @@ Readings.meta = {
     title: "Sent Data Rate:",
     defaultValue: 0,
     unit: "B/s",
+    formatter: d3.format(".2f"),
     type: Number
   },
   receivedDataRate: {
     title: "Received Data Rate:",
     defaultValue: 0,
     unit: "B/s",
+    formatter: d3.format(".2f"),
     type: Number
   },
   online: {

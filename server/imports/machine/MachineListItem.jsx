@@ -70,7 +70,15 @@ export default MachineListItem = React.createClass({
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
               let rawValue = self.data.state[reading];
-              let value = rawValue.toString();
+
+              let value = rawValue;
+
+              if(Readings.meta[reading].formatter !== undefined){
+                value = Readings.meta[reading].formatter(value);
+              }
+
+              value = value.toString();
+
               if(Readings.meta[reading].unit !== undefined){
                 value = value + " " + Readings.meta[reading].unit;
               }
