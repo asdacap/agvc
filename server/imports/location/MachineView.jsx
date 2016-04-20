@@ -60,52 +60,78 @@ let icons = {
   </g>
 };
 
-export default MachineView = React.createClass({
-  mixins: [ReactMeteorData],
+let MachineViewAnimator = React.createClass({
   propTypes: {
     machine: React.PropTypes.object.isRequired,
-    atTime: React.PropTypes.any.isRequired // Actually date. But can't seems to find react type for it
+    machineState: React.PropTypes.object.isRequired
   },
-  getMeteorData(){
+  componentDidMount(){
+    this.stillAlive = true;
+  },
+  componentWillUnmount(){
+    this.stillAlive = false;
+  },
+  calculatePosition(){
+    let position = undefined;
 
-    let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
-
-    if(ready){
-      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+    if(this.oldPosition !== undefined){
+      let elapsed = new Date().getTime() - this.updatedAt.getTime();
+      let duration = 200.0;
+      if(this.previousUpdateAt !== undefined){
+        // Smoother duration
+        duration = this.updatedAt.getTime() - this.previousUpdateAt.getTime();
+        if(duration > 500){
+          duration = 500;
+        }
+      }
+      let progress = elapsed/duration;
+      if(progress > 1) progress = 1;
+      let newX = this.oldPosition.x + (this.props.machineState.position.x - this.oldPosition.x)*progress;
+      let newY = this.oldPosition.y + (this.props.machineState.position.y - this.oldPosition.y)*progress;
+      position = {
+        x: newX,
+        y: newY
+      };
+    }else{
+      position = this.props.machineState.position;
     }
 
-    return {
-      ready: ready,
-      state: StateCalculator.calculate(this.props.machine.machineId, this.props.atTime)
-    }
+    return position;
+  },
+  componentWillReceiveProps(){
+    this.oldPosition = this.calculatePosition();
+    this.previousUpdateAt = this.updatedAt;
+    this.updatedAt = new Date();
   },
   render(){
 
-    if(this.machineState == undefined || this.machineState.position === undefined){
-      return <g></g>; // Nothing
-    }
-
+    let position = this.calculatePosition();
     let extraIcon = null; // Nothing
 
-    if(this.machineState.status != "normal"){
+    if(this.props.machineState.status != "normal"){
       let icon = null;
-      if(this.machineState.status == "offline"){
+      if(this.props.machineState.status == "offline"){
         icon = icons.offline;
-      }else if(this.machineState.status == "outOfCircuit"){
+      }else if(this.props.machineState.status == "outOfCircuit"){
         icon = icons.outOfCircuit;
-      }else if(this.machineState.status == "obstructed"){
+      }else if(this.props.machineState.status == "obstructed"){
         icon = icons.obstructed;
-      }else if(this.machineState.status == "manualMode"){
+      }else if(this.props.machineState.status == "manualMode"){
         icon = icons.manualMode;
       }
 
-      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.machineState.status]}>
+      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.machineState.status]}>
         {icon}
       </g>;
     }
 
-    let point = this.machineState.position;
-    return <g style={styles.container} transform={ "translate("+point.x+","+point.y+")" }>
+    Meteor.setTimeout(_ => {
+      if(this.stillAlive){
+        this.forceUpdate();
+      }
+    }, Settings.machine_view_render_timeout);
+
+    return <g style={styles.container} transform={ "translate("+position.x+","+position.y+")" }>
       <rect
         style={ styles.AGVStyle }
         id="rect4181"
@@ -137,8 +163,38 @@ export default MachineView = React.createClass({
         d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
         id="path4138-9-2" />
 
-      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.machineState.status]} textAnchor="middle">{this.props.machine.machineId}</text>
+      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.machineState.status]} textAnchor="middle">{this.props.machine.machineId}</text>
       {extraIcon}
     </g>; // Something
+
+  }
+});
+
+export default MachineView = React.createClass({
+  mixins: [ReactMeteorData],
+  propTypes: {
+    machine: React.PropTypes.object.isRequired,
+    atTime: React.PropTypes.any.isRequired // Actually date. But can't seems to find react type for it
+  },
+  getMeteorData(){
+    let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+
+    if(ready){
+      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+    }
+
+    return {
+      ready: ready,
+      state: this.machineState
+    }
+  },
+  render(){
+
+    if(this.machineState === undefined || this.machineState.position === undefined){
+      return <g></g>; // Nothing
+    }else{
+      return <MachineViewAnimator machine={this.props.machine}
+              machineState={this.data.state} />
+    }
   }
 });

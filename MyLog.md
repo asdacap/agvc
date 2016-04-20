@@ -234,3 +234,15 @@ no compression's response time is about 4 to 15ms, Websocket with compression is
 about 4 to 10 ms. The different between Websocket compression or not is harder
 to predict, but it seems to have a consistent advantage. Without websocket, it is
 likely using HTTP long polling which shows a consistently worst performance.
+
+20 April
+========
+
+This morning, I added a bigger curcuit map, the curcuit map of the curcuit similar
+in the robotics lab. Just now I've moved the animation for the MachineView in the
+map to use manual animation instead of relying in reactive call. Had to split the
+component to two as ReactMeteorData is calling itself on every forceUpdate().
+However, even after the animation, the cpu usage is still high. I suspect the
+culprit is minimongo or the publish/subscribe cycle that runs every 200 milisecond.
+The subscription already had been tuned to run every minute. So its probably an
+issue minimongo. I guess realtime update came at a cost.

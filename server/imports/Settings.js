@@ -6,7 +6,8 @@ Settings = {
   ping_interval: 1000, // Milisecond between ping
   client_ping_interval: 1000,
   viewtime_update_interval: 200,
-  use_bigger_map: true
+  use_bigger_map: true,
+  machine_view_render_timeout: 50
 };
 
 export default Settings;

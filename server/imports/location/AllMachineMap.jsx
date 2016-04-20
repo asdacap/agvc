@@ -11,12 +11,11 @@ import { FasterViewTime } from '../client/ViewTime';
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
-    this.fasterViewTime = new FasterViewTime(100);
     return {};
   },
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
-    var atTime = this.fasterViewTime.time;
+    var atTime = ViewTime.time;
 
     return {
       machines: Machines.find({}).fetch(),
