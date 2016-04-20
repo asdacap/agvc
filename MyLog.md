@@ -247,11 +247,34 @@ culprit is minimongo or the publish/subscribe cycle that runs every 200 miliseco
 The subscription already had been tuned to run every minute. So its probably an
 issue minimongo. I guess realtime update came at a cost.
 
-I've splitted each reading type into its own collection. With that I can combine some
-subscription. Unfortunately, no change in client cpu usage can be seen.
+I've splitted each reading type into its own collection. With that, I can combine some
+subscription. Unfortunately, no change in client cpu usage can be seen even with that.
 
 It turns out, the major cause of the 28ms loop interval is the RFID reader having a
 timeout of 25ms. Reduced that by half. Now the loop interval is 16ms.
 
 Explicitly setting nodelay on the TCP socket on server and arduino did not improve
 the response time.
+
+In total for today, there is about 23 commit. There are various minor changes.
+One of those is that the AGV icon will now blink when the status is not "normal".
+Then, I finally removed the wifly_hq library. The connection status is detected
+using a wire from the wifly module. The chart now have a reading range. The
+selectable range are 1 minute, 10 minute and 1 hour. Be careful when selecting
+1 hour as the reading that is updated every second will load about 3600 record.
+So the browser will hang. Strangely, as I expect the Meteor developer to have
+some thought on blocking user's UI. Another ui change is the addition of
+alert if the reading value is too high or too low.
+
+Finally after doing various stuff, the high CPU usage was resolved by animating
+the icon direcly through DOM. Actual cause of high CPU usage is probably React's
+internal mechanism acting up.
+
+The response time has been improved by about 10 ms by specifying wifly to send
+data when it found a newline character. I experimented with sending data directly
+to the machine interface instead of into mongodb and then the interface picking
+that up. The result is higher than expected difference of about 20ms.
+
+Aside from that, I've added a bandwidth reading. Strangely there seems to be data
+being sent from the server to the agv even if the agv is offline. Will check that
+out tomorrow.
