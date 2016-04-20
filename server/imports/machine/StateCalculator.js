@@ -22,10 +22,9 @@ function calculateLastInterruptedTime(locationLog, atTime){
     let value = readingVal[1];
 
     // Check the first time it is out of circuit
-    let readingLog = Readings.findOne({
-      type: reading,
+    let readingLog = Readings[reading].findOne({
       machineId: locationLog.machineId,
-      reading: value,
+      value: value,
       createdAt: {
         $gte: locationLog.createdAt,
         $lte: atTime
@@ -137,7 +136,7 @@ function calculateStatus(machineId, atTime){
   let onlineLog = Readings.getLastReadingLog("online", machineId, atTime);
 
   // Ignore it if it is true
-  if(onlineLog !== undefined && onlineLog.reading == true) onlineLog = undefined;
+  if(onlineLog !== undefined && onlineLog.value == true) onlineLog = undefined;
   if(onlineLog !== undefined){
     cStatus = "offline";
     cStatusTime = onlineLog.createdAt.getTime();
@@ -147,7 +146,7 @@ function calculateStatus(machineId, atTime){
   let outOfCircuitLog = Readings.getLastReadingLog("outOfCircuit", machineId, atTime);
 
   // Ignore it if it is false
-  if(outOfCircuitLog !== undefined && outOfCircuitLog.reading == false) outOfCircuitLog = undefined;
+  if(outOfCircuitLog !== undefined && outOfCircuitLog.value == false) outOfCircuitLog = undefined;
   if(outOfCircuitLog !== undefined && outOfCircuitLog.createdAt.getTime() > cStatusTime){
     cStatus = "outOfCircuit";
     cStatusTime = outOfCircuitLog.createdAt.getTime();
@@ -157,7 +156,7 @@ function calculateStatus(machineId, atTime){
   let obstructedLog = Readings.getLastReadingLog("obstructed", machineId, atTime);
 
   // Ignore it if it is false
-  if(obstructedLog !== undefined && obstructedLog.reading == false) obstructedLog = undefined;
+  if(obstructedLog !== undefined && obstructedLog.value == false) obstructedLog = undefined;
   if(obstructedLog !== undefined && obstructedLog.createdAt.getTime() > cStatusTime){
     cStatus = "obstructed";
     cSTatusTime = obstructedLog.createdAt.getTime();
@@ -167,7 +166,7 @@ function calculateStatus(machineId, atTime){
   let manualModeLog = Readings.getLastReadingLog("manualMode", machineId, atTime);
 
   // Ignore it if it is false
-  if(manualModeLog !== undefined && manualModeLog.reading == false) manualModeLog = undefined;
+  if(manualModeLog !== undefined && manualModeLog.value == false) manualModeLog = undefined;
   if(manualModeLog !== undefined && manualModeLog.createdAt.getTime() > cStatusTime){
     cStatus = "manualMode";
     cSTatusTime = manualModeLog.createdAt.getTime();
@@ -205,7 +204,7 @@ export default StateCalculator = {
       // Fetch the last one
       var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
       if(readingValue !== undefined){
-        readingValue = readingValue.reading;
+        readingValue = readingValue.value;
       }else{
         readingValue = Readings.meta[reading].defaultValue;
       }

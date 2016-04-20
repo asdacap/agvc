@@ -2,8 +2,7 @@
 
 import Machines from '../machine/Machines';
 
-export default Readings = new Mongo.Collection("readings");
-Readings.attachBehaviour("timestampable");
+export default Readings = {};
 
 //// reading type metadata
 Readings.availableReadings = [
@@ -16,6 +15,35 @@ Readings.availableReadings = [
   "obstructed",
   "manualMode"
 ];
+
+//// Schemas
+var ReadingSchema = new SimpleSchema({
+  value: {
+    type: "none", // None as some reading is of type boolean
+    optional: false
+  },
+  machineId: {
+    type: String,
+    optional: false
+  }
+});
+
+//// Actually define the readings collection
+Readings.availableReadings.forEach(reading => {
+  Readings[reading] = new Mongo.Collection(reading+"Readings");
+  Readings[reading].attachBehaviour("timestampable");
+  Readings[reading].attachSchema(ReadingSchema);
+});
+
+//// Ensure index for performance
+if(Meteor.isServer){
+  Meteor.startup(function(){
+    Readings.availableReadings.forEach(reading => {
+      Readings[reading].rawCollection().ensureIndex({ machineId: 1, createdAt: -1 }, {}, _ => _);
+      Readings[reading].rawCollection().ensureIndex({ machineId: 1, createdAt: 1 }, {}, _ => _);
+    });
+  });
+}
 
 // Battery value needs to be transformed a little bit
 function batteryValueTransformer(value){
@@ -77,33 +105,14 @@ Readings.meta = {
   }
 };
 
-//// Schemas
-var ReadingSchema = new SimpleSchema({
-  type: {
-    type: String,
-    optional: false
-  },
-  reading: {
-    type: "none", // None as some reading is of type boolean
-    optional: false
-  },
-  machineId: {
-    type: String,
-    optional: false
-  }
-});
-
-Readings.attachSchema(ReadingSchema);
-
 //// Publications
 if(Meteor.isServer){
   Meteor.publish("Readings.fromDate", function(machineId, reading, fromDate){
-    return Readings.find({ machineId: machineId, type: reading, createdAt: { $gt: fromDate } });
+    return Readings[reading].find({ machineId: machineId, createdAt: { $gt: fromDate } });
   });
   Meteor.publish("Readings.last", function(machineId, reading, atTime){
-    let readings = Readings.find({
+    let readings = Readings[reading].find({
       machineId: machineId,
-      type: reading,
       createdAt: { $lte: atTime }
     }, {
       sort: { createdAt: -1 },
@@ -113,9 +122,8 @@ if(Meteor.isServer){
     return readings;
   });
   Meteor.publish("Readings.createdAtRange", function(machineId, reading, fromTime, endTime){
-    let readings = Readings.find({
+    let readings = Readings[reading].find({
       machineId: machineId,
-      type: reading,
       createdAt: { $gte: fromTime, $lte: endTime }
     });
 
@@ -151,27 +159,18 @@ Machines.setReading = function(machineId, reading, value){
   var toSet = {};
   toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )
-  Readings.insert({ machineId: machineId, type: reading, reading: value })
+  Readings[reading].insert({ machineId: machineId, value: value })
 }
 
 
 //// Utility function to get reading
 
 Readings.getLastReadingLog = function(reading, machineId, atTime){
-  return Readings.findOne({
+  return Readings[reading].findOne({
     machineId: machineId,
-    createdAt: { $lte: atTime },
-    type: reading
+    createdAt: { $lte: atTime }
   }, {
     sort: { createdAt: -1 },
     limit: 1
   });
 };
-
-//// Ensure index for performance
-if(Meteor.isServer){
-  Meteor.startup(function(){
-    Readings.rawCollection().ensureIndex({ type: 1, machineId: 1, createdAt: -1 }, {}, _ => _);
-    Readings.rawCollection().ensureIndex({ type: 1, machineId: 1, createdAt: 1 }, {}, _ => _);
-  });
-}

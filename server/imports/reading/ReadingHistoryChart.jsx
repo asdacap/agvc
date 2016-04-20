@@ -59,9 +59,8 @@ let ReadingHistoryChart = React.createClass({
       fromTime: fromTime,
       toTime: toTime,
       ready: self.handle.ready(),
-      readings: Readings.find({
+      readings: Readings[self.props.reading].find({
         machineId: this.props.machine.machineId,
-        type: this.props.reading,
         createdAt: {
           $gte: fromTime.toDate(),
           $lte: toTime.toDate()
@@ -106,7 +105,7 @@ let ReadingHistoryChart = React.createClass({
       let fromTime = this.data.fromTime;
       let toTime = this.data.toTime;
 
-      let data = this.data.readings.map(d => [d.createdAt, d.reading]);
+      let data = this.data.readings.map(d => [d.createdAt, d.value]);
       data = data.filter(d => d[0].getTime() <= toTime.toDate().getTime() && d[0].getTime() >= fromTime.toDate().getTime() );
 
       let lastval = this.props.machine[this.props.reading];
