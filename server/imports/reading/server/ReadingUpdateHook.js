@@ -2,11 +2,8 @@ import Readings from '../Readings';
 import Machines from '../../machine/Machines';
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 
-console.log("Registering callback");
-
 Readings.availableReadings.forEach(function(reading){
   function callback(value, machineObj){
-    console.log("Callback on value "+value);
     if(machineObj === undefined) return;
     if(Readings.meta[reading].type == Boolean){
       value = parseInt(value, 0);

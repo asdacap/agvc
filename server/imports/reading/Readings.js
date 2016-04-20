@@ -135,7 +135,6 @@ if(Meteor.isServer){
   });
   Meteor.publish("Readings.createdAtRange", function(machineId, fromTime, endTime, reading){
     if(reading !== undefined){
-      console.log("Individual reading "+machineId+" ft "+fromTime.toString()+" "+endTime.toString()+" "+reading);
       let readings = Readings[reading].find({
         machineId: machineId,
         createdAt: { $gte: fromTime, $lte: endTime }
@@ -181,7 +180,6 @@ Readings.availableReadings.forEach(function(reading){
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
   var toSet = {};
-  console.log("Setting value "+value);
   toSet[reading] = value;
   Machines.update({ machineId: machineId }, { $set: toSet } )
   Readings[reading].insert({ machineId: machineId, value: value })
