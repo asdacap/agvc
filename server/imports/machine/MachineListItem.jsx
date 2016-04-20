@@ -30,7 +30,7 @@ var styles = {
     marginBottom: "20px"
   },
   Table: {
-    height: "200px"
+    height: "400px"
   },
   CardHeaderBackgroundOnStatus: {
     offline: "#ffdd29",
