@@ -1,4 +1,3 @@
-#include "wifi_hq/WiFlyHQ.h"
 #include "ConnectionManager.h"
 #include "wiflyConfigurator.h"
 #include "lineFollowing.h"

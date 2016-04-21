@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "GlobalListener.h"
+#include "RateLimiter.h"
 
 #ifndef CONNECTION_MANAGER
 #define CONNECTION_MANAGER
@@ -8,20 +9,16 @@
 typedef HardwareSerial SerialType;
 
 namespace ConnectionManager{
-  char serverHost[50];
-  long lastTCPConnectAttempt = -1;
-  bool ledON = true;
-  bool wasConnected = false;
-  bool handshaking = false;
-  bool webSocketAvailable = false;
   SerialType *serial;
-  int loopcount = 0;
 
   int CONNECTED_IN = 26;
   int CONNECTED_LED = 28;
+  bool isConnected = false;
+  long lastMessage = 0;
+
+  RateLimiter helloRate(1000);
 
   bool connected();
-  void onTCPConnected();
   void registerMachine();
 
   void setup(SerialType *serial){
@@ -54,7 +51,7 @@ namespace ConnectionManager{
   }
 
   bool connected(){
-    return digitalRead(CONNECTED_IN) == HIGH;
+    return isConnected;
   }
 
   // Delegates to stream
@@ -64,22 +61,16 @@ namespace ConnectionManager{
   int peek() { return serial->peek(); }
   void flush() { serial->flush(); }
 
-  // Run each loop to check tcp connectivity stuff.
-  void loopTCPConnectivityCheck(){
-    if(!wasConnected && connected()){
-      registerMachine();
-    }
-    if(wasConnected && !connected()){
-      GlobalListener::onDisconnect();
-    }
-    wasConnected = connected();
-  }
-
   void listenReceive(){
-    if(!connected()) return;
+    if(connected()){
+        lastMessage++; // Do something useless
+    }
     if(serial->available()){
       String data = serial->readStringUntil('\n');
       if (data.length() > 0) {
+        lastMessage = millis();
+        isConnected = true;
+
         if(data == F("identify") ){
           registerMachine();
         }else if(data.startsWith(F("p:"))){
@@ -101,10 +92,14 @@ namespace ConnectionManager{
   }
 
   void loop(){
-    loopTCPConnectivityCheck();
+    if(!isConnected){
+      if(helloRate.isItOK()) serial->println(F("hello"));
+    }else if(millis() - lastMessage > 5){
+      isConnected = false;
+    }
     listenReceive();
 
-    digitalWrite(CONNECTED_LED, digitalRead(CONNECTED_IN));
+    digitalWrite(CONNECTED_LED, connected() ? HIGH : LOW);
   }
 }
 
