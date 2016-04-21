@@ -73,6 +73,44 @@ let styles = {
   }
 };
 
+let AnalogCircle = React.createClass({
+  getCursorPosition(event) {
+    let el = this.refs.svgEl;
+    let rect = el.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+    return { x, y };
+  },
+  onMouseDownAndMove(e){
+    let pos = this.getCursorPosition(e);
+    console.log("button "+e.button);
+    console.log("mouse down "+pos.x+" "+pos.y);
+  },
+  onMouseUp(e){
+    console.log("button "+e.button);
+    let pos = this.getCursorPosition(e);
+    console.log("mouse up "+pos.x+" "+pos.y);
+  },
+  render(){
+
+    let centerX = this.props.x*120;
+    let centerY = this.props.y*120;
+
+    centerX = centerX + 150;
+    centerY = centerY + 150;
+
+    return <svg width="300" height="300" ref="svgEl"
+        onMouseDown={this.onMouseDownAndMove}
+        onMouseMove={this.onMouseDownAndMove}
+        onMouseUp={this.onMouseUp}>
+      <circle cx="150" cy="150" r="120"
+        stroke="black"
+        fill="#DDDDDD" />
+      <circle cx={centerX} cy={centerY} r="50" stroke="black" fill="#CCCCCC"/>
+    </svg>;
+  }
+});
+
 export default ManualTab = React.createClass({
   enterManual(e){
     e.preventDefault();
@@ -138,6 +176,12 @@ export default ManualTab = React.createClass({
     }
     Meteor.call('manualStop', this.props.machine.machineId);
   },
+  getInitialState(){
+    return {
+      dirX: 0,
+      dirY: 0
+    }
+  },
   handleKeyPress(e){
     if(this.keyPressing) return;
     this.keyPressing = true;
@@ -180,9 +224,14 @@ export default ManualTab = React.createClass({
 
     let innerBox = null;
 
-    if(!this.props.machine.online){
+    if(!this.props.machine.online && false){
       innerBox = <div style={styles.InnerBox}>
         <div style={styles.OfflineNotice}>Machine is offline</div>
+      </div>;
+    }else if(true){
+      innerBox = <div style={styles.InnerBox}>
+        <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
+        <AnalogCircle x={this.state.dirX} y={this.state.dirY}/>
       </div>;
     }else if(manual){
       innerBox = <div style={styles.InnerBox}>
@@ -207,6 +256,7 @@ export default ManualTab = React.createClass({
           onTouchStart={this.left} onTouchEnd={this.stop}>
           <HardwareKeyboardArrowLeft />
         </VFloatingActionButton>
+        <AnalogCircle />
       </div>;
     }else{
       innerBox = <div style={styles.InnerBox}>
