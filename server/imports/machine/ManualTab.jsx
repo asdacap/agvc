@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {
   RaisedButton,
   FloatingActionButton
@@ -137,11 +138,41 @@ export default ManualTab = React.createClass({
     }
     Meteor.call('manualStop', this.props.machine.machineId);
   },
+  handleKeyPress(e){
+    if(this.keyPressing) return;
+    this.keyPressing = true;
+    if(e.keyCode == '37'){
+      this.left(e);
+    }else if(e.keyCode == '38'){
+      this.forward(e);
+    }else if(e.keyCode == '39'){
+      this.right(e);
+    }else if(e.keyCode == '40'){
+      this.backward(e);
+    }else if(e.keyCode == '32'){
+      if(this.props.machine.manualMode){
+        this.exitManual(e);
+      }else{
+        this.enterManual(e);
+      }
+    }
+  },
+  handleKeyDepress(e){
+    this.stop(e);
+    this.keyPressing = false;
+  },
+  componentDidMount(){
+    document.addEventListener('keydown', this.handleKeyPress);
+    document.addEventListener('keyup', this.handleKeyDepress);
+  },
   componentWillUnmount(){
     if(this.commandHandle !== undefined){
       Meteor.clearInterval(this.commandHandle);
       this.commandHandle = undefined;
     }
+
+    document.removeEventListener('keydown', this.handleKeyPress);
+    document.removeEventListener('keyup', this.handleKeyDepress);
   },
   render(){
     let manual = this.props.machine.manualMode;
