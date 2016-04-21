@@ -6,6 +6,7 @@ import Map from './Map';
 import MachineView from './MachineView';
 import ViewTime from '../client/ViewTime';
 import { FasterViewTime } from '../client/ViewTime';
+import MapView from './MapView';
 
 // Draw the map along with all the machines
 export default SingleMachineMap = React.createClass({
@@ -40,18 +41,4 @@ export default SingleMachineMap = React.createClass({
       </g>
     </svg>;
   }
-})
-
-// Draw the map
-var MapView = function(){
-
-  let extra = "";
-  if(Map.extraSVG !== undefined){
-    extra = Map.extraSVG;
-  }
-
-  return <g>
-    <g>{ Map.paths.map((p,idx) => <path d={p.svgPathD} stroke="black" strokeWidth="5" fill="none" key={idx} />) }</g>
-    <g dangerouslySetInnerHTML={{ __html: extra }} ></g>
-  </g>;
-};
+});
