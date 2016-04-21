@@ -15,12 +15,11 @@ export default SingleMachineMap = React.createClass({
   },
   mixins: [ReactMeteorData],
   getInitialState(){
-    this.fasterViewTime = new FasterViewTime(100);
     return {};
   },
   getMeteorData(){
     var handle = Meteor.subscribe("Machine", this.props.machineId);
-    var atTime = this.fasterViewTime.time;
+    var atTime = ViewTime.time;
 
     return {
       machine: Machines.findOne({ machineId: this.props.machineId }),
