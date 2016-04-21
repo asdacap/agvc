@@ -38,30 +38,50 @@ let ResponseMap = {
 
 if(Settings.use_bigger_map){
   ResponseMap = {
-    "04 8e a1 c2 d7 38 81": {
+    "04 8e a1 c2 d7 38 81": [{
+      type: "path",
+      pathId: "horizontalRight",
+      pathProgress: 0,
+      pathDirection: -1
+    },{
       type: "path",
       pathId: "verticalRight",
       pathProgress: 1,
       pathDirection: -1
-    },
-    "04 46 9e c2 d7 38 81": {
+    }],
+    "04 46 9e c2 d7 38 81": [{
+      type: "path",
+      pathId: "verticalRight",
+      pathProgress: 0,
+      pathDirection: -1
+    },{
       type: "path",
       pathId: "verticalLeft",
       pathProgress: 1,
       pathDirection: -1
-    },
-    "04 49 9f c2 d7 38 81": {
+    }],
+    "04 49 9f c2 d7 38 81": [{
+      type: "path",
+      pathId: "verticalLeft",
+      pathProgress: 0,
+      pathDirection: -1
+    },{
       type: "path",
       pathId: "horizontalLeft",
       pathProgress: 1,
       pathDirection: -1
-    },
-    "04 81 a5 c2 d7 38 81": {
+    }],
+    "04 81 a5 c2 d7 38 81": [{
+      type: "path",
+      pathId: "horizontalLeft",
+      pathProgress: 0,
+      pathDirection: -1
+    },{
       type: "path",
       pathId: "horizontalRight",
       pathProgress: 1,
       pathDirection: -1
-    }
+    }]
   }
 }
 
@@ -74,9 +94,23 @@ AGVMachineHandler.registerEventHandler({
       return;
     }
 
-    var newlog = _.extend({},ResponseMap[value]);
-    newlog.machineId = machineObj.machineId;
+    let response = [];
+    if(ResponseMap[value].constructor === Array){
+      response = ResponseMap[value];
+    }else{
+      response.push(ResponseMap[value]);
+    }
 
-    LocationLogs.insert(newlog);
+    let offsetTime = 0;
+    let createdAtTime = new Date().getTime();
+    response.forEach(resp => {
+      var newlog = _.extend({ createdAt: new Date(createdAtTime+offsetTime) },resp);
+      newlog.machineId = machineObj.machineId;
+
+      LocationLogs.insert(newlog);
+
+      // To make sure later log comes later
+      offsetTime = offsetTime+1;
+    });
   }
 });

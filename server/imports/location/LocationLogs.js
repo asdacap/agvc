@@ -33,18 +33,20 @@ var LocationLogSchema = {
 LocationLogs.attachSchema(LocationLogSchema);
 
 if(Meteor.isServer){
-  Meteor.publish("LocationLogs.last", function(machineId, atTime){
+  Meteor.publish("LocationLogs.last", function(machineId, atTime, limit){
     if(machineId === undefined || atTime === undefined){
       console.log("Location logs missing parameters");
       return null;
     }
+
+    if(limit === undefined) limit = 1;
 
     return LocationLogs.find({
       machineId: machineId,
       createdAt: { $lte: atTime }
     }, {
       sort: { createdAt: -1 },
-      limit: 1
+      limit: limit
     });
   });
 

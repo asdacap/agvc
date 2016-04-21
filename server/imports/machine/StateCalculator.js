@@ -42,6 +42,64 @@ function calculateLastInterruptedTime(locationLog, atTime){
   return finalTime;
 }
 
+// Check if there any interruption to the AVG during the time duration
+function findInterruptionWithinTime(machineId, fromTime, toTime){
+  let interruptionReading = ["obstructed", "outOfCircuit", "manualMode"];
+  let interrupted = false;
+  interruptionReading.forEach(reading => {
+    if(interrupted) return;
+
+    let readingLog = Readings[reading].findOne({
+      machineId: machineId,
+      createdAt: {
+        $gte: fromTime,
+        $lte: toTime
+      }
+    });
+    if(readingLog !== undefined) interrupted = true;
+  });
+  return interrupted;
+}
+
+// attempt to estimate speed by considering previously recorded speed
+function calculateEstimatedSpeed(machineId, atPath, atTime){
+  let locationLogs = LocationLogs.find({
+    machineId: machineId,
+    type: "path",
+    createdAt: {
+      $lte: atTime
+    }
+  }, {
+    sort: { createdAt: -1 },
+    limit: 20
+  }).fetch();
+
+  let speeds = [];
+
+  for(let i=0;i<locationLogs.length-1;i++){
+    let log1 = locationLogs[i];
+    let log2 = locationLogs[i+1];
+    if(log1.pathId != atPath) continue;
+    if(log1.pathId !== log2.pathId) continue;
+    if(findInterruptionWithinTime(log2.createdAt, log1.createdAt)) continue;
+
+    let diff = Math.abs(log1.pathProgress - log2.pathProgress);
+    let timediff = (log1.createdAt.getTime() - log2.createdAt.getTime())/1000;
+
+    // Probably just sits there
+    if(diff == 0) continue;
+
+    speeds.push(diff/timediff);
+  }
+
+  if(speeds.length == 0) return undefined;
+
+  let total = 0;
+  speeds.forEach(speed => total = total+speed);
+
+  return total/speeds.length;
+}
+
 // Attempt to calculate the state of a machine
 // at a particular time.
 function calculateLocationPoint(locationLog, atTime){
@@ -78,7 +136,10 @@ function calculateLocationPoint(locationLog, atTime){
       var length = pts.length();
     }
 
-    var speed = path.machineSpeed;
+    var speed = calculateEstimatedSpeed(locationLog.machineId, locationLog.pathId, atTime)
+    if(speed == undefined){
+      speed = path.machineSpeed/length;
+    }
 
     // final time calculation
     // In case an event happen between the start of the log
@@ -89,13 +150,13 @@ function calculateLocationPoint(locationLog, atTime){
     // Back to our calculation
     let timePassed = (finalTime - locationLog.createdAt.getTime());
     timePassed /= 1000.0;
-    let lengthPassed = timePassed*speed;
+    let progressPassed = timePassed*speed;
 
     if(locationLog.pathDirection == 1){
-      var progress = locationLog.pathProgress + (lengthPassed/length);
+      var progress = locationLog.pathProgress + progressPassed;
     }else{
       // Reversed direction
-      var progress = locationLog.pathProgress - (lengthPassed/length);
+      var progress = locationLog.pathProgress - progressPassed;
     }
     if(progress > 1){
       progress = 1;
@@ -185,7 +246,7 @@ export default StateCalculator = {
 
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;
-    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime).ready();
+    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime, 20).ready();
     ready = ready && Meteor.subscribe("LocationLogs.createdAtRange", machineId, atTime, toTime).ready();
     ready = ready && Meteor.subscribe("Readings.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
