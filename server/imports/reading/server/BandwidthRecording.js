@@ -52,6 +52,9 @@ AGVMachineHandler.registerEventHandler({
       Meteor.clearInterval(intervalHandle);
       handler.removeListener('dataReceived', onDataReceived);
       handler.removeListener('commandSent', onCommandSent);
+      // There should be nothing more
+      Machines.setReading(machineId, 'sentDataRate', 0);
+      Machines.setReading(machineId, 'receivedDataRate', 0);
     })
   }
 })
