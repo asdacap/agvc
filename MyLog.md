@@ -278,3 +278,88 @@ that up. The result is higher than expected difference of about 20ms.
 Aside from that, I've added a bandwidth reading. Strangely there seems to be data
 being sent from the server to the agv even if the agv is offline. Will check that
 out tomorrow.
+
+21 April
+========
+
+24 commit today. Mostly small commit though. But there are some significant changes.
+The map can now show arbitrary svg. Basically I just load an svg image and put it
+at the back of the map. Interestingly there is no way for meteor to embed it into
+clientside code. So it needs to be loaded via HTTP. Does not really matter though...
+
+A scale property has been added to MachineView. So the smaller map in the MachinePage
+shows a bigger AGV icon.
+
+The button in the manual mode tab will now vibrate on phones. I wonder why this is
+not built in MaterialUI. For a UI library inspired from android, MaterialUI is
+surprisingly not mobile friendly.
+
+One big commit today is the inclusion of UDP interface. The arduino's protocol has
+been modified to detect connection by itself by sending 'hello' packet every second.
+It seems that its not arduino that skips the detection of new TCP connection, but
+the wifly module itself. Checked by setting GPIO pin to HIGH when a TCP connection
+is alive. When powering down arduino (with a connection to the server), and powering
+it up quickly, the server detect a new incoming connection, but not wifly. So, the
+protocol for UDP should make the TCP connection more robust. Unfortunately when using
+UDP, which is the commit's original intention, the response time is far more
+unpredictable, seems higher than TCP and a lot of loss packet. So I switched back
+to TCP, now made more reliable with a protocol made for UDP.
+
+Another change is better position prediction. Essentially when estimating the AGV's
+location, it needs the speed of the AGV. Previously the speed is hardcoded and
+specified beforehand on the map. Now it uses previously measured speed. So,
+with enough data, the hardcoded speed is now merely a hint.
+
+The manual tab now can use keyboard to control the AGV. Direction keys as expected
+and space bar to toggle manual mode.
+
+A 'master' settings has been added. The TCP/UDP/Machine interface will now only
+start when the master flag is turned on.
+
+The reading will not not add a new value if it the new value is the same as
+previous two value. Instead the last reading will have a newer timestamp. this
+should reduce reading logs and make things more efficient especially on clientside.
+Unfortunately readings which change a lot like response time, would not
+benefit much from this.
+
+Speaking of readings, new temperature sensor just arrived today. I ordered a different
+model from different store, but it sent the same LM35 sensor that I ordered before.
+But this one worked fine. This confirm that the previous sensor is not working,
+and it is not my fault. :-)
+
+Other than that, most commit today is largely tweaks. I've added average to the chart,
+the 'live' button will be disabled when the clientside is disconnected, cleanups, etc.
+
+Right now I have effectively nothing to do. I was thinking about making an analog
+manualMode, but that does not sounds necessary. The biggest problem about the
+system right now is high client CPU usage. I'm not exactly sure what is the cause,
+but it is either the MapView, both small and all machine or the chart. Likely,
+it is both.
+
+For the map, I'm not exactly sure what is the issue. Perhaps it is the point calculation
+that is taking time. Or perhaps it is simply the StateCalculator. Or ReactJS is
+acting up, probably due do development mode?. One thing I notice before about
+animating the MachineView is that, animating with React is really CPU intensive.
+Instead I translate the machineView manually through DOM. Far less CPU intensive.
+Another thing I made is several React's higher order component that limits the rendering.
+That seems to help, but sometimes the CPU usage still rise for no reason. Sometimes,
+there seems to be no activity at all.
+
+Regarding the ReadingHistoryChart. I don't think I can make much improvement there.
+I'm even impressed by how fast d3 can render stuff. But the bottleneck does not seems
+to be the rendering, but either the chart calculation, or minimongo. I'm thinking minimongo,
+as the chart calculation uses a lot of it. Actually, not that much. Anyway, the point is,
+for example, the responseTime from the arduino for some reason is send twice, sometimes.
+That means, in 10 minutes, (I just checked before) there is about 940 record about it.
+Loading 940 record to clientside does not sounds very clever. What happen when the range
+is set to 1 hour? It will (and did) surely hang. A solution would be to use an aggregate
+function to sample a maximum of... let say, 200 record. It won't look nice, but it
+won't hang.
+
+Considering I'm basically out of major development stuff to do, the next step would
+be to measure stuff. This sunday, I'll try to arrange three robot at the same time with
+the system. See the response time. How bad can it get.
+
+Oh yea, I forgot. There has not been a response time between client to arduino
+and back. I should make one. And we should also see the effect of using redis instead
+of mongodb.
