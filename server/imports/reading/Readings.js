@@ -228,8 +228,24 @@ Readings.availableReadings.forEach(function(reading){
 Machines.setReading = function(machineId, reading, value){
   var toSet = {};
   toSet[reading] = value;
-  Machines.update({ machineId: machineId }, { $set: toSet } )
-  Readings[reading].insert({ machineId: machineId, value: value })
+  Machines.update({ machineId: machineId }, { $set: toSet } );
+
+  // Check duplicated reading
+  let previousTwo = Readings[reading].find({
+    machineId: machineId,
+    createdAt: { $lte: new Date() }
+  },{
+    sort: { createdAt: -1 },
+    limit: 2
+  }).fetch();
+
+  if(previousTwo.length == 2 && previousTwo[0].value == previousTwo[1].value && previousTwo[0].value == value){
+    // Update the first one with current time
+    Readings[reading].update({ _id_: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
+  }else{
+    // Make another record
+    Readings[reading].insert({ machineId: machineId, value: value });
+  }
 }
 
 
