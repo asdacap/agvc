@@ -122,14 +122,6 @@ let dataInRangeCalculator = function(fromTime, toTime, reading, machine){
   return data;
 }
 
-// Inefficient... but works
-let averageInRangeCalculator = function(fromTime, toTime, reading, machine){
-  let data = dataInRangeCalculator(fromTime, toTime, reading, machine);
-  let total = 0;
-  data.forEach(d => total = total + d[1]);
-  return total/data.length;
-}
-
 let ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
@@ -243,7 +235,7 @@ let ReadingHistoryChart = React.createClass({
     if(Readings.meta[reading].formatter !== undefined){
       average = Readings.meta[reading].formatter(average);
     }else if(Readings.meta[reading].type == Boolean){
-      average = d3.format(".2f")(average);
+      average = d3.format(".2f")(average*100);
     }else{
       average = d3.format(".2f")(average);
     }
@@ -264,8 +256,21 @@ let ReadingHistoryChart = React.createClass({
 
       let data = this.data.data;
       let total = 0;
-      data.forEach(d => total = total+d[1]);
-      let average = total/data.length;
+      let totalTime = 0;
+
+      for(let i=0;i<data.length-1;i++){
+        let d1 = data[i];
+        let d2 = data[i+1];
+        let timeDiff = d2[0].getTime()-d1[0].getTime();
+        totalTime = totalTime + timeDiff;
+        let mult = (d2[1]+d1[1])/2;
+        if(Readings.meta[this.props.reading].type == Boolean){
+          mult = d1[1];
+        }
+        total = total+timeDiff*mult;
+      }
+
+      let average = total/totalTime;
 
       d3.select(this.refs.average).text("Average : "+this.formatAverage(average));
 
