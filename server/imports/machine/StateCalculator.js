@@ -44,9 +44,6 @@ function calculateLastInterruptedTime(locationLog, atTime){
 
 // Attempt to calculate the state of a machine
 // at a particular time.
-// The state would be the readings and position
-// and a status.
-
 function calculateLocationPoint(locationLog, atTime){
   if(locationLog.type === 'point'){
     var point = Map.getPoint(locationLog.pointId);
@@ -127,6 +124,8 @@ function calculateLocationPoint(locationLog, atTime){
   }
 }
 
+// The state would be the readings and position
+// and a status.
 function calculateStatus(machineId, atTime){
   // Set the default status and when it happened
   let cStatus = "normal";
