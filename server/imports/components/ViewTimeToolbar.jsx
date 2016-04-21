@@ -82,10 +82,17 @@ let ViewTimeToolbar = React.createClass({
 
   //// Date setter/getter
   setDate(e, newDate){
-    ViewTime.time = newDate;
+    let ctime = new Date(ViewTime.time.getTime());
+    ctime.setDate(newDate.getDate());
+    ctime.setMonth(newDate.getMonth());
+    ctime.setFullYear(newDate.getFullYear());
+    ViewTime.time = ctime;
   },
   setTime(e, newTime){
-    ViewTime.time = newTime;
+    let ctime = new Date(ViewTime.time.getTime());
+    ctime.setMinutes(newTime.getMinutes());
+    ctime.setHours(newTime.getHours());
+    ViewTime.time = ctime;
   },
   setSecond(e){
     var newSecond = e.target.value;
