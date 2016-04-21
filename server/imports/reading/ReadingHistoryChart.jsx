@@ -74,6 +74,14 @@ let ReadingHistoryChart = React.createClass({
       subFromTime,
       subToTime,
       self.props.reading);
+    Meteor.subscribe("Readings.last",
+      self.props.machine.machineId,
+      fromTime.toDate(),
+      self.props.reading);
+    Meteor.subscribe("Readings.first",
+      self.props.machine.machineId,
+      toTime.toDate(),
+      self.props.reading);
 
     return {
       fromTime: fromTime,
@@ -122,30 +130,100 @@ let ReadingHistoryChart = React.createClass({
   },
   drawD3Chart(){
     if(this.data.ready){
-      let fromTime = this.data.fromTime;
-      let toTime = this.data.toTime;
+      let fromTime = this.data.fromTime.toDate();
+      let toTime = this.data.toTime.toDate();
 
+      // Convert the data to a data/value array
       let data = this.data.readings.map(d => [d.createdAt, d.value]);
-      data = data.filter(d => d[0].getTime() <= toTime.toDate().getTime() && d[0].getTime() >= fromTime.toDate().getTime() );
+      data = data.filter(d => d[0].getTime() <= toTime.getTime() && d[0].getTime() >= fromTime.getTime() );
 
-      let lastval = this.props.machine[this.props.reading];
-      if(data.length > 0){
-        lastval = data[data.length-1][1];
+      // Calculate first and last value
+      let lastVal = this.props.machine[this.props.reading];
+      let lastTime = toTime;
+
+      // The log after the to time
+      let nextLog = Readings[this.props.reading].findOne({
+        machineId: this.props.machine.machineId,
+        createdAt: { $gte: toTime }
+      }, {
+        sort: { createdAt: 1 },
+        limit: 1
+      });
+      if(nextLog !== undefined){
+        lastVal = nextLog.value;
+        lastTime = nextLog.createdAt;
       }
-      let firstval = (data[0] !== undefined ? data[0][1] : lastval);
-      data.unshift([this.data.fromTime.toDate(), firstval]);
-      data.push([toTime.toDate(), lastval]);
+
+      let firstVal = Readings.meta[this.props.reading].defaultValue;
+      let firstTime = fromTime;
+
+      // The log before the from time
+      let lastLog = Readings[this.props.reading].findOne({
+        machineId: this.props.machine.machineId,
+        createdAt: { $lte: fromTime }
+      }, {
+        sort: { createdAt: -1 },
+        limit: 1
+      });
+
+      if(lastLog !== undefined){
+        firstVal = lastLog.value;
+        firstTime = lastLog.createdAt;
+      }
+
+      data.push([lastTime, lastVal]);
+      data.unshift([firstTime, firstVal]);
+
+      // Interpolate the values to get the boundary value
+      if(data[0][0].getTime() < fromTime.getTime()){
+        if(data.length == 1){
+          data[0][0] = fromTime;
+        }else{
+          let before = data[0];
+          let later = data[1];
+          let timeRange = later[0].getTime() - before[0].getTime();
+          let progress = (fromTime.getTime() - before[0].getTime())/timeRange;
+
+          let newValue = d3.interpolate(before[1],later[1])(progress);
+          if(Readings.meta[this.props.reading].type == Boolean){
+            newValue = before[1];
+          }
+
+          data[0][1] = newValue;
+          data[0][0] = fromTime;
+        }
+      }
+
+      let lastidx = data.length-1;
+      if(data[lastidx][0].getTime() > toTime.getTime()){
+        if(data.length == 1){
+          data[lastidx][0] = fromTime;
+        }else{
+          let before = data[lastidx-1];
+          let later = data[lastidx];
+          let timeRange = later[0].getTime() - before[0].getTime();
+          let progress = (toTime.getTime() - before[0].getTime())/timeRange;
+
+          let newValue = d3.interpolate(before[1],later[1])(progress);
+          if(Readings.meta[this.props.reading].type == Boolean){
+            newValue = before[1];
+          }
+
+          data[lastidx][1] = newValue;
+          data[lastidx][0] = toTime;
+        }
+      }
 
       let values = data.map(d => d[1]);
-      let timeDomain = [fromTime.toDate(), toTime.toDate()];
+      let timeDomain = [fromTime, toTime];
 
       let x = d3.time.scale()
-        .clamp(true)
+        .clamp(false)
         .domain(timeDomain)
         .range([0, this.getChartWidth()]);
 
       let y = d3.scale.linear()
-        .clamp(true)
+        .clamp(false)
         .domain([0, _.max(values)])
         .range([this.getChartHeight(), 0]);
 

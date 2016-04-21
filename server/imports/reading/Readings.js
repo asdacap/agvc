@@ -157,6 +157,29 @@ if(Meteor.isServer){
       });
     }
   });
+  Meteor.publish("Readings.first", function(machineId, atTime, reading){
+    if(reading !== undefined){
+      let readings = Readings[reading].find({
+        machineId: machineId,
+        createdAt: { $gte: atTime }
+      }, {
+        sort: { createdAt: 1 },
+        limit: 1
+      });
+
+      return readings;
+    }else{
+      return Readings.availableReadings.map(reading => {
+        return Readings[reading].find({
+          machineId: machineId,
+          createdAt: { $gte: atTime }
+        }, {
+          sort: { createdAt: 1 },
+          limit: 1
+        });
+      });
+    }
+  });
   Meteor.publish("Readings.createdAtRange", function(machineId, fromTime, endTime, reading){
     if(reading !== undefined){
       let readings = Readings[reading].find({
