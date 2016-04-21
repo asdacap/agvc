@@ -23,6 +23,113 @@ import Color from 'color';
 import ViewTime from '../client/ViewTime';
 import { FasterViewTime } from '../client/ViewTime';
 
+// Generate data suitable to be used in the d3 chart
+// Also used to calculate average
+let dataInRangeCalculator = function(fromTime, toTime, reading, machine){
+
+  let machineId = machine.machineId;
+  let readings = Readings[reading].find({
+    machineId: machineId,
+    createdAt: {
+      $gte: fromTime,
+      $lte: toTime
+    }
+  }, {
+    sort: { createdAt: 1 }
+  }).fetch();
+
+  // Convert the data to a data/value array
+  let data = readings.map(d => [d.createdAt, d.value]);
+  data = data.filter(d => d[0].getTime() <= toTime.getTime() && d[0].getTime() >= fromTime.getTime() );
+
+  // Calculate first and last value
+  let lastVal = machine[reading];
+  let lastTime = toTime;
+
+  // The log after the to time
+  let nextLog = Readings[reading].findOne({
+    machineId: machine.machineId,
+    createdAt: { $gte: toTime }
+  }, {
+    sort: { createdAt: 1 },
+    limit: 1
+  });
+  if(nextLog !== undefined){
+    lastVal = nextLog.value;
+    lastTime = nextLog.createdAt;
+  }
+
+  let firstVal = Readings.meta[reading].defaultValue;
+  let firstTime = fromTime;
+
+  // The log before the from time
+  let lastLog = Readings[reading].findOne({
+    machineId: machine.machineId,
+    createdAt: { $lte: fromTime }
+  }, {
+    sort: { createdAt: -1 },
+    limit: 1
+  });
+
+  if(lastLog !== undefined){
+    firstVal = lastLog.value;
+    firstTime = lastLog.createdAt;
+  }
+
+  data.push([lastTime, lastVal]);
+  data.unshift([firstTime, firstVal]);
+
+  // Interpolate the values to get the boundary value
+  if(data[0][0].getTime() < fromTime.getTime()){
+    if(data.length == 1){
+      data[0][0] = fromTime;
+    }else{
+      let before = data[0];
+      let later = data[1];
+      let timeRange = later[0].getTime() - before[0].getTime();
+      let progress = (fromTime.getTime() - before[0].getTime())/timeRange;
+
+      let newValue = d3.interpolate(before[1],later[1])(progress);
+      if(Readings.meta[reading].type == Boolean){
+        newValue = before[1];
+      }
+
+      data[0][1] = newValue;
+      data[0][0] = fromTime;
+    }
+  }
+
+  let lastidx = data.length-1;
+  if(data[lastidx][0].getTime() > toTime.getTime()){
+    if(data.length == 1){
+      data[lastidx][0] = fromTime;
+    }else{
+      let before = data[lastidx-1];
+      let later = data[lastidx];
+      let timeRange = later[0].getTime() - before[0].getTime();
+      let progress = (toTime.getTime() - before[0].getTime())/timeRange;
+
+      let newValue = d3.interpolate(before[1],later[1])(progress);
+      if(Readings.meta[reading].type == Boolean){
+        newValue = before[1];
+      }
+
+      data[lastidx][1] = newValue;
+      data[lastidx][0] = toTime;
+    }
+  }
+
+  return data;
+}
+
+// Inefficient... but works
+let averageInRangeCalculator = function(fromTime, toTime, reading, machine){
+  let data = dataInRangeCalculator(fromTime, toTime, reading, machine);
+  let total = 0;
+  data.forEach(d => total = total + d[1]);
+  return total/data.length;
+}
+
 let ReadingHistoryChart = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
@@ -83,19 +190,22 @@ let ReadingHistoryChart = React.createClass({
       toTime.toDate(),
       self.props.reading);
 
+    let data = [];
+
+    if(self.handle.ready()){
+      data = dataInRangeCalculator(
+        fromTime.toDate(),
+        toTime.toDate(),
+        this.props.reading,
+        this.props.machine
+      )
+    }
+
     return {
       fromTime: fromTime,
+      data: data,
       toTime: toTime,
-      ready: self.handle.ready(),
-      readings: Readings[self.props.reading].find({
-        machineId: this.props.machine.machineId,
-        createdAt: {
-          $gte: fromTime.toDate(),
-          $lte: toTime.toDate()
-        }
-      }, {
-        sort: { createdAt: 1 }
-      }).fetch()
+      ready: self.handle.ready()
     }
   },
   componentDidMount(){
@@ -128,91 +238,36 @@ let ReadingHistoryChart = React.createClass({
   getChartHeight(){
     return this.getHeight() - this.getBottomMargin() - this.getTopMargin();
   },
+  formatAverage(average){
+    let reading = this.props.reading;
+    if(Readings.meta[reading].formatter !== undefined){
+      average = Readings.meta[reading].formatter(average);
+    }else if(Readings.meta[reading].type == Boolean){
+      average = d3.format(".2f")(average);
+    }else{
+      average = d3.format(".2f")(average);
+    }
+
+    average = average.toString();
+    if(Readings.meta[reading].unit !== undefined){
+      average = average + " " + Readings.meta[reading].unit;
+    }else if(Readings.meta[reading].type == Boolean){
+      average = average + "%";
+    }
+
+    return average;
+  },
   drawD3Chart(){
     if(this.data.ready){
       let fromTime = this.data.fromTime.toDate();
       let toTime = this.data.toTime.toDate();
 
-      // Convert the data to a data/value array
-      let data = this.data.readings.map(d => [d.createdAt, d.value]);
-      data = data.filter(d => d[0].getTime() <= toTime.getTime() && d[0].getTime() >= fromTime.getTime() );
+      let data = this.data.data;
+      let total = 0;
+      data.forEach(d => total = total+d[1]);
+      let average = total/data.length;
 
-      // Calculate first and last value
-      let lastVal = this.props.machine[this.props.reading];
-      let lastTime = toTime;
-
-      // The log after the to time
-      let nextLog = Readings[this.props.reading].findOne({
-        machineId: this.props.machine.machineId,
-        createdAt: { $gte: toTime }
-      }, {
-        sort: { createdAt: 1 },
-        limit: 1
-      });
-      if(nextLog !== undefined){
-        lastVal = nextLog.value;
-        lastTime = nextLog.createdAt;
-      }
-
-      let firstVal = Readings.meta[this.props.reading].defaultValue;
-      let firstTime = fromTime;
-
-      // The log before the from time
-      let lastLog = Readings[this.props.reading].findOne({
-        machineId: this.props.machine.machineId,
-        createdAt: { $lte: fromTime }
-      }, {
-        sort: { createdAt: -1 },
-        limit: 1
-      });
-
-      if(lastLog !== undefined){
-        firstVal = lastLog.value;
-        firstTime = lastLog.createdAt;
-      }
-
-      data.push([lastTime, lastVal]);
-      data.unshift([firstTime, firstVal]);
-
-      // Interpolate the values to get the boundary value
-      if(data[0][0].getTime() < fromTime.getTime()){
-        if(data.length == 1){
-          data[0][0] = fromTime;
-        }else{
-          let before = data[0];
-          let later = data[1];
-          let timeRange = later[0].getTime() - before[0].getTime();
-          let progress = (fromTime.getTime() - before[0].getTime())/timeRange;
-
-          let newValue = d3.interpolate(before[1],later[1])(progress);
-          if(Readings.meta[this.props.reading].type == Boolean){
-            newValue = before[1];
-          }
-
-          data[0][1] = newValue;
-          data[0][0] = fromTime;
-        }
-      }
-
-      let lastidx = data.length-1;
-      if(data[lastidx][0].getTime() > toTime.getTime()){
-        if(data.length == 1){
-          data[lastidx][0] = fromTime;
-        }else{
-          let before = data[lastidx-1];
-          let later = data[lastidx];
-          let timeRange = later[0].getTime() - before[0].getTime();
-          let progress = (toTime.getTime() - before[0].getTime())/timeRange;
-
-          let newValue = d3.interpolate(before[1],later[1])(progress);
-          if(Readings.meta[this.props.reading].type == Boolean){
-            newValue = before[1];
-          }
-
-          data[lastidx][1] = newValue;
-          data[lastidx][0] = toTime;
-        }
-      }
+      d3.select(this.refs.average).text("Average : "+this.formatAverage(average));
 
       let values = data.map(d => d[1]);
       let timeDomain = [fromTime, toTime];
@@ -322,6 +377,7 @@ let ReadingHistoryChart = React.createClass({
           <path ref="area" style={styles.Area}></path>
           <path ref="line" style={styles.Line}></path>
         </g>
+        <text fontFamily="Arial" fontSize="15" y="40" x="10" ref="average"></text>
         <g className="readingChartAxis" ref="xAxis" style={styles.AxisStyle} transform={"translate(0,"+(this.getChartHeight()+this.getTopMargin())+")"} />
         <g className="readingChartAxis" ref="yAxis" style={styles.AxisStyle} transform={"translate("+this.getChartWidth()+","+this.getTopMargin()+")"} />
       </svg>;
