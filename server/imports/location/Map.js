@@ -47,7 +47,16 @@ if(Settings.use_bigger_map){
         machineSpeed: 500
       }
     ]
+  };
+
+  if(Meteor.isServer){
+    Map.extraSVG = Assets.getText("map_extra.svg");
+  }else if(Meteor.isClient){
+    HTTP.get("/map_extra.svg", {}, function(e, result){
+      Map.extraSVG = result.content;
+    });
   }
+
 };
 
 Map.getPath = function(pathId){
