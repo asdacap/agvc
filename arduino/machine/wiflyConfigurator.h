@@ -22,7 +22,7 @@ void configureWifly(T &wifiSerial){
 
   sendAndPrintResult("set sys iofunc 0x00 ", wifiSerial);
   //sendAndPrintResult("set sys iofunc 0x50 ", wifiSerial);
-  sendAndPrintResult("set ip protocol 1", wifiSerial);
+  sendAndPrintResult("set ip protocol 2", wifiSerial);
   sendAndPrintResult("set comm remote 0", wifiSerial);
   sendAndPrintResult("set sys sleep 0", wifiSerial);
   sendAndPrintResult("set comm idle 0", wifiSerial);

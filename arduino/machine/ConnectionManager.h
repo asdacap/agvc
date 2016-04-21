@@ -63,7 +63,7 @@ namespace ConnectionManager{
 
   void listenReceive(){
     if(connected()){
-        lastMessage++; // Do something useless
+        lastMessage++; // Do something useless. Or it won't upload... for some reason
     }
     if(serial->available()){
       String data = serial->readStringUntil('\n');
@@ -94,7 +94,7 @@ namespace ConnectionManager{
   void loop(){
     if(!isConnected){
       if(helloRate.isItOK()) serial->println(F("hello"));
-    }else if(millis() - lastMessage > 5){
+    }else if(millis() - lastMessage > 5000){
       isConnected = false;
     }
     listenReceive();
