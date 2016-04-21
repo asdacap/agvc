@@ -5,11 +5,15 @@ import {
 } from 'material-ui';
 import { ReadingList } from './MachineStatusTab';
 import MediaQuery from 'react-responsive';
+import VibrateOnTouch from '../components/VibrateOnTouch';
 
 import HardwareKeyboardArrowDown from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-down';
 import HardwareKeyboardArrowUp from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-up';
 import HardwareKeyboardArrowLeft from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-left';
 import HardwareKeyboardArrowRight from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-right';
+
+let VRaisedButton = VibrateOnTouch(RaisedButton);
+let VFloatingActionButton = VibrateOnTouch(FloatingActionButton, true);
 
 let styles = {
   OfflineNotice: {
@@ -151,31 +155,31 @@ export default ManualTab = React.createClass({
       </div>;
     }else if(manual){
       innerBox = <div style={styles.InnerBox}>
-        <RaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
-        <FloatingActionButton label='Up' style={styles.Buttons.Up}
+        <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
+        <VFloatingActionButton label='Up' style={styles.Buttons.Up}
           onMouseDown={this.forward} onMouseUp={this.stop}
           onTouchStart={this.forward} onTouchEnd={this.stop}>
           <HardwareKeyboardArrowUp />
-        </FloatingActionButton>
-        <FloatingActionButton label='Down' style={styles.Buttons.Down}
+        </VFloatingActionButton>
+        <VFloatingActionButton label='Down' style={styles.Buttons.Down}
           onMouseDown={this.backward} onMouseUp={this.stop}
           onTouchStart={this.backward} onTouchEnd={this.stop}>
           <HardwareKeyboardArrowDown />
-        </FloatingActionButton>
-        <FloatingActionButton label='Right' style={styles.Buttons.Right}
+        </VFloatingActionButton>
+        <VFloatingActionButton label='Right' style={styles.Buttons.Right}
           onMouseDown={this.right} onMouseUp={this.stop}
           onTouchStart={this.right} onTouchEnd={this.stop}>
           <HardwareKeyboardArrowRight />
-        </FloatingActionButton>
-        <FloatingActionButton label='Left' style={styles.Buttons.Left}
+        </VFloatingActionButton>
+        <VFloatingActionButton label='Left' style={styles.Buttons.Left}
           onMouseDown={this.left} onMouseUp={this.stop}
           onTouchStart={this.left} onTouchEnd={this.stop}>
           <HardwareKeyboardArrowLeft />
-        </FloatingActionButton>
+        </VFloatingActionButton>
       </div>;
     }else{
       innerBox = <div style={styles.InnerBox}>
-        <RaisedButton style={styles.Buttons.ManualToggle} label='Manual Off' onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
+        <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual Off' onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />
       </div>;
     }
 
