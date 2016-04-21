@@ -20,8 +20,6 @@ void configureWifly(T &wifiSerial){
   wifiSerial.setTimeout(300);
   Serial.println(wifiSerial.readString());
 
-  sendAndPrintResult("set sys iofunc 0x00 ", wifiSerial);
-  //sendAndPrintResult("set sys iofunc 0x50 ", wifiSerial);
   sendAndPrintResult("set ip protocol 2", wifiSerial);
   sendAndPrintResult("set comm remote 0", wifiSerial);
   sendAndPrintResult("set sys sleep 0", wifiSerial);
