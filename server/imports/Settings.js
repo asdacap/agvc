@@ -10,6 +10,7 @@ Settings = {
   use_bigger_map: true,
   bandwidth_record_interval: 1000,
   master: true,
+  bypassCommandQueue: false,
   machine_view_render_timeout: 33
 };
 

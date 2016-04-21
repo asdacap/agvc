@@ -141,6 +141,9 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
     this.onMachineChanged(this.machineObj);
   }
 
+  sendMessage(message){
+    this.driver.sendMessage(message);
+  }
   // Listen to new command from the commandQueue on the machine object
   onMachineChanged(newDocument, oldDocument){
     var self = this;
@@ -154,7 +157,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         return;
       }
       //console.log("send data "+command.command);
-      self.driver.sendMessage(command.command);
+      self.sendMessage(command.command);
       self.emit("commandSent", command.command, self.machineObj.machineId, this);
     });
   }
@@ -185,6 +188,14 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 AGVMachineHandler.registerEventHandler = function(evObj){
   eventRegistrations.push(evObj);
 };
+
+AGVMachineHandler.sendMessage = function(machineId, message){
+  if(machinesConnection[machineId] !== undefined){
+    machinesConnection[machineId].sendMessage(message);
+    return true;
+  }
+  return false;
+}
 
 let startOfflineSweeper = function(){
   Meteor.setInterval(function(){
