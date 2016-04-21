@@ -8,11 +8,14 @@ import { startMachineTCPListener } from '../machine-interface/server/TCPInterfac
 import { startUDPListener } from '../machine-interface/server/UDPInterface'
 import { startSerialListener } from '../arduino-configurator/server/SerialListener';
 import { startOfflineSweeper } from '../machine-interface/server/AGVMachineHandler';
+import Settings from '../Settings';
 
-Meteor.startup(function(){
-  startMachineTCPListener();
-  startSerialListener();
-  startOfflineSweeper();
-  startUDPListener();
-  //startMachineWebSocketListener();
-});
+if(Settings.master){
+  Meteor.startup(function(){
+    startMachineTCPListener();
+    startSerialListener();
+    startOfflineSweeper();
+    startUDPListener();
+    //startMachineWebSocketListener();
+  });
+}

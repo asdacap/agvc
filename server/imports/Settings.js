@@ -9,7 +9,10 @@ Settings = {
   viewtime_update_interval: 200,
   use_bigger_map: true,
   bandwidth_record_interval: 1000,
+  master: true,
   machine_view_render_timeout: 33
 };
+
+Settings = _.extend(Settings, Meteor.settings);
 
 export default Settings;
