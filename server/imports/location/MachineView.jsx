@@ -113,7 +113,13 @@ let RobotDrawing = React.createClass({
 let MachineViewAnimator = React.createClass({
   propTypes: {
     machine: React.PropTypes.object.isRequired,
+    scale: React.PropTypes.number,
     machineState: React.PropTypes.object.isRequired
+  },
+  getDefaultProps(){
+    return {
+      scale: 1
+    };
   },
   componentDidMount(){
     this.stillAlive = true;
@@ -121,7 +127,7 @@ let MachineViewAnimator = React.createClass({
     let repositionContainer = _ => {
       let position = this.calculatePosition();
       if(position != undefined){
-        container.setAttribute("transform", "translate("+position.x+","+position.y+")");
+        container.setAttribute("transform", "translate("+position.x+","+position.y+"),scale("+this.props.scale+","+this.props.scale+")");
       }
       if(this.stillAlive){
         setTimeout(repositionContainer, Settings.machine_view_render_timeout);
@@ -194,7 +200,9 @@ let MachineViewAnimator = React.createClass({
       }
     }
 
-    return <g style={styles.container} ref="container" transform={ "translate("+position.x+","+position.y+")" }>
+    return <g style={styles.container}
+      ref="container"
+      transform={ "translate("+position.x+","+position.y+"), scale("+this.props.scale+","+this.props.scale+")" }>
       <NoRerenderContainer fill={robotFill}>
         <RobotDrawing/>
       </NoRerenderContainer>
@@ -210,7 +218,13 @@ export default MachineView = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object.isRequired,
+    scale: React.PropTypes.number,
     atTime: React.PropTypes.any.isRequired // Actually date. But can't seems to find react type for it
+  },
+  getDefaultProps(){
+    return {
+      scale: 1
+    };
   },
   getMeteorData(){
     let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
@@ -230,7 +244,8 @@ export default MachineView = React.createClass({
       return <g></g>; // Nothing
     }else{
       return <MachineViewAnimator machine={this.props.machine}
-              machineState={this.data.state} />
+              machineState={this.data.state}
+              scale={this.props.scale} />
     }
   }
 });

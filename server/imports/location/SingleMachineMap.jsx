@@ -36,7 +36,7 @@ export default SingleMachineMap = React.createClass({
       <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
       <MapView />
       <g>
-        <MachineView machine={this.data.machine} atTime={this.data.time} />
+        <MachineView machine={this.data.machine} atTime={this.data.time} scale={2} />
       </g>
     </svg>;
   }
