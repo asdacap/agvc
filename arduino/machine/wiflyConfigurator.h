@@ -35,7 +35,7 @@ void configureWifly(T &wifiSerial){
   sendAndPrintResult("set ip remote " + String(Settings.serverPort), wifiSerial);
   sendAndPrintResult("set sys autoconn "+ String(Settings.tcpConnectDelay), wifiSerial);
   sendAndPrintResult("set ip flags 0x6", wifiSerial);
-  sendAndPrintResult("set sys iofunc 0x40", wifiSerial);
+  sendAndPrintResult("set sys iofunc 0x0", wifiSerial);
   sendAndPrintResult("set comm open 0", wifiSerial);
   sendAndPrintResult("set comm close 0", wifiSerial);
   sendAndPrintResult("set comm match 10", wifiSerial);
