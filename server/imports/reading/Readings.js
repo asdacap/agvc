@@ -248,6 +248,14 @@ Machines.setReading = function(machineId, reading, value){
   }
 }
 
+//// Override addMachine so that initial reading is created
+let oldAddMachine = Machines.addMachine;
+Machines.addMachine = function(props){
+  oldAddMachine(props);
+  Readings.availableReadings.forEach(reading => {
+    Machines.setReading(props.machineId, reading, Readings.meta[reading].defaultValue);
+  });
+}
 
 //// Utility function to get reading
 Readings.getLastReadingLog = function(reading, machineId, atTime){

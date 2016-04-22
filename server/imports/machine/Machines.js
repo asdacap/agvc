@@ -89,10 +89,14 @@ Machines.defaultValue = {
   onlineAt: new Date(0)
 }
 
+Machines.addMachine = function(props){
+  _.extend(props, Machines.defaultValue);
+  Machines.insert(props);
+}
+
 Meteor.methods({
   addMachine(props){
-    _.extend(props, Machines.defaultValue);
-    Machines.insert(props);
+    Machines.addMachine(props);
   },
   deleteMachine(machineId){
     Machines.remove({machineId: machineId});
