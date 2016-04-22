@@ -94,12 +94,12 @@ var MachineFormCommon = {
       <FlatButton
         label="Cancel"
         secondary={true}
-        onClick={this.close}
+        onTouchTap={this.close}
         />,
       <FlatButton
         label="Submit"
         primary={true}
-        onClick={this.onSubmit}
+        onTouchTap={this.onSubmit}
         />
     ];
 

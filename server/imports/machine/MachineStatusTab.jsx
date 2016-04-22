@@ -176,24 +176,24 @@ export default MachineStatusTab = React.createClass({
     return <div style={styles.TopContainer}>
       {
         this.state.showMap ? <MediaQuery query='(min-width: 700px)'>
-          <div style={styles.MapContainerLeft} onClick={this.toggleAllMachineMap}>
+          <div style={styles.MapContainerLeft} onTouchTap={this.toggleAllMachineMap}>
             <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
           </div>
         </MediaQuery> : <span></span>
       }
       <div style={styles.StatusContainer}>
         {
-          this.state.showMap ? <div onClick={this.toggleAllMachineMap}>
+          this.state.showMap ? <div onTouchTap={this.toggleAllMachineMap}>
             <MediaQuery query='(max-width: 700px)'>
               <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
             </MediaQuery>
           </div> : <RaisedButton style={styles.ButtonWithMargin} label="Show Map"
-          onClick={this.toggleAllMachineMap}/>
+          onTouchTap={this.toggleAllMachineMap}/>
         }
         <RaisedButton style={styles.ButtonWithMargin} label="Send Setting"
-          onClick={this.sendSetting} disabled={!this.props.machine.online}/>
-        <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
-        <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
+          onTouchTap={this.sendSetting} disabled={!this.props.machine.online}/>
+        <RaisedButton style={styles.ButtonWithMargin} label="Delete" onTouchTap={this.delete}/>
+        <RaisedButton style={styles.ButtonWithMargin} label="Edit" onTouchTap={this.edit}/>
         <List>
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
         </List>

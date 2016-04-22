@@ -78,12 +78,12 @@ let ServerConfigurationForm = React.createClass({
       <FlatButton
         label="Cancel"
         secondary={true}
-        onClick={this.close}
+        onTouchTap={this.close}
         />,
       <FlatButton
         label="Save"
         primary={true}
-        onClick={this.onSubmit}
+        onTouchTap={this.onSubmit}
         />
     ];
 
@@ -163,13 +163,13 @@ let ConfigureArduinoDialog = React.createClass({
         label="Cancel"
         secondary={true}
         disable={this.state.configuring}
-        onClick={this.close}
+        onTouchTap={this.close}
         />,
       <FlatButton
         label="Configure"
         primary={true}
         disable={this.state.configuring}
-        onClick={this.configure}
+        onTouchTap={this.configure}
         />
     ];
 

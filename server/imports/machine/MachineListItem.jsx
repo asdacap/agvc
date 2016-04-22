@@ -98,7 +98,7 @@ export default MachineListItem = React.createClass({
         </Table>
       </CardText>
       <CardActions>
-        <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
+        <RaisedButton label="Open" onTouchTap={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
       </CardActions>
     </Card>;
   }

@@ -68,7 +68,7 @@ export default MachineListStatus = React.createClass({
             </div>;
           }) }
         </div>
-        <FloatingActionButton onClick={this.toggleForm} style={styles.AddMachineFloatingButton}>
+        <FloatingActionButton onTouchTap={this.toggleForm} style={styles.AddMachineFloatingButton}>
           <ContentAdd />
         </FloatingActionButton>
       </div>

@@ -65,8 +65,8 @@ export default MachineMessageLogTab = React.createClass({
             }) }
           </TableBody>
         </Table>
-        <FlatButton onClick={this.clearMessageLog} label="Clear" />&nbsp;
-        <FlatButton onClick={this.addMessageLog} label="Click to add" />&nbsp;
+        <FlatButton onTouchTap={this.clearMessageLog} label="Clear" />&nbsp;
+        <FlatButton onTouchTap={this.addMessageLog} label="Click to add" />&nbsp;
         <Table>
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>

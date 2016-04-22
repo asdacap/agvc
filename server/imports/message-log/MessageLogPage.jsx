@@ -63,8 +63,8 @@ export default MessageLogPage = React.createClass({
         <SideNavPage ref="navPage">
           <div>
             <AppBar title="Message Logs" onLeftIconButtonTouchTap={this.toggleNav} style={styles.AppBar}/>
-            <FlatButton onClick={this.clearMessageLog} label="Clear" />&nbsp;
-            <FlatButton onClick={this.addMessageLog} label="Click to add" />&nbsp;
+            <FlatButton onTouchTap={this.clearMessageLog} label="Clear" />&nbsp;
+            <FlatButton onTouchTap={this.addMessageLog} label="Click to add" />&nbsp;
             <Table>
               <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                 <TableRow>
