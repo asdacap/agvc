@@ -149,7 +149,8 @@ let ReadingList = React.createClass({
 export default MachineStatusTab = React.createClass({
   getInitialState(){
     return {
-      openForm: false
+      openForm: false,
+      showMap: true
     };
   },
   delete(){
@@ -157,6 +158,9 @@ export default MachineStatusTab = React.createClass({
       Meteor.call("deleteMachine", this.props.machine.machineId);
       FlowRouter.go('dashboard');
     }
+  },
+  toggleAllMachineMap(){
+    this.setState({ showMap: !this.state.showMap });
   },
   edit(){
     this.setState({ openForm: true });
@@ -170,16 +174,24 @@ export default MachineStatusTab = React.createClass({
   render(){
     var self = this;
     return <div style={styles.TopContainer}>
-      <MediaQuery query='(min-width: 700px)'>
-        <div style={styles.MapContainerLeft}>
-          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
-        </div>
-      </MediaQuery>
+      {
+        this.state.showMap ? <MediaQuery query='(min-width: 700px)'>
+          <div style={styles.MapContainerLeft} onClick={this.toggleAllMachineMap}>
+            <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
+          </div>
+        </MediaQuery> : <span></span>
+      }
       <div style={styles.StatusContainer}>
-        <MediaQuery query='(max-width: 700px)'>
-          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
-        </MediaQuery>
-        <RaisedButton style={styles.ButtonWithMargin} label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
+        {
+          this.state.showMap ? <div onClick={this.toggleAllMachineMap}>
+            <MediaQuery query='(max-width: 700px)'>
+              <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
+            </MediaQuery>
+          </div> : <RaisedButton style={styles.ButtonWithMargin} label="Show Map"
+          onClick={this.toggleAllMachineMap}/>
+        }
+        <RaisedButton style={styles.ButtonWithMargin} label="Send Setting"
+          onClick={this.sendSetting} disabled={!this.props.machine.online}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
         <List>
