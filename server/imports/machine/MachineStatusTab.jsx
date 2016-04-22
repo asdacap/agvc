@@ -14,6 +14,7 @@ import ViewTime from '../client/ViewTime';
 import SingleMachineMap from '../location/SingleMachineMap';
 import MediaQuery from 'react-responsive';
 import Readings from '../reading/Readings'
+import ClientMachineResponseTime from '../client-machine-response-time/client/ClientMachineResponseTime';
 
 var styles = {
   ButtonWithMargin: {
@@ -147,6 +148,20 @@ let ReadingList = React.createClass({
 });
 
 export default MachineStatusTab = React.createClass({
+  mixins: [ReactMeteorData],
+  getMeteorData(){
+
+    let clientMachineResponseTime = 0;
+
+    let record = ClientMachineResponseTime.findOne({machineId: this.props.machine.machineId});
+    if(record !== undefined){
+      clientMachineResponseTime = record.responseTime;
+    }
+
+    return {
+      clientMachineResponseTime
+    }
+  },
   getInitialState(){
     return {
       openForm: false,
@@ -196,6 +211,7 @@ export default MachineStatusTab = React.createClass({
         <RaisedButton style={styles.ButtonWithMargin} label="Edit" onTouchTap={this.edit}/>
         <List>
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
+          <ListItem primaryText="Client-Machine response time" secondaryText={this.data.clientMachineResponseTime} />
         </List>
         <ReadingList machine={this.props.machine} />
         <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>

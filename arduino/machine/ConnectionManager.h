@@ -75,6 +75,8 @@ namespace ConnectionManager{
           registerMachine();
         }else if(data.startsWith(F("p:"))){
           sendData(data);
+        }else if(data.startsWith(F("cP:"))){
+          sendData(data);
         }else{
           Serial.print(F("Receive data: "));
           Serial.println(data);
