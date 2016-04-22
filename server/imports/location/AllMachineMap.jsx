@@ -13,7 +13,12 @@ import MapView from './MapView';
 export default AllMachineMap = React.createClass({
   mixins: [ReactMeteorData],
   getInitialState(){
-    return {};
+    return {
+      showMap: true
+    };
+  },
+  toggleAllMachineMap(){
+    this.setState({ showMap: !this.state.showMap });
   },
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
@@ -25,13 +30,20 @@ export default AllMachineMap = React.createClass({
     }
   },
   render(){
-    return <svg width="100%" height="500px" viewBox="0 0 1200 900">
-      <rect x="-10000" y="-10000" width="30000" height="30000" fill="#d6d6d6" />
-      <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
+    if(this.state.showMap){
+      return <svg width="100%" height="500px" viewBox="0 0 1200 900" onClick={this.toggleAllMachineMap}>
+        <rect x="-10000" y="-10000" width="30000" height="30000" fill="#d6d6d6" />
+        <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
         <MapView />
-      <g>
-        { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
-      </g>
-    </svg>;
+        <g>
+          { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
+        </g>
+      </svg>;
+    }else{
+      return <svg width="100%" height="50px" viewBox="0 0 500 50" onClick={this.toggleAllMachineMap}>
+        <rect x="-10000" y="-10000" width="30000" height="30000" fill="#d6d6d6" />
+        <text fontFamily="Arial" fontSize="25px" x="250" y="35"  textAnchor="middle">Map Hidden</text>
+      </svg>;
+    }
   }
 })
