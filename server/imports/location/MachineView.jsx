@@ -230,7 +230,9 @@ export default MachineView = React.createClass({
     let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
 
     if(ready){
-      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+      Meteor.autorun(_ => {
+        this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+      });
     }
 
     return {
