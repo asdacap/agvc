@@ -171,7 +171,7 @@ function calculateLocationPoint(locationLog, atTime){
       var parr = pts.at(length*progress);
       var point = {
         x: parr[0],
-        x: parr[1]
+        y: parr[1]
       };
     }
 
