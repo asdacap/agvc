@@ -1,6 +1,15 @@
 import React from 'react';
 import ClientResponseTimes from './ClientResponseTimes';
 
+let styles = {
+  Indicator: {
+    position: "fixed",
+    top: 3,
+    left: 3,
+    zIndex: 1200
+  }
+}
+
 export default ResponseTimeIndicator = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
@@ -20,6 +29,6 @@ export default ResponseTimeIndicator = React.createClass({
     }
   },
   render(){
-    return <span style={{ position: "fixed", bottom: 3, left: 3 }}>{this.data.responseTime}</span>;
+    return <span style={styles.Indicator}>{this.data.responseTime}</span>;
   }
 });
