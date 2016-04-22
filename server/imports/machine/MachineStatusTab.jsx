@@ -121,10 +121,19 @@ let ReadingChartListItem = React.createClass({
 let ReadingList = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
-    StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
-    return {
-      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
+
+    let machineStateReady = undefined;
+    let machineState = undefined;
+
+    if(this.props.machineState !== undefined){
+      machineStateReady = this.props.machineStateReady;
+      machineState = this.props.machineState;
+    }else{
+      machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+      machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
     }
+
+    return { machineStateReady, machineState };
   },
   getDefaultProps(){
     return {
@@ -136,9 +145,10 @@ let ReadingList = React.createClass({
     var listItems = Readings.availableReadings.map(function(reading){
       return <ReadingChartListItem
         machine={self.props.machine}
+        machineState={self.props.machineState}
         reading={reading}
         expandable={self.props.expandable}
-        value={self.data.state[reading]}
+        value={self.data.machineState[reading]}
         key={reading}/>;
     });
     return <List>
@@ -150,7 +160,6 @@ let ReadingList = React.createClass({
 export default MachineStatusTab = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
-
     let clientMachineResponseTime = 0;
 
     let record = ClientMachineResponseTime.findOne({machineId: this.props.machine.machineId});
@@ -158,8 +167,13 @@ export default MachineStatusTab = React.createClass({
       clientMachineResponseTime = record.responseTime;
     }
 
+    let machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+    let machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
+
     return {
-      clientMachineResponseTime
+      clientMachineResponseTime,
+      machineStateReady,
+      machineState
     }
   },
   getInitialState(){
@@ -192,7 +206,8 @@ export default MachineStatusTab = React.createClass({
       {
         this.state.showMap ? <MediaQuery query='(min-width: 700px)'>
           <div style={styles.MapContainerLeft} onTouchTap={this.toggleAllMachineMap}>
-            <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
+            <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}
+              machineState={this.data.machineState} machineStateReady={this.data.machineStateReady}/>
           </div>
         </MediaQuery> : <span></span>
       }
@@ -200,7 +215,8 @@ export default MachineStatusTab = React.createClass({
         {
           this.state.showMap ? <div onTouchTap={this.toggleAllMachineMap}>
             <MediaQuery query='(max-width: 700px)'>
-              <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
+              <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}
+              machineState={this.data.machineState} machineStateReady={this.data.machineStateReady}/>
             </MediaQuery>
           </div> : <RaisedButton style={styles.ButtonWithMargin} label="Show Map"
           onTouchTap={this.toggleAllMachineMap}/>
@@ -213,7 +229,7 @@ export default MachineStatusTab = React.createClass({
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
           <ListItem primaryText="Client-Machine response time" secondaryText={this.data.clientMachineResponseTime} />
         </List>
-        <ReadingList machine={this.props.machine} />
+        <ReadingList machine={this.props.machine} machineState={this.data.machineState} machineStateReady={this.data.machineStateReady} />
         <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </div>
     </div>;

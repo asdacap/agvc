@@ -227,10 +227,21 @@ export default MachineView = React.createClass({
     };
   },
   getMeteorData(){
-    let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+    let ready = false;
 
-    if(ready){
-      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+    if(this.props.machineState === undefined){
+      ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+
+      if(ready){
+        this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+      }
+    }else{
+      if(this.props.machienStateReady !== undefined){
+        ready = this.props.machineStateReady;
+      }else{
+        ready = true;
+      }
+      this.machineState = this.props.machineState;
     }
 
     return {
