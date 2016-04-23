@@ -4,6 +4,10 @@ var settings = {
   tcpPort: 10000
 }
 
+if(process.argv.length > 2){
+  settings.machineId = process.argv[2];
+}
+
 var net = require('net');
 var split = require('split');
 var prompt = require('prompt');

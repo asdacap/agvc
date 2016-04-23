@@ -45,15 +45,8 @@ export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time)
-
-    let state = undefined;
-
-    Meteor.autorun(_ => {
-      state = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
-    });
-
     return {
-      state
+      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
   },
   render(){
