@@ -204,25 +204,6 @@ let MachineViewAnimator = React.createClass({
   render(){
 
     let position = this.calculatePosition();
-    let extraIcon = null; // Nothing
-
-    if(this.props.machineState.status != "normal"){
-      let icon = null;
-      if(this.props.machineState.status == "offline"){
-        icon = icons.offline;
-      }else if(this.props.machineState.status == "outOfCircuit"){
-        icon = icons.outOfCircuit;
-      }else if(this.props.machineState.status == "obstructed"){
-        icon = icons.obstructed;
-      }else if(this.props.machineState.status == "manualMode"){
-        icon = icons.manualMode;
-      }
-
-      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.machineState.status]}>
-        {icon}
-      </g>;
-    }
-
     let blinkShow = Math.floor(new Date().getTime()/1000)%2;
 
     return <g style={styles.container}
