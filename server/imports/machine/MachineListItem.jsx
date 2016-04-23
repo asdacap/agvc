@@ -23,6 +23,11 @@ import {
 import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
 import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import NoRerenderContainer from '../components/NoRerenderContainer';
+
+let NTableRow = NoRerenderContainer(TableRow, false, ["style"]);
+let NCardTitle = NoRerenderContainer(CardTitle, false, ["style"]);
+let NCardActions = NoRerenderContainer(CardActions, true);
 
 var styles = {
   MachineListItem: {
@@ -44,6 +49,7 @@ var styles = {
 export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
+    StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time)
     return {
       state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
     }
@@ -60,12 +66,12 @@ export default MachineListItem = React.createClass({
     }
 
     return <Card style={styles.MachineListItem} initiallyExpanded={true}>
-      <CardTitle title={this.props.machine.machineId}
+      <NCardTitle title={this.props.machine.machineId}
          subtitle={this.data.state.status}
          actAsExpander={true}
          style={titleStyle}
          showExpandableButton={true}/>
-       <CardText expandable={true}>
+      <CardText expandable={true}>
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
@@ -89,17 +95,18 @@ export default MachineListItem = React.createClass({
                 style.backgroundColor = styles.badValueColor;
               }
 
-              return <TableRow key={reading} style={style}>
+              // Value is just to prevent it from rerendering
+              return <NTableRow key={reading} style={style} value={value}>
                 <TableRowColumn>{Readings.meta[reading].title}</TableRowColumn>
                 <TableRowColumn>{value}</TableRowColumn>
-              </TableRow>;
+              </NTableRow>;
               }) }
           </TableBody>
         </Table>
       </CardText>
-      <CardActions>
+      <NCardActions>
         <RaisedButton label="Open" onTouchTap={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
-      </CardActions>
+      </NCardActions>
     </Card>;
   }
 });

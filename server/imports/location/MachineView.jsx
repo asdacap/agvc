@@ -68,47 +68,78 @@ let icons = {
 
 let RobotDrawing = React.createClass({
   render(){
+    let extraIcon = null; // Nothing
 
-    let robotStyle = _.extend({}, styles.AGVStyle);
-    if(this.props.fill !== undefined){
-      robotStyle.fill = this.props.fill;
+    if(this.props.status != "normal"){
+      let icon = null;
+      if(this.props.status == "offline"){
+        icon = icons.offline;
+      }else if(this.props.status == "outOfCircuit"){
+        icon = icons.outOfCircuit;
+      }else if(this.props.status == "obstructed"){
+        icon = icons.obstructed;
+      }else if(this.props.status == "manualMode"){
+        icon = icons.manualMode;
+      }
+
+      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.status]}>
+        {icon}
+      </g>;
     }
 
-    return <g>
-      <rect
-        style={ robotStyle }
-        id="rect4181"
-        width="12.678572"
-        height="23.035715"
-        x="21.964285"
-        y="-11.477083" />
-      <circle
-        style={ robotStyle }
-        id="path4138"
-        cx="-11.492928"
-        cy="25"
-        r="10" />
-      <circle
-        style={ robotStyle }
-        id="path4138-9"
-        cx="11.964286"
-        cy="25"
-        r="10" />
-      <rect
-        style={ robotStyle }
-        id="rect3336"
-        width="50"
-        height="50"
-        x="-25"
-        y="-25" />
-      <path
-        style={ robotStyle }
-        d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
-        id="path4138-9-2" />
-    </g>; // Something
+    let robotFill = styles.AGVStyle.fill;
+    let blinkingColor = styles.BlinkingColor[this.props.status];
+    if(blinkingColor !== undefined){
+      if(this.props.blinkShow){
+        robotFill = blinkingColor;
+      }
+    }
 
+    let robotStyle = _.extend({}, styles.AGVStyle);
+    robotStyle.fill = robotFill;
+
+    return <g>
+
+      <g>
+        <rect
+          style={ robotStyle }
+          id="rect4181"
+          width="12.678572"
+          height="23.035715"
+          x="21.964285"
+          y="-11.477083" />
+        <circle
+          style={ robotStyle }
+          id="path4138"
+          cx="-11.492928"
+          cy="25"
+          r="10" />
+        <circle
+          style={ robotStyle }
+          id="path4138-9"
+          cx="11.964286"
+          cy="25"
+          r="10" />
+        <rect
+          style={ robotStyle }
+          id="rect3336"
+          width="50"
+          height="50"
+          x="-25"
+          y="-25" />
+        <path
+          style={ robotStyle }
+          d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
+          id="path4138-9-2" />
+      </g>
+
+      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.status]} textAnchor="middle">{this.props.machine.machineId}</text>
+      {extraIcon}
+    </g>; // Something
   }
 });
+
+RobotDrawing = NoRerenderContainer(RobotDrawing, false, [], ["status", "blinkShow"]);
 
 let MachineViewAnimator = React.createClass({
   propTypes: {
@@ -173,42 +204,14 @@ let MachineViewAnimator = React.createClass({
   render(){
 
     let position = this.calculatePosition();
-    let extraIcon = null; // Nothing
-
-    if(this.props.machineState.status != "normal"){
-      let icon = null;
-      if(this.props.machineState.status == "offline"){
-        icon = icons.offline;
-      }else if(this.props.machineState.status == "outOfCircuit"){
-        icon = icons.outOfCircuit;
-      }else if(this.props.machineState.status == "obstructed"){
-        icon = icons.obstructed;
-      }else if(this.props.machineState.status == "manualMode"){
-        icon = icons.manualMode;
-      }
-
-      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.machineState.status]}>
-        {icon}
-      </g>;
-    }
-
-    let robotFill = undefined;
-    let blinkingColor = styles.BlinkingColor[this.props.machineState.status];
-    if(blinkingColor !== undefined){
-      if(Math.floor(new Date().getTime()/1000)%2){
-        robotFill = blinkingColor;
-      }
-    }
+    let blinkShow = Math.floor(new Date().getTime()/1000)%2;
 
     return <g style={styles.container}
       ref="container"
       transform={ "translate("+position.x+","+position.y+"), scale("+this.props.scale+","+this.props.scale+")" }>
-      <NoRerenderContainer fill={robotFill}>
-        <RobotDrawing/>
-      </NoRerenderContainer>
-
-      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.machineState.status]} textAnchor="middle">{this.props.machine.machineId}</text>
-      {extraIcon}
+      <RobotDrawing blinkShow={blinkShow}
+        status={this.props.machineState.status}
+        machine={this.props.machine} />
     </g>; // Something
 
   }

@@ -22,7 +22,7 @@ export default SingleMachineMap = React.createClass({
     var atTime = ViewTime.time;
 
     return {
-      machine: Machines.findOne({ machineId: this.props.machineId }),
+      machine: Machines.findOne({ machineId: this.props.machineId }, { reactive: false }),
       time: atTime
     }
   },

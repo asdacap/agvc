@@ -15,6 +15,7 @@ import SingleMachineMap from '../location/SingleMachineMap';
 import MediaQuery from 'react-responsive';
 import Readings from '../reading/Readings'
 import ClientMachineResponseTime from '../client-machine-response-time/client/ClientMachineResponseTime';
+import NoRerenderContainer from '../components/NoRerenderContainer';
 
 var styles = {
   ButtonWithMargin: {
@@ -49,6 +50,8 @@ var styles = {
   },
   badValueColor: "#ffdd29"
 }
+
+let NListItem = NoRerenderContainer(ListItem, false, [], ["secondaryText"]);
 
 let ReadingChartListItem = React.createClass({
   getInitialState(){
@@ -90,11 +93,11 @@ let ReadingChartListItem = React.createClass({
 
     if(this.state.open){
       return <div style={styles.Expanded}>
-        <ListItem primaryText={Readings.meta[reading].title}
+        <NListItem primaryText={Readings.meta[reading].title}
           style={listItemStyle}
           secondaryText={secondaryText}
           onTouchTap={this.toggle} >
-        </ListItem>
+        </NListItem>
         <div style={styles.ChartContainerStyle}>
           <SelectField value={this.state.range}
             floatingLabelText="Readng period"
@@ -108,11 +111,11 @@ let ReadingChartListItem = React.createClass({
         </div>
       </div>;
     }else{
-      return <ListItem primaryText={Readings.meta[reading].title}
+      return <NListItem primaryText={Readings.meta[reading].title}
         style={listItemStyle}
         secondaryText={secondaryText}
         onTouchTap={this.toggle} >
-      </ListItem>;
+      </NListItem>;
 
     }
   }
