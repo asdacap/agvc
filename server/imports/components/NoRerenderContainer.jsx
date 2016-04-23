@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default NoRerenderContainer = (Wrapped, alwaysNo, skipProps, log) => {
+export default NoRerenderContainer = (Wrapped, alwaysNo, skipProps, onlyProps, log) => {
   if(skipProps === undefined){
     skipProps = [];
   }
@@ -8,11 +8,20 @@ export default NoRerenderContainer = (Wrapped, alwaysNo, skipProps, log) => {
     shouldComponentUpdate(nextProps, nextState){
       if(alwaysNo) return false;
       let allSame = true;
-      _.keys(nextProps).forEach(key => {
+      let keys = _.keys(nextProps);
+      if(onlyProps !== undefined){
+        keys = onlyProps;
+      }else{
+        keys = _.keys(nextProps);
+      }
+
+      keys.forEach(key => {
         if(key == "children") return;
         if(skipProps.indexOf(key) != -1) return;
         if(this.props[key] != nextProps[key]) {
-          console.log("different "+key);
+          if(log){
+            console.log("different "+key);
+          }
           allSame = false;
         }
       });
