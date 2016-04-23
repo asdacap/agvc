@@ -110,6 +110,8 @@ let RobotDrawing = React.createClass({
   }
 });
 
+RobotDrawing = NoRerenderContainer(RobotDrawing);
+
 let MachineViewAnimator = React.createClass({
   propTypes: {
     machine: React.PropTypes.object.isRequired,
@@ -203,9 +205,7 @@ let MachineViewAnimator = React.createClass({
     return <g style={styles.container}
       ref="container"
       transform={ "translate("+position.x+","+position.y+"), scale("+this.props.scale+","+this.props.scale+")" }>
-      <NoRerenderContainer fill={robotFill}>
-        <RobotDrawing/>
-      </NoRerenderContainer>
+      <RobotDrawing fill={robotFill}/>
 
       <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.machineState.status]} textAnchor="middle">{this.props.machine.machineId}</text>
       {extraIcon}
