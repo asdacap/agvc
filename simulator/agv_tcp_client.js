@@ -13,6 +13,7 @@ var split = require('split');
 var prompt = require('prompt');
 
 var socket = net.connect(settings.tcpPort);
+socket.setNoDelay(true);
 var splitted = socket.pipe(split());
 
 function sendMessage(message){
