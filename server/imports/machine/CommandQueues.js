@@ -21,7 +21,6 @@ let schema = {
   machineId: {
     type: String,
     optional: false,
-    index: true,
     unique: true
   },
   commandQueue: {
@@ -45,8 +44,6 @@ if(Meteor.isServer){
   Meteor.publish("CommandQueues.forMachine", (machineId) => {
     return CommandQueues.find({ machineId });
   });
-
-  CommandQueues.rawCollection().ensureIndex({ machineId: 1 }, {}, _ => _);
 }
 
 export default CommandQueues;

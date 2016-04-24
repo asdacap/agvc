@@ -5,8 +5,7 @@ LocationLogs.attachBehaviour('timestampable');
 var LocationLogSchema = {
   machineId: {
     type: String,
-    optional: false,
-    index: true
+    optional: false
   },
   type: {
     type: String, // Either 'point' or 'path'

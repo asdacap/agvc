@@ -6,7 +6,6 @@ var MachineSchema = {
   machineId: {
     type: String,
     optional: false,
-    index: true,
     unique: true
   },
   online: {
