@@ -25,7 +25,7 @@ export default AllMachineMap = React.createClass({
     var atTime = ViewTime.time;
 
     return {
-      machines: Machines.find({}).fetch(),
+      machines: Machines.find({}, { fields: { _id: 1, machineId: 1 } }).fetch(),
       time: atTime
     }
   },
