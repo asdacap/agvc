@@ -1,6 +1,8 @@
 import serialjs from 'serialport-js';
+import split from 'split';
 import GlobalStates from '../../global-state/GlobalStates';
 import ServerConfiguration from '../../server-configuration/ServerConfiguration';
+import Promise from 'promise';
 
 let startSerialListener = function(){
   // For checking port existance
@@ -24,32 +26,65 @@ let startSerialListener = function(){
     let conf = ServerConfiguration.get();
 
     function start(port){
+      let splitted = split();
+      let status = 'waiting';
+
+      function sendCommand(command){
+        function doIt(){
+          console.log('Doing it');
+          let promise = new Promise((resolve, reject) => {
+            console.log("Sending command:"+command);
+            port.send(command+'\n');
+            setTimeout(function(){
+              resolve();
+            }, 500);
+          });
+
+          return promise;
+        }
+        return doIt;
+      }
+
       function doCommand(){
-        console.log('Configuring for arduino in port '+confObj.port);
-        port.send('wifiSSID:'+conf.wifiSSID);
-        port.send('wifiPassphrase:'+conf.wifiPassphrase);
-        port.send('serverHost:'+conf.serverHost);
-        port.send('serverPort:'+conf.serverPort);
-        port.send('tcpConnectDelay:'+conf.tcpConnectDelay);
-        port.send('machineId:'+confObj.machineId);
-        port.send('save');
-        port.send('reconfigure');
-        setTimeout(function(){
-          console.log("Command sent");
-          port.close();
-        },2000);
+        status = 'configuring';
+        let promise = sendCommand('wifiSSID:'+conf.wifiSSID)()
+          .then(sendCommand('wifiPassphrase:'+conf.wifiPassphrase))
+          .then(sendCommand('serverHost:'+conf.serverHost))
+          .then(sendCommand('serverPort:'+conf.serverPort))
+          .then(sendCommand('tcpConnectDelay:'+conf.tcpConnectDelay))
+          .then(sendCommand('machineId:'+confObj.machineId))
+          .then(sendCommand('save'))
+          .then(sendCommand('dump'))
+          .then(sendCommand('reconfigure'))
+          .then(function(){
+            console.log('Command sent');
+            splitted.removeListener('data', startWait);
+            port.close();
+          }, function(){
+            console.warn('failed to send command');
+            splitted.removeListener('data', startWait);
+            port.close();
+          });
       }
 
       function startWait(data){
-        console.log("Finding 'Looping' keyword -> "+data);
-        // Must wait for looping first
-        if(data.trim() == 'Looping'){
-          doCommand();
-          port.removeListener('data', startWait);
+        if(status == 'waiting'){
+          console.log("Finding 'Looping' keyword -> "+data);
+          // Must wait for looping first
+          if(data.trim() == 'Looping'){
+            doCommand();
+          }
+        }else if(status == 'configuring'){
+          console.log("Configuring -> "+data);
         }
       }
 
-      port.on('data', startWait);
+      function sendToSplit(data){
+        splitted.write(data);
+      }
+
+      port.on('data', sendToSplit);
+      splitted.on('data', startWait);
       port.on('error', function(e){
         console.warn("Got port error "+e.toString());
       });
@@ -62,7 +97,7 @@ let startSerialListener = function(){
     serialjs.open(
       confObj.port,
       start,
-      '\n'
+      ''
     );
   }
 

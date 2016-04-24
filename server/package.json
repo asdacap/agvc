@@ -26,7 +26,8 @@
     "react-mounter": "^1.2.0",
     "react-responsive": "^1.1.2",
     "serialport-js": "^0.2.1",
-    "split": "^1.0.0"
+    "split": "^1.0.0",
+    "promise": "~7.1.1"
   },
   "devDependencies": {},
   "scripts": {
