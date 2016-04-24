@@ -236,7 +236,7 @@ export default MachineView = React.createClass({
       ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
 
       if(ready){
-        this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+        this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime, { status: true, position: true });
       }
     }else{
       if(this.props.machineStateReady !== undefined){

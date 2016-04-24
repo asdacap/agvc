@@ -235,7 +235,14 @@ function calculateStatus(machineId, atTime){
   return cStatus;
 };
 
+let defaultCalculateStateOptions = {
+  status: true,
+  position: true
+};
+Readings.availableReadings.forEach(reading => defaultCalculateStateOptions[reading] = true);
+
 export default StateCalculator = {
+  defaultCalculateStateOptions,
   subscribe(machineId, atTime){
 
     // Subscribing only the last one is inefficent
@@ -252,42 +259,54 @@ export default StateCalculator = {
     ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
     return ready;
   },
-  calculate(machineId, atTime){
+  calculate(machineId, atTime, options){
+
+    if(options === undefined){
+      options = defaultCalculateStateOptions;
+    }
+
     // Attempt to calculate the state of the machine at the time
     let state = {};
 
     // First, the easy one. The readings.
     Readings.availableReadings.forEach(reading => {
 
-      // Fetch the last one
-      var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
-      if(readingValue !== undefined){
-        readingValue = readingValue.value;
+      if(options[reading]){
+        // Fetch the last one
+        var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
+        if(readingValue !== undefined){
+          readingValue = readingValue.value;
+        }else{
+          readingValue = Readings.meta[reading].defaultValue;
+        }
+
+        state[reading] = readingValue;
+      }
+    });
+
+
+    if(options.position){
+      // Then, the hard one, the position
+      let lastLocation = LocationLogs.findOne({
+        machineId: machineId,
+        createdAt: { $lte: atTime }
+      }, {
+        sort: { createdAt: -1 },
+        limit: 1
+      });
+
+      if(lastLocation === undefined){
+        state.position = undefined;
       }else{
-        readingValue = Readings.meta[reading].defaultValue;
+        state.position = calculateLocationPoint(lastLocation, atTime);
       }
 
-      state[reading] = readingValue;
-    });
-
-
-    // Then, the hard one, the position
-    let lastLocation = LocationLogs.findOne({
-      machineId: machineId,
-      createdAt: { $lte: atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    });
-
-    if(lastLocation === undefined){
-      state.position = undefined;
-    }else{
-      state.position = calculateLocationPoint(lastLocation, atTime);
     }
 
-    // Then, the status one
-    state.status = calculateStatus(machineId, atTime);
+    if(options.status){
+      // Then, the status one
+      state.status = calculateStatus(machineId, atTime);
+    }
 
     return state;
   }

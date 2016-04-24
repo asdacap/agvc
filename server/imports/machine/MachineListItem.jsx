@@ -50,8 +50,12 @@ export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time)
+
+    // Position is not needed
+    let opts = _.extend({}, StateCalculator.defaultCalculateStateOptions, { position: false });
+
     return {
-      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
+      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts)
     }
   },
   render(){
