@@ -13,3 +13,7 @@ if(Meteor.isClient){
 }
 
 export default GlobalStates;
+
+if(Meteor.isServer){
+  GlobalStates.rawCollection().ensureIndex({ type: 1 }, {}, _ => _);
+}

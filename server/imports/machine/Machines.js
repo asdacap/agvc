@@ -97,6 +97,9 @@ if(Meteor.isServer){
   Meteor.publish("Machine", function(machineId){
     return Machines.find({ machineId });
   });
+
+  Machines.rawCollection().ensureIndex({ machineId: 1, online: 1 }, {}, _ => _);
+  Machines.rawCollection().ensureIndex({ online: 1 }, {}, _ => _);
 }
 
 _.extend(Machines, {

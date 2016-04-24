@@ -32,4 +32,6 @@ if(Meteor.isServer){
   Meteor.publish("ClientMachinePing", connectionId => {
     return ClientMachinePing.find({ connectionId });
   });
+
+  ClientMachinePing.rawCollection().ensureIndex({ connectionId: 1, machineId: 1 }, {}, _ => _);
 }
