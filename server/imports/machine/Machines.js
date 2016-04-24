@@ -2,21 +2,6 @@
 var Machines = new Mongo.Collection("machines");
 Machines.attachBehaviour("timestampable");
 
-var MachineCommandSchema = new SimpleSchema({
-  command: {
-    type: String,
-    optional: false
-  },
-  droppable: {
-    type: Boolean,
-    optional: true
-  },
-  createdAt: {
-    type: Date,
-    optional: false
-  }
-});
-
 var MachineSchema = {
   machineId: {
     type: String,
@@ -66,9 +51,6 @@ var MachineSchema = {
     type: Number,
     decimal: true,
     optional: false
-  },
-  commandQueue: {
-    type: [MachineCommandSchema]
   }
 };
 
@@ -76,7 +58,6 @@ var MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
 Machines.defaultValue = {
-  commandQueue: [],
   motorBaseSpeed: 200,
   motorPIDMultiplier: 80,
   motorDiffRange: 200,

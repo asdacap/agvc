@@ -12,6 +12,7 @@ import {
   Paper
 } from 'material-ui';
 import MessageLogs from '../message-log/MessageLogs';
+import CommandQueues from './CommandQueues';
 import moment from 'moment';
 import 'moment-duration-format';
 
@@ -23,8 +24,17 @@ export default MachineMessageLogTab = React.createClass({
   },
   getMeteorData(){
     Meteor.subscribe("MessageLogs.forMachine", this.props.machine.machineId, this.limit.get());
+    Meteor.subscribe("CommandQueues.forMachine", this.props.machine.machineId);
+
+    let queue = [];
+    let que = CommandQueues.findOne({ machineId: this.props.machine.machineId });
+    if(que !== undefined){
+      queue = que.commandQueue
+    }
+
     return {
-      messages: MessageLogs.find({ fromMachineId: this.props.machine.machineId }, { sort: { createdAt: -1 } }).fetch()
+      messages: MessageLogs.find({ fromMachineId: this.props.machine.machineId }, { sort: { createdAt: -1 } }).fetch(),
+      commandQueue: queue
     }
   },
   addMessageLog(){
@@ -55,10 +65,10 @@ export default MachineMessageLogTab = React.createClass({
   render(){
     return (
       <div>
-        { this.props.machine.commandQueue.length > 0 ? "Command Queue" : "" }
+        { this.data.commandQueue.length > 0 ? "Command Queue" : "" }
         <Table selectable={false}>
           <TableBody displayRowCheckbox={false}>
-            { this.props.machine.commandQueue.map(function(command, idx){
+            { this.data.commandQueue.map(function(command, idx){
               return <TableRow key={idx}>
                 <TableRowColumn>{command.command}</TableRowColumn>
               </TableRow>;
