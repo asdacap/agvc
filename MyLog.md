@@ -363,3 +363,22 @@ the system. See the response time. How bad can it get.
 Oh yea, I forgot. There has not been a response time between client to arduino
 and back. I should make one. And we should also see the effect of using redis instead
 of mongodb.
+
+23 April
+========
+
+These two days, only 12 commit have been made. I was busy. I have to come home to
+attend a "aqikah" for my newborn nephew. I manage to do some stuff. The AllMachineMap
+and the map in StatusTab can now be hidden by clicking it. I've added a more accurate
+machine simulator. And I did some optimization. From the profiling obtained from chrome
+developer tools, it seems that majority of the time, React is taking the time. So,
+the optimization is basically tweaking NoRerenderContainer and applying it everwhere
+it make sense. Another thing I noticed is that one major cause of CPU usage is in the
+machines subscription and fetch. Kinda expected, given all reading would be updated
+to the machines. Another thing I figurout is that, the commandQueue may be causing
+unnecessary update. I will move out outside the machines collection soon. After that,
+the next optimization will finally involve the StateCalculator. My newest idea involve
+calculating the state on the server every 200 miliseconds or some specified interval.
+Once, the interval happened, we can subscribe to it from the client. An issue with this
+approach is that the calculation might take too much time and the client will request
+the next atTime before the previous one can finish generating.
