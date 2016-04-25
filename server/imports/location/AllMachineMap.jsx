@@ -25,7 +25,7 @@ export default AllMachineMap = React.createClass({
     };
   },
   toggleAllMachineMap(){
-    if(!alwaysShow){
+    if(!this.props.alwaysShow){
       this.setState({ showMap: !this.state.showMap });
     }
   },

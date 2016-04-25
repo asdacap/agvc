@@ -246,14 +246,18 @@ export default MachineView = React.createClass({
       state: this.machineState
     }
   },
+  openMachinePage(e){
+    e.preventDefault();
+    FlowRouter.go('machine', {machineId: this.props.machine.machineId});
+  },
   render(){
 
     if(this.machineState === undefined || this.machineState.position === undefined){
       return <g></g>; // Nothing
     }else{
-      return <MachineViewAnimator machine={this.props.machine}
+      return <g onTouchTap={this.openMachinePage} style={{ cursor: "pointer" }}><MachineViewAnimator machine={this.props.machine}
               machineState={this.data.state}
-              scale={this.props.scale} />
+              scale={this.props.scale} /></g>;
     }
   }
 });

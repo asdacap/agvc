@@ -53,7 +53,7 @@ let AllMachineMapPage = React.createClass({
         <SideNavPage ref="navPage">
           <div style={containerStyle}>
             <ViewTimeToolbar title="Map" toggleNav={this.toggleNav} />
-            <AllMachineMap style={mapStyle} scale={0.5} allwaysShow={true}/>
+            <AllMachineMap style={mapStyle} scale={0.5} alwaysShow={true}/>
             <ResponseTimeIndicator />
           </div>
         </SideNavPage>
