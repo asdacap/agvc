@@ -1,5 +1,6 @@
 import {mount} from 'react-mounter';
 import Dashboard from './components/Dashboard';
+import AllMachineMapPage from './location/AllMachineMapPage';
 import MachinePage from './machine/MachinePage';
 import MessageLogPage from './message-log/MessageLogPage';
 import ConfigurationPage from './server-configuration/ConfigurationPage';
@@ -8,6 +9,13 @@ FlowRouter.route('/', {
   name: 'dashboard',
   action: function(params, queryParams) {
     mount(Dashboard, params);
+  }
+});
+
+FlowRouter.route('/all_machine_map', {
+  name: 'allMachineMap',
+  action: function(params, queryParams) {
+    mount(AllMachineMapPage, params);
   }
 });
 
