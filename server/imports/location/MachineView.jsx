@@ -1,6 +1,8 @@
 import React from 'react';
 import StateCalculator from '../machine/StateCalculator';
+import LiveStateCalculator from '../machine/LiveStateCalculator';
 import NoRerenderContainer from '../components/NoRerenderContainer';
+import ViewTime from '../client/ViewTime';
 
 let styles = {
   container: {
@@ -221,8 +223,7 @@ export default MachineView = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object.isRequired,
-    scale: React.PropTypes.number,
-    atTime: React.PropTypes.any.isRequired // Actually date. But can't seems to find react type for it
+    scale: React.PropTypes.number
   },
   getDefaultProps(){
     return {
@@ -233,10 +234,25 @@ export default MachineView = React.createClass({
     let ready = false;
 
     if(this.props.machineState === undefined){
-      ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+      let atTime = this.props.atTime;
+      if(atTime === undefined){
+        if(ViewTime.mode == "live"){
+          Chronos.liveUpdate(200);
+          this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
+        }else{
+          atTime = ViewTime.time;
+          ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
 
-      if(ready){
-        this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime, { status: true, position: true });
+          if(ready){
+            this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
+          }
+        }
+      }else{
+        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+
+        if(ready){
+          this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
+        }
       }
     }else{
       if(this.props.machineStateReady !== undefined){

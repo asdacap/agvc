@@ -14,8 +14,8 @@ import { calculateEstimatedSpeed } from './SpeedCalculator';
 
 // Calculate the last time this locationLog is interrupted
 // Used by calculateLocationPoint to know if the path ended prematurely
-function calculateLastInterruptedTime(locationLog, atTime){
-  let finalTime = atTime;
+function calculateLastInterruptedTime(locationLog, machineObj, startTime){
+  let finalTime = new Date();
 
   let whatToLookFor = [
     ["outOfCircuit", true],
@@ -27,7 +27,9 @@ function calculateLastInterruptedTime(locationLog, atTime){
     let reading = readingVal[0];
     let value = readingVal[1];
 
-    if(machineObj[readingVal] !== undefined && machineObj[readingVal+"UpdatedAt"].getTime() < finalTime.getTime()){
+    if(machineObj[readingVal] !== undefined &&
+      machineObj[readingVal+"UpdatedAt"].getTime() < finalTime.getTime() &&
+      machineObj[readingVal+"UpdatedAt"].getTime() > startTime.getTime()){
       finalTime = machineObj[readingVal+"UpdatedAt"];
     }
   });
@@ -84,7 +86,7 @@ function calculateLocationPoint(locationLog, machineObj){
     // In case an event happen between the start of the log
     // and finalTime (which is current time),
     // Truncate the finalTime to that time
-    let finalTime = calculateLastInterruptedTime(locationLog, machineObj);
+    let finalTime = calculateLastInterruptedTime(locationLog, machineObj, locationLog.createdAt);
 
     // Back to our calculation
     let timePassed = (finalTime - locationLog.createdAt.getTime());
@@ -175,13 +177,15 @@ export default LiveStateCalculator = {
   calculate(machineId, machineObj, options){
 
     if(machineObj === undefined){
-      machineObj = Machines.findOne({ machineId });
+      machineObj = Machines.findOne({ machineId: machineId }, { reactive: false });
     }
 
-    if(options === undefined){
-      options = defaultCalculateStateOptions;
+    if(machineObj === undefined){
+      // Bare minimum before sanitize
+      machineObj = {
+        machineId: machineId
+      };
     }
-
     // Sanitize the machinObj
     Readings.availableReadings.forEach(reading => {
       if(machineObj[reading] === undefined){
@@ -191,6 +195,10 @@ export default LiveStateCalculator = {
         machineObj[reading+"UpdatedAt"] = new Date();
       }
     });
+
+    if(options === undefined){
+      options = defaultCalculateStateOptions;
+    }
 
     // Attempt to calculate the state of the machine at the time
     let state = {};

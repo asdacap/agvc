@@ -63,6 +63,9 @@ function getPreviousSpeeds(machineId, atPath, atTime){
 function calculateEstimatedSpeed(machineId, atPath, atTime){
 
   let speeds = getPreviousSpeeds(machineId, atPath, atTime);
+  if(speeds == undefined){
+    return undefined;
+  }
 
   let total = 0;
   speeds.forEach(speed => total = total+speed);

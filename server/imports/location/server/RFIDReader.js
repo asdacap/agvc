@@ -2,6 +2,7 @@ import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler'
 import LocationLogs from '../LocationLogs';
 import Machines from '../../machine/Machines';
 import Settings from '../../Settings';
+import { calculateEstimatedSpeed } from '../../machine/SpeedCalculator';
 
 // This file handlers the mapping between RFID string read from the machine
 // into a location log. It also handle the rudimentary scheduling, ie predicting
@@ -108,7 +109,19 @@ AGVMachineHandler.registerEventHandler({
       var newlog = _.extend({ createdAt: new Date(createdAtTime+offsetTime) },resp);
       newlog.machineId = machineObj.machineId;
 
-      LocationLogs.insert(newlog);
+      let _id = LocationLogs.insert(newlog);
+
+      if(newlog.type == "path"){
+        let nextSpeed = calculateEstimatedSpeed(machineObj.machineId, newlog.pathId, newlog.createdAt );
+        if(nextSpeed !== undefined){
+          LocationLogs.update(_id, {
+            $set: { nextEstimatedSpeed: nextSpeed
+            }
+          });
+          newlog.nextEstimatedSpeed = nextSpeed;
+        }
+      }
+
       Machines.update({ machineId: machineObj.machineId }, { $set: { lastLocationLog: newlog } });
 
       // To make sure later log comes later

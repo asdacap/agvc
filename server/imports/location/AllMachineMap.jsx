@@ -22,11 +22,9 @@ export default AllMachineMap = React.createClass({
   },
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
-    var atTime = ViewTime.time;
 
     return {
-      machines: Machines.find({}, { fields: { _id: 1, machineId: 1 } }).fetch(),
-      time: atTime
+      machines: Machines.find({}, { fields: { _id: 1, machineId: 1 } }).fetch()
     }
   },
   render(){
@@ -36,7 +34,7 @@ export default AllMachineMap = React.createClass({
         <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
         <MapView />
         <g>
-          { this.data.machines.map( m => <MachineView machine={m} atTime={this.data.time} key={m._id}/> ) }
+          { this.data.machines.map( m => <MachineView machine={m} key={m._id}/> ) }
         </g>
       </svg>;
     }else{

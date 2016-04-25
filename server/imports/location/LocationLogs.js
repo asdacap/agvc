@@ -26,6 +26,11 @@ var LocationLogSchema = {
   pathProgress: {
     type: Number, // 0 to 1 showing path progress
     optional: true
+  },
+  nextEstimatedSpeed: {
+    type: Number, // 0 to 1 showing path progress
+    decimal: true,
+    optional: true
   }
 };
 
