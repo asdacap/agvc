@@ -248,8 +248,8 @@ export default StateCalculator = {
     // Subscribing only the last one is inefficent
     // We are subscribing record for the whole minute
     atTime = new Date(atTime.getTime());
-    atTime.setSeconds(Math.floor(atTime.getSeconds()/10)*10,0);
-    let toTime = moment(new Date(atTime.getTime())).add(20, 'seconds').toDate();
+    atTime.setSeconds(Math.floor(atTime.getSeconds()/5)*5,0);
+    let toTime = moment(new Date(atTime.getTime())).add(10, 'seconds').toDate();
 
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;

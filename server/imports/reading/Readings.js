@@ -259,6 +259,25 @@ Machines.addMachine = function(props){
 
 //// Utility function to get reading
 Readings.getLastReadingLog = function(reading, machineId, atTime){
+
+  if(Meteor.isClient){
+    // It is possible that getting all readings, then sorting it would
+    // be faster in client
+    let readings = Readings[reading].find({
+      machineId: machineId,
+      createdAt: { $lte: atTime }
+    }, { reactive: false, fields: { createdAt: 1, value: 1 } }).fetch();
+
+    readings.sort((rA, rB) => rA.createdAt.getTime() - rB.createdAt.getTime());
+
+    if(readings.length == 0){
+      return undefined;
+    }else{
+      let result = readings[readings.length-1];
+      result.machineId = machineId;
+      return result;
+    }
+  }
   return Readings[reading].findOne({
     machineId: machineId,
     createdAt: { $lte: atTime }
