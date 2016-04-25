@@ -36,6 +36,32 @@ var LocationLogSchema = {
 
 LocationLogs.attachSchema(LocationLogSchema);
 
+LocationLogs.getLastLog = function(machineId, atTime){
+  if(Meteor.isClient){
+    // Probably faster this way
+    let logs = LocationLogs.find({ machineId: machineId }, { reactive: false }).fetch();
+
+    logs = logs.filter(L => L.createdAt.getTime() <= atTime.getTime());
+    logs.sort((rA, rB) => rA.createdAt.getTime() - rB.createdAt.getTime());
+
+    if(logs.length == 0){
+      return undefined;
+    }else{
+      return logs[logs.length-1];
+    }
+
+  }else{
+    LocationLogs.findOne({
+      machineId: machineId,
+      createdAt: { $lte: atTime }
+    }, {
+      sort: { createdAt: -1 },
+      limit: 1,
+      reactive: false
+    });
+  }
+}
+
 if(Meteor.isServer){
   Meteor.publish("LocationLogs.last", function(machineId, atTime, limit){
     if(machineId === undefined || atTime === undefined){

@@ -266,10 +266,10 @@ Readings.getLastReadingLog = function(reading, machineId, atTime){
     // It is possible that getting all readings, then sorting it would
     // be faster in client
     let readings = Readings[reading].find({
-      machineId: machineId,
-      createdAt: { $lte: atTime }
+      machineId: machineId
     }, { reactive: false, fields: { createdAt: 1, value: 1 } }).fetch();
 
+    readings = readings.filter(read => read.createdAt.getTime() <= atTime.getTime());
     readings.sort((rA, rB) => rA.createdAt.getTime() - rB.createdAt.getTime());
 
     if(readings.length == 0){

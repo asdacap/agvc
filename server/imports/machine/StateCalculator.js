@@ -22,18 +22,31 @@ function calculateLastInterruptedTime(locationLog, atTime){
     let reading = readingVal[0];
     let value = readingVal[1];
 
-    // Check the first time it is out of circuit
-    let readingLog = Readings[reading].findOne({
-      machineId: locationLog.machineId,
-      value: value,
-      createdAt: {
-        $gte: locationLog.createdAt,
-        $lte: atTime
-      }
-    }, {
-      sort: { createdAt: 1 },
-      limit: 1
-    });
+    let readingLog = undefined;
+    if(Meteor.isClient){
+      let readings = Readings[reading].find({
+        machineId: locationLog.machineId,
+        value: value
+      }).fetch();
+
+      readings = readings.filter(read =>
+        read.createdAt.getTime() >= locationLog.createdAt.getTime() &&
+        read.createdAt.getTime() <= atTime.getTime());
+      readings.sort((rA, rB) => rB.createdAt.getTime() - rA.createdAt.getTime());
+
+    }else{
+      readingLog = Readings[reading].findOne({
+        machineId: locationLog.machineId,
+        value: value,
+        createdAt: {
+          $gte: locationLog.createdAt,
+          $lte: atTime
+        }
+      }, {
+        sort: { createdAt: 1 },
+        limit: 1
+      });
+    }
 
     if(readingLog !== undefined && readingLog.createdAt.getTime() < finalTime.getTime()){
       finalTime = readingLog.createdAt;
@@ -196,7 +209,7 @@ export default StateCalculator = {
 
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;
-    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime, 20).ready();
+    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("LocationLogs.createdAtRange", machineId, atTime, toTime).ready();
     ready = ready && Meteor.subscribe("Readings.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
@@ -230,13 +243,7 @@ export default StateCalculator = {
 
     if(options.position){
       // Then, the hard one, the position
-      let lastLocation = LocationLogs.findOne({
-        machineId: machineId,
-        createdAt: { $lte: atTime }
-      }, {
-        sort: { createdAt: -1 },
-        limit: 1
-      });
+      let lastLocation = LocationLogs.getLastLog(machineId, atTime);
 
       if(lastLocation === undefined){
         state.position = undefined;
