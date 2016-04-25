@@ -382,3 +382,30 @@ calculating the state on the server every 200 miliseconds or some specified inte
 Once, the interval happened, we can subscribe to it from the client. An issue with this
 approach is that the calculation might take too much time and the client will request
 the next atTime before the previous one can finish generating.
+
+24 April
+========
+
+Today is all about optimizations. I added some options to the state calculator so that
+only some of the state is being calculated if needed. The getLastReadingLog has also
+been improved on the clientside so that it will filter first, and sort the arrays manually.
+I've tried precalculating the state on the server. But the server will be under heavy load,
+and at the same time, latency become a bigger issue as it will be subscribing to new
+CalculatedState before the previous one even received.
+
+A better optimization is to detect if the TimeView is actually live. If it is, don't
+use the StateCalculator at all. Instead use the machine object directly.
+
+Aside from that, I tried using three physical robot at the same time. The result is
+funny and cute, but there are some issues like line following calculation sometimes
+going out of line, the router I brought seems to be really bad at this.
+
+Regarding the high server side cpu usage, it turns out, the normal development server's
+mongodb do not have oplog turned on. It is not turned on by default without a replicaset.
+Setting up my desktop's mongodb to have a replicaset with a single mongodb instance,
+turning on the oplog shows a dramatic drop in CPU usage. Even better, the response time
+when using the commandQueue improves.
+
+One UI problem that I detected is that, the readings seems to 'blink' on every
+StateCalculator subscription change. A possible solution is to split the ranged
+state calculator's subscription into two, changing only one subscription at a time.
