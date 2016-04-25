@@ -16,6 +16,8 @@ import MediaQuery from 'react-responsive';
 import Readings from '../reading/Readings'
 import ClientMachineResponseTime from '../client-machine-response-time/client/ClientMachineResponseTime';
 import NoRerenderContainer from '../components/NoRerenderContainer';
+import StateCalculator from '../machine/StateCalculator';
+import LiveStateCalculator from '../machine/LiveStateCalculator';
 
 var styles = {
   ButtonWithMargin: {
@@ -170,8 +172,16 @@ export default MachineStatusTab = React.createClass({
       clientMachineResponseTime = record.responseTime;
     }
 
-    let machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
-    let machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
+    let machineStateReady = false;
+    let machineState = undefined;
+    if(ViewTime.mode == "live"){
+      Chronos.liveUpdate(200);
+      machineStateReady = true;
+      machineState = LiveStateCalculator.calculate(this.props.machine.machineId, this.props.machine);
+    }else{
+      machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+      machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
+    }
 
     return {
       clientMachineResponseTime,
