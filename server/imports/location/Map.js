@@ -1,3 +1,4 @@
+import Resources from '../Resources';
 
 // This map represent how to transfer the location representation to visual cuues
 // on the screen. Point is represented by a coordinate. Path is represented by
@@ -49,13 +50,7 @@ if(Settings.use_bigger_map){
     ]
   };
 
-  if(Meteor.isServer){
-    Map.extraSVG = Assets.getText("map_extra.svg");
-  }else if(Meteor.isClient){
-    HTTP.get("/map_extra.svg", {}, function(e, result){
-      Map.extraSVG = result.content;
-    });
-  }
+  Map.extraSVG = Resources.map_extra;
 
 };
 
