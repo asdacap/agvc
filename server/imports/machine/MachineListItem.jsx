@@ -24,6 +24,9 @@ import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
 import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import NoRerenderContainer from '../components/NoRerenderContainer';
+import StateCalculator from './StateCalculator';
+import LiveStateCalculator from './LiveStateCalculator';
+import Machines from './Machines';
 
 let NTableRow = NoRerenderContainer(TableRow, false, ["style"]);
 let NCardTitle = NoRerenderContainer(CardTitle, false, ["style"]);
@@ -49,13 +52,22 @@ var styles = {
 export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
-    StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time)
 
     // Position is not needed
     let opts = _.extend({}, StateCalculator.defaultCalculateStateOptions, { position: false });
 
-    return {
-      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts)
+    if(ViewTime.mode == "live"){
+      // Should be subscribed by the parent
+      let machine = Machines.findOne({ machineId: this.props.machine.machineId });
+      return {
+        state: LiveStateCalculator.calculate(this.props.machine.machineId, machine, opts)
+      }
+    }else{
+      StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+
+      return {
+        state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts)
+      }
     }
   },
   render(){

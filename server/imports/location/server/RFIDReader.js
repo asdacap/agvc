@@ -1,5 +1,6 @@
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 import LocationLogs from '../LocationLogs';
+import Machines from '../../machine/Machines';
 import Settings from '../../Settings';
 
 // This file handlers the mapping between RFID string read from the machine
@@ -108,6 +109,7 @@ AGVMachineHandler.registerEventHandler({
       newlog.machineId = machineObj.machineId;
 
       LocationLogs.insert(newlog);
+      Machines.update({ machineId: machineObj.machineId }, { $set: { lastLocationLog: newlog } });
 
       // To make sure later log comes later
       offsetTime = offsetTime+1;

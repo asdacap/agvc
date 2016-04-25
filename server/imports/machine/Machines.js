@@ -50,6 +50,11 @@ var MachineSchema = {
     type: Number,
     decimal: true,
     optional: false
+  },
+  lastLocationLog: {
+    type: Object,
+    blackbox: true,
+    optional: true
   }
 };
 

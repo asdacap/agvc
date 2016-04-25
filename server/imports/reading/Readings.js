@@ -226,14 +226,16 @@ Readings.availableReadings.forEach(function(reading){
 
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  var toSet = {};
+  let atTime = new Date();
+  let toSet = {};
   toSet[reading] = value;
-  Machines.update({ machineId: machineId }, { $set: toSet } );
+  toSet[reading+"UpdatedAt"] = atTime;
+  Machines.update({ machineId: machineId }, { $set: toSet });
 
   // Check duplicated reading
   let previousTwo = Readings[reading].find({
     machineId: machineId,
-    createdAt: { $lte: new Date() }
+    createdAt: { $lte: atTime }
   },{
     sort: { createdAt: -1 },
     limit: 2
@@ -244,7 +246,7 @@ Machines.setReading = function(machineId, reading, value){
     Readings[reading].update({ _id_: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
   }else{
     // Make another record
-    Readings[reading].insert({ machineId: machineId, value: value });
+    Readings[reading].insert({ machineId: machineId, value: value, createdAt: atTime });
   }
 }
 
