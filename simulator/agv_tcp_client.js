@@ -49,4 +49,4 @@ setInterval(function(){
 
   rfidnum++;
   rfidnum = rfidnum%rfids.length;
-}, 1000);
+}, 5000);
