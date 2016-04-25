@@ -62,7 +62,6 @@ function calculateLocationPoint(locationLog, machineObj){
 
     let pathEl = undefined;
     let pts = undefined;
-    let length = undefined;
 
     if(Meteor.isClient){
       pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -71,12 +70,7 @@ function calculateLocationPoint(locationLog, machineObj){
       pts = Point(path.svgPathD);
     }
 
-    if(Meteor.isClient){
-      length = pathEl.getTotalLength();
-    }else{
-      length = pts.length();
-    }
-
+    let length = path.length;
     let speed = locationLog.nextEstimatedSpeed;
     if(speed == undefined){
       speed = path.machineSpeed/length;
