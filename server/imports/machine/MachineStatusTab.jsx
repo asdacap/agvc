@@ -12,6 +12,7 @@ import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 import ViewTime from '../client/ViewTime';
 import SingleMachineMap from '../location/SingleMachineMap';
+import Settings from '../Settings';
 import MediaQuery from 'react-responsive';
 import Readings from '../reading/Readings'
 import ClientMachineResponseTime from '../client-machine-response-time/client/ClientMachineResponseTime';
@@ -175,12 +176,18 @@ export default MachineStatusTab = React.createClass({
     let machineStateReady = false;
     let machineState = undefined;
     if(ViewTime.mode == "live"){
-      Chronos.liveUpdate(200);
+      Chronos.liveUpdate(Settings.viewtime_update_interval);
       machineStateReady = true;
-      machineState = LiveStateCalculator.calculate(this.props.machine.machineId, this.props.machine);
+      machineState = LiveStateCalculator.calculate(
+        this.props.machine.machineId,
+        this.props.machine,
+        _.extend({}, LiveStateCalculator.defaultCalculateStateOptions, { position: false }));
     }else{
       machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
-      machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
+      machineState = StateCalculator.calculate(
+        this.props.machine.machineId,
+        ViewTime.time,
+        _.extend({}, LiveStateCalculator.defaultCalculateStateOptions, { position: false }));
     }
 
     return {

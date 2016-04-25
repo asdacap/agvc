@@ -19,11 +19,9 @@ export default SingleMachineMap = React.createClass({
   },
   getMeteorData(){
     var handle = Meteor.subscribe("Machine", this.props.machineId);
-    var atTime = ViewTime.time;
 
     return {
-      machine: Machines.findOne({ machineId: this.props.machineId }, { reactive: false }),
-      time: atTime
+      machine: Machines.findOne({ machineId: this.props.machineId }, { reactive: false })
     }
   },
   render(){
@@ -36,11 +34,7 @@ export default SingleMachineMap = React.createClass({
       <rect x="0" y="0" width="1200" height="900" fill="#EEEEEE" />
       <MapView />
       <g>
-        <MachineView machine={this.data.machine}
-          machineState={this.props.machineState}
-          machineStateReady={this.props.machineStateReady}
-          atTime={this.data.time}
-          scale={2} />
+        <MachineView machine={this.data.machine} scale={2} />
       </g>
     </svg>;
   }

@@ -6,7 +6,8 @@ Settings = {
   dropppable_command_timeout: 5000, // Milisecond before a droppable command is dropped
   ping_interval: 1000, // Milisecond between ping
   client_ping_interval: 1000,
-  viewtime_update_interval: 200,
+  viewtime_update_interval: 500,
+  machineview_update_interval: 200,
   use_bigger_map: true,
   bandwidth_record_interval: 1000,
   master: true,

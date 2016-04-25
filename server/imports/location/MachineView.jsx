@@ -3,6 +3,8 @@ import StateCalculator from '../machine/StateCalculator';
 import LiveStateCalculator from '../machine/LiveStateCalculator';
 import NoRerenderContainer from '../components/NoRerenderContainer';
 import ViewTime from '../client/ViewTime';
+import Settings from '../Settings';
+import { FasterViewTime } from '../client/ViewTime';
 
 let styles = {
   container: {
@@ -176,14 +178,7 @@ let MachineViewAnimator = React.createClass({
 
     if(this.oldPosition !== undefined){
       let elapsed = new Date().getTime() - this.updatedAt.getTime();
-      let duration = 200.0;
-      if(this.previousUpdateAt !== undefined){
-        // Smoother duration
-        duration = this.updatedAt.getTime() - this.previousUpdateAt.getTime();
-        if(duration > 500){
-          duration = 500;
-        }
-      }
+      let duration = Settings.machineview_update_interval;
       let progress = elapsed/duration;
       if(progress > 1) progress = 1;
       let newX = this.oldPosition.x + (this.props.machineState.position.x - this.oldPosition.x)*progress;
@@ -200,7 +195,6 @@ let MachineViewAnimator = React.createClass({
   },
   componentWillReceiveProps(){
     this.oldPosition = this.calculatePosition();
-    this.previousUpdateAt = this.updatedAt;
     this.updatedAt = new Date();
   },
   render(){
@@ -219,6 +213,8 @@ let MachineViewAnimator = React.createClass({
   }
 });
 
+let fasterRefresh = new FasterViewTime(Settings.machineview_update_interval);
+
 export default MachineView = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
@@ -233,34 +229,16 @@ export default MachineView = React.createClass({
   getMeteorData(){
     let ready = false;
 
-    if(this.props.machineState === undefined){
-      let atTime = this.props.atTime;
-      if(atTime === undefined){
-        if(ViewTime.mode == "live"){
-          Chronos.liveUpdate(200);
-          this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
-        }else{
-          atTime = ViewTime.time;
-          ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
-
-          if(ready){
-            this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
-          }
-        }
-      }else{
-        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
-
-        if(ready){
-          this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
-        }
-      }
+    if(ViewTime.mode == "live"){
+      Chronos.liveUpdate(Settings.machineview_update_interval);
+      this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
     }else{
-      if(this.props.machineStateReady !== undefined){
-        ready = this.props.machineStateReady;
-      }else{
-        ready = true;
+      let atTime = fasterRefresh.time;
+      ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+
+      if(ready){
+        this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
       }
-      this.machineState = this.props.machineState;
     }
 
     return {
