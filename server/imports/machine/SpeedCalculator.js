@@ -33,7 +33,7 @@ function getPreviousSpeeds(machineId, atPath, atTime){
     }
   }, {
     sort: { createdAt: -1 },
-    limit: 20
+    limit: 50
   }).fetch();
 
   let speeds = [];
@@ -68,6 +68,13 @@ function calculateEstimatedSpeed(machineId, atPath, atTime){
   }
 
   let total = 0;
+  speeds.sort();
+  // Find median
+  if(speeds.length > 3){
+    let middle = speeds.length/2;
+    let nspeeds = [speeds[middle-1],speeds[middle],speeds[middle+1]];
+    speeds = nspeeds;
+  }
   speeds.forEach(speed => total = total+speed);
 
   return total/speeds.length;
