@@ -8,7 +8,7 @@ import ConfigurationPage from './server-configuration/ConfigurationPage';
 FlowRouter.route('/', {
   name: 'dashboard',
   action: function(params, queryParams) {
-    mount(Dashboard, params);
+    mount(Dashboard, _.extend({}, params, queryParams));
   }
 });
 
@@ -22,8 +22,8 @@ FlowRouter.route('/all_machine_map', {
 FlowRouter.route('/chart/:reading?', {
   name: 'dashboardChart',
   action: function(params, queryParams) {
-    params['page'] = 'chart';
-    mount(Dashboard, params);
+    params['which_page'] = 'chart';
+    mount(Dashboard, _.extend({}, params, queryParams));
   }
 });
 

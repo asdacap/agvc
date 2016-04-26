@@ -38,6 +38,7 @@ var styles = {
     padding: "1ex"
   },
   StatusButton: {
+    marginRight: "1ex"
   },
   SelectField: {
     marginLeft: "1ex",
@@ -63,7 +64,12 @@ export default MachineListStatus = React.createClass({
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
     return {
-      machines: Machines.find({}).fetch(),
+      machines: Machines.find({}, {
+        skip: this.props.page*Settings.per_page_machine_count,
+        limit: Settings.per_page_machine_count,
+        reactive: false
+      }).fetch(),
+      count: Machines.find({}).count(),
       openForm: this.state.openForm.get()
     };
   },
@@ -81,9 +87,21 @@ export default MachineListStatus = React.createClass({
   },
   render(){
     let self = this;
+
+    let pages = [];
+    for(let i = 0;i*Settings.per_page_machine_count<this.data.count;i++){
+      pages.push(i);
+    }
+
     return <div className="machine-lists">
       <div style={styles.MachineListPanel}>
         <RaisedButton label="Statuses" onTouchTap={this.goToCharts} style={styles.StatusButton}/>
+        {pages.map(page_num => {
+          return <RaisedButton label={"Page "+(page_num+1)}
+            disabled={this.props.page == page_num}
+            key={page_num}
+            onTouchTap={_ => FlowRouter.go("dashboardChart", {}, {page: page_num}) }/>
+        })}
         <SelectField value={this.props.reading}
           floatingLabelText="Reading Type"
           onChange={this.handleReadingChange}

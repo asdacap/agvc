@@ -12,6 +12,7 @@ Settings = {
   bandwidth_record_interval: 1000,
   master: true,
   bypassCommandQueue: false,
+  per_page_machine_count: 8,
   disable_client_machine_response_time: true,
   machine_view_render_timeout: 33
 };
