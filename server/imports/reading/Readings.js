@@ -243,7 +243,7 @@ Machines.setReading = function(machineId, reading, value){
 
   if(previousTwo.length == 2 && previousTwo[0].value == previousTwo[1].value && previousTwo[0].value == value){
     // Update the first one with current time
-    Readings[reading].update({ _id_: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
+    Readings[reading].update({ _id: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
   }else{
     // Make another record
     Readings[reading].insert({ machineId: machineId, value: value, createdAt: atTime });
