@@ -87,6 +87,7 @@ Readings.meta = {
   loopInterval: {
     title: "Loop Interval",
     defaultValue: 0,
+    badHigh: 50,
     unit: "ms",
     type: Number
   },

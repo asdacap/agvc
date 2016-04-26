@@ -41,7 +41,7 @@ var styles = {
     height: "400px"
   },
   CardHeaderBackgroundOnStatus: {
-    offline: "#ffdd29",
+    offline: "#fc3b3b",
     outOfCircuit: "#ffdd29",
     obstructed: "#ffdd29",
     manualMode: "#299fff",
