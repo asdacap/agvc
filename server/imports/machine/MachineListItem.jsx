@@ -81,7 +81,7 @@ export default MachineListItem = React.createClass({
       titleStyle.backgroundColor = styles.CardHeaderBackgroundOnStatus[this.data.state.status];
     }
 
-    return <Card style={styles.MachineListItem} initiallyExpanded={true}>
+    return <Card style={styles.MachineListItem} initiallyExpanded={false}>
       <NCardTitle title={this.props.machine.machineId}
          subtitle={this.data.state.status}
          actAsExpander={true}
