@@ -28,6 +28,12 @@ splitted.on("data", function(data){
   }else if(data.indexOf("cP:") == 0){
     sendMessage(data);
   }
+
+  if(data == "enterManual"){
+    sendMessage("manualMode:1");
+  }else if(data == "exitManual"){
+    sendMessage("manualMode:0");
+  }
 });
 
 sendMessage("machineId:"+settings.machineId);
