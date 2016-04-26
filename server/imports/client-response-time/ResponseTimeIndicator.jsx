@@ -8,7 +8,8 @@ let styles = {
     position: "fixed",
     top: 3,
     left: 3,
-    zIndex: 1200
+    zIndex: 1200,
+    pointerEvents: "none"
   }
 }
 
