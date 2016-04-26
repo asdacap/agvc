@@ -409,3 +409,23 @@ when using the commandQueue improves.
 One UI problem that I detected is that, the readings seems to 'blink' on every
 StateCalculator subscription change. A possible solution is to split the ranged
 state calculator's subscription into two, changing only one subscription at a time.
+
+25 April
+========
+
+More optimizations today. A significant addition today is the addition of LiveStateCalculator
+which is basically like StateCalculator, but for live mode. It uses significantly
+less CPU power, and mostly use the machine's object itself. Some fields is added
+to the machines attribute to record when the readings has been logged. Additionally
+the speed is now precalculated in the locationLogs. This even makes the StateCalculator
+much more efficient. More optimization was made to the client-side query. And then
+the ViewTime interval was increased to 500ms. The MachineView can now be clicked
+to open the machine page.
+
+In summary, it could handle the load much better this time. Interestingly, it seems that
+the map is using less CPU than the table. I'm also seeing weird high cpu usage. Some of it
+came from the Chronos package.
+
+Tomorrow, I'm going to have to finish the poster. And figurout what to put in the technical
+report. Additionally, I may change the use of chronos to the FasterViewTime class.
+And make some pagination.
