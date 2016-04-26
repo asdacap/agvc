@@ -1,5 +1,6 @@
 import React from 'react';
 import ClientResponseTimes from './ClientResponseTimes';
+import ViewTime from '../client/ViewTime';
 
 let styles = {
   Indicator: {
@@ -15,8 +16,7 @@ export default ResponseTimeIndicator = React.createClass({
   getMeteorData(){
     let responseTime = 0;
 
-    Chronos.liveUpdate(1000);
-
+    ViewTime.time; // Just for live update
     Meteor.subscribe("ClientResponseTimes", Meteor.connection._lastSessionId);
 
     let record = ClientResponseTimes.findOne({ connectionId: Meteor.connection._lastSessionId });

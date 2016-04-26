@@ -229,11 +229,10 @@ export default MachineView = React.createClass({
   getMeteorData(){
     let ready = false;
 
+    let atTime = fasterRefresh.time;
     if(ViewTime.mode == "live"){
-      Chronos.liveUpdate(Settings.machineview_update_interval);
       this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
     }else{
-      let atTime = fasterRefresh.time;
       ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
 
       if(ready){

@@ -176,7 +176,7 @@ export default MachineStatusTab = React.createClass({
     let machineStateReady = false;
     let machineState = undefined;
     if(ViewTime.mode == "live"){
-      Chronos.liveUpdate(Settings.viewtime_update_interval);
+      ViewTime.time; // For the update
       machineStateReady = true;
       machineState = LiveStateCalculator.calculate(
         this.props.machine.machineId,
