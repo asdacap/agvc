@@ -14,6 +14,7 @@ Settings = {
   bypassCommandQueue: false,
   per_page_machine_count: 8,
   disable_client_machine_response_time: true,
+  show_average_readings: true,
   machine_view_render_timeout: 33
 };
 

@@ -18,6 +18,7 @@ import AllMachineMap from '../location/AllMachineMap';
 import ViewTime from '../client/ViewTime';
 import ViewTimeToolbar from './ViewTimeToolbar';
 import ResponseTimeIndicator from '../client-response-time/ResponseTimeIndicator';
+import AverageReadingIndicator from '../reading/AverageReadingIndicator';
 import moment from 'moment';
 
 Dashboard = React.createClass({
@@ -39,6 +40,7 @@ Dashboard = React.createClass({
             <AllMachineMap page={this.props.page}/>
             {this.props.which_page == "chart" ? <MachineListChart reading={this.props.reading} page={this.props.page}/> : <MachineListStatus page={this.props.page}/>}
             <ResponseTimeIndicator />
+            <AverageReadingIndicator />
           </div>
         </SideNavPage>
       </AppCanvas>;
