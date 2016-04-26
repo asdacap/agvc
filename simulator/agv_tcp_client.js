@@ -39,13 +39,15 @@ var rfids = [
   "04 81 a5 c2 d7 38 81"
 ]
 
+setInterval(function(){
+  sendMessage("temperature:"+(Math.floor(Math.random()*100)));
+  sendMessage("battery:"+(Math.floor(Math.random()*500)));
+  sendMessage("loopInterval:"+(Math.floor(Math.random()*10)));
+}, 1000);
+
 var rfidnum = 0;
 setInterval(function(){
   sendMessage("rfid:"+rfids[rfidnum]);
-
-  sendMessage("temperature:"+(Math.floor(Math.random()*100)));
-  sendMessage("battery:"+(Math.floor(Math.random()*10)));
-  sendMessage("loopInterval:"+(Math.floor(Math.random()*10)));
 
   rfidnum++;
   rfidnum = rfidnum%rfids.length;
