@@ -1,12 +1,15 @@
 import ClientResponseTimeLogs from '../ClientResponseTimeLogs';
+import Settings from '../../Settings';
 
-Meteor.autorun(function(){
+if(Settings.show_client_response_time){
+  Meteor.autorun(function(){
 
-  Chronos.liveUpdate(1000);
-  Meteor.subscribe("ClientResponseTimeLogs", Meteor.connection._lastSessionId);
+    Chronos.liveUpdate(1000);
+    Meteor.subscribe("ClientResponseTimeLogs", Meteor.connection._lastSessionId);
 
-  let logs = ClientResponseTimeLogs.find({ connectionId: Meteor.connection._lastSessionId }).fetch().forEach(log => {
-    Meteor.call('responseTimeLogPing', log._id);
+    let logs = ClientResponseTimeLogs.find({ connectionId: Meteor.connection._lastSessionId }).fetch().forEach(log => {
+      Meteor.call('responseTimeLogPing', log._id);
+    });
+
   });
-
-});
+}
