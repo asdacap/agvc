@@ -17,22 +17,11 @@ import { calculateEstimatedSpeed } from './SpeedCalculator';
 function calculateLastInterruptedTime(locationLog, machineObj, startTime){
   let finalTime = new Date();
 
-  let whatToLookFor = [
-    ["outOfCircuit", true],
-    ["manualMode", true],
-    ["obstructed", true]
-  ]
-
-  whatToLookFor.forEach((readingVal) => {
-    let reading = readingVal[0];
-    let value = readingVal[1];
-
-    if(machineObj[readingVal] !== undefined &&
-      machineObj[readingVal+"UpdatedAt"].getTime() < finalTime.getTime() &&
-      machineObj[readingVal+"UpdatedAt"].getTime() > startTime.getTime()){
-      finalTime = machineObj[readingVal+"UpdatedAt"];
+  if(locationLog.firstInterruption !== undefined){
+    if(locationLog.firstInterruption < finalTime){
+      finalTime = locationLog.firstInterruption;
     }
-  });
+  }
 
   return finalTime;
 }
@@ -83,7 +72,7 @@ function calculateLocationPoint(locationLog, machineObj){
     let finalTime = calculateLastInterruptedTime(locationLog, machineObj, locationLog.createdAt);
 
     // Back to our calculation
-    let timePassed = (finalTime - locationLog.createdAt.getTime());
+    let timePassed = (finalTime.getTime() - locationLog.createdAt.getTime());
     timePassed /= 1000.0;
     let progressPassed = timePassed*speed;
     let progress = 0;
@@ -187,6 +176,9 @@ export default LiveStateCalculator = {
       }
       if(machineObj[reading+"UpdatedAt"] === undefined){
         machineObj[reading+"UpdatedAt"] = new Date();
+      }
+      if(machineObj[reading+"StartUpdatedAt"] === undefined){
+        machineObj[reading+"StartUpdatedAt"] = new Date();
       }
     });
 

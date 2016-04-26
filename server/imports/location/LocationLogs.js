@@ -11,6 +11,10 @@ var LocationLogSchema = {
     type: String, // Either 'point' or 'path'
     optional: false
   },
+  firstInterruption: {
+    type: Date,
+    optional: true
+  },
   pointId: {
     type: String,
     optional: true
@@ -25,6 +29,7 @@ var LocationLogSchema = {
   },
   pathProgress: {
     type: Number, // 0 to 1 showing path progress
+    decimal: true,
     optional: true
   },
   nextEstimatedSpeed: {
@@ -51,7 +56,7 @@ LocationLogs.getLastLog = function(machineId, atTime){
     }
 
   }else{
-    LocationLogs.findOne({
+    return LocationLogs.findOne({
       machineId: machineId,
       createdAt: { $lte: atTime }
     }, {

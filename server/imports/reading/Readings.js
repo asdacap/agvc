@@ -204,6 +204,14 @@ if(Meteor.isServer){
 //// Attaching additional schemas to machine
 var MachineSchema = {}
 Readings.availableReadings.forEach(function(reading){
+  MachineSchema[reading+"UpdatedAt"] = {
+    type: Date,
+    optional: true
+  };
+  MachineSchema[reading+"StartUpdatedAt"] = {
+    type: Date,
+    optional: true
+  };
   if(Readings.meta[reading].type == Boolean){
     MachineSchema[reading] = {
       type: Boolean,
@@ -227,10 +235,6 @@ Readings.availableReadings.forEach(function(reading){
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
   let atTime = new Date();
-  let toSet = {};
-  toSet[reading] = value;
-  toSet[reading+"UpdatedAt"] = atTime;
-  Machines.update({ machineId: machineId }, { $set: toSet });
 
   // Check duplicated reading
   let previousTwo = Readings[reading].find({
@@ -244,9 +248,18 @@ Machines.setReading = function(machineId, reading, value){
   if(previousTwo.length == 2 && previousTwo[0].value == previousTwo[1].value && previousTwo[0].value == value){
     // Update the first one with current time
     Readings[reading].update({ _id: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
+    let toSet = {};
+    toSet[reading] = value;
+    toSet[reading+"UpdatedAt"] = atTime;
+    Machines.update({ machineId: machineId }, { $set: toSet });
   }else{
     // Make another record
     Readings[reading].insert({ machineId: machineId, value: value, createdAt: atTime });
+    let toSet = {};
+    toSet[reading] = value;
+    toSet[reading+"UpdatedAt"] = atTime;
+    toSet[reading+"StartUpdatedAt"] = atTime;
+    Machines.update({ machineId: machineId }, { $set: toSet });
   }
 }
 
