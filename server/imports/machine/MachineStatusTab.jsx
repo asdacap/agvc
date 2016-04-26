@@ -217,9 +217,6 @@ export default MachineStatusTab = React.createClass({
   closeEdit(){
     this.setState({ openForm: false });
   },
-  sendSetting(){
-    Meteor.call("sendMachineSetting", this.props.machine.machineId);
-  },
   render(){
     var self = this;
     return <div style={styles.TopContainer}>
@@ -241,8 +238,6 @@ export default MachineStatusTab = React.createClass({
           </div> : <RaisedButton style={styles.ButtonWithMargin} label="Show Map"
           onTouchTap={this.toggleAllMachineMap}/>
         }
-        <RaisedButton style={styles.ButtonWithMargin} label="Send Setting"
-          onTouchTap={this.sendSetting} disabled={!this.props.machine.online}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Delete" onTouchTap={this.delete}/>
         <RaisedButton style={styles.ButtonWithMargin} label="Edit" onTouchTap={this.edit}/>
         <List>

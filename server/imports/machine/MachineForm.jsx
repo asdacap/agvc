@@ -134,6 +134,7 @@ var EditMachineForm = React.createClass(_.extend({
     });
 
     Meteor.call("editMachine",props);
+    Meteor.call("sendMachineSetting", this.props.machine.machineId);
 
     this.props.close();
   },
