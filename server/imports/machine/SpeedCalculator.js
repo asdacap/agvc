@@ -71,7 +71,7 @@ function calculateEstimatedSpeed(machineId, atPath, atTime){
   speeds.sort();
   // Find median
   if(speeds.length > 3){
-    let middle = speeds.length/2;
+    let middle = Math.floor(speeds.length/2);
     let nspeeds = [speeds[middle-1],speeds[middle],speeds[middle+1]];
     speeds = nspeeds;
   }
