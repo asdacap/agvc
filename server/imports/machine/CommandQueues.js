@@ -31,13 +31,20 @@ let schema = {
 let Schema = new SimpleSchema(schema);
 CommandQueues.attachSchema(Schema);
 
-CommandQueues.getForMachine = function(machineId){
-  let machine = CommandQueues.findOne({ machineId });
+CommandQueues.getForMachine = function(machineId, fields){
+  if(fields === undefined){
+    fields = {
+      machineId: 1,
+      commandQueue: 1
+    };
+  }
+
+  let machine = CommandQueues.findOne({ machineId }, { fields: fields, reactive: false });
   if(machine !== undefined){
     return machine;
   }
   CommandQueues.insert({ machineId, commandQueue: [] });
-  return CommandQueues.findOne({ machineId });
+  return CommandQueues.findOne({ machineId }, { fields: fields, reactive: false });
 }
 
 if(Meteor.isServer){

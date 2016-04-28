@@ -242,6 +242,8 @@ Machines.setReading = function(machineId, reading, value){
     machineId: machineId,
     createdAt: { $lte: atTime }
   },{
+    reactive: false,
+    fields: { value: 1 },
     sort: { createdAt: -1 },
     limit: 2
   }).fetch();
