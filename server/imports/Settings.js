@@ -21,4 +21,12 @@ Settings = {
 
 Settings = _.extend(Settings, Meteor.settings);
 
+if(process.env.TCP_LISTEN_PORT){
+  Settings.tcp_listen_port = parseInt(process.env.TCP_LISTEN_PORT, 0);
+}
+
+if(process.env.UDP_LISTEN_PORT){
+  Settings.udp_listen_port = parseInt(process.env.UDP_LISTEN_PORT, 0);
+}
+
 export default Settings;
