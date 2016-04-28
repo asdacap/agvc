@@ -1,6 +1,7 @@
 // This file needs to be loaded first
 
 import Machines from '../machine/Machines';
+import nextMachineTimestamp from '../machine/nextMachineTimestamp';
 import d3 from 'd3';
 
 export default Readings = {};
@@ -235,7 +236,7 @@ Readings.availableReadings.forEach(function(reading){
 
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  let atTime = new Date();
+  let atTime = nextMachineTimestamp(machineId);
 
   // Check duplicated reading
   let previousTwo = Readings[reading].find({
@@ -250,7 +251,7 @@ Machines.setReading = function(machineId, reading, value){
 
   if(previousTwo.length == 2 && previousTwo[0].value == previousTwo[1].value && previousTwo[0].value == value){
     // Update the first one with current time
-    Readings[reading].update({ _id: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
+    Readings[reading].update({ _id: previousTwo[0]._id }, { $set: { createdAt: atTime } });
     let toSet = {};
     toSet[reading] = value;
     toSet[reading+"UpdatedAt"] = atTime;
