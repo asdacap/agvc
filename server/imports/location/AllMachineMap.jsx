@@ -8,6 +8,7 @@ import ViewTime from '../client/ViewTime';
 import { FasterViewTime } from '../client/ViewTime';
 import NoRerenderContainer from '../components/NoRerenderContainer';
 import MapView from './MapView';
+import Settings from '../Settings';
 
 // Draw the map along with all the machines
 export default AllMachineMap = React.createClass({
@@ -32,8 +33,18 @@ export default AllMachineMap = React.createClass({
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
 
-    return {
-      machines: Machines.find({}, { fields: { _id: 1, machineId: 1 } }).fetch()
+    if(this.props.page !== undefined){
+      return {
+        machines: Machines.find({}, {
+            skip: this.props.page*Settings.per_page_machine_count,
+            limit: Settings.per_page_machine_count,
+            fields: { _id: 1, machineId: 1 }
+          }).fetch()
+      }
+    }else{
+      return {
+        machines: Machines.find({}, { fields: { _id: 1, machineId: 1 } }).fetch()
+      }
     }
   },
   render(){
