@@ -27,6 +27,8 @@ import NoRerenderContainer from '../components/NoRerenderContainer';
 import StateCalculator from './StateCalculator';
 import LiveStateCalculator from './LiveStateCalculator';
 import Machines from './Machines';
+import TrackerUpdateLimiter from '../utils/TrackerUpdateLimiter';
+import Settings from '../Settings';
 
 let NTableRow = NoRerenderContainer(TableRow, false, ["style"]);
 let NCardTitle = NoRerenderContainer(CardTitle, false, ["style"]);
@@ -52,23 +54,27 @@ var styles = {
 export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
+    let state = null;
+    let machine = null;
 
-    // Position is not needed
-    let opts = _.extend({}, StateCalculator.defaultCalculateStateOptions, { position: false });
+    TrackerUpdateLimiter(none =>{
+      // Position is not needed
+      let opts = _.extend({}, StateCalculator.defaultCalculateStateOptions, { position: false });
 
-    if(ViewTime.mode == "live"){
-      // Should be subscribed by the parent
-      let machine = Machines.findOne({ machineId: this.props.machine.machineId });
-      return {
-        state: LiveStateCalculator.calculate(this.props.machine.machineId, machine, opts)
+      if(ViewTime.mode == "live"){
+        // Should be subscribed by the parent
+        machine = Machines.findOne({ machineId: this.props.machine.machineId });
+        state = LiveStateCalculator.calculate(this.props.machine.machineId, machine, opts);
+      }else{
+        StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+        state = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts);
       }
-    }else{
-      StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+    }, Settings.react_tracker_update_delay);
 
-      return {
-        state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts)
-      }
+    return {
+      state
     }
+
   },
   render(){
     let self = this;
