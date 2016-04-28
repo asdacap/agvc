@@ -1,4 +1,8 @@
 
+import Machines from '../machine/Machines';
+import nextMachineTimestamp from '../machine/nextMachineTimestamp';
+import { calculateEstimatedSpeed } from '../machine/SpeedCalculator';
+
 export default LocationLogs = new Mongo.Collection("locations");
 LocationLogs.attachBehaviour('timestampable');
 
@@ -65,6 +69,28 @@ LocationLogs.getLastLog = function(machineId, atTime){
       reactive: false
     });
   }
+}
+
+// safer locationlogs insert. This make sure that
+// it also modifies the machine
+LocationLogs.safeInsert = function(machineId, log){
+  log = _.extend({}, log);
+  log.createdAt = nextMachineTimestamp(machineId);
+  log.machineId = machineId;
+  let _id = LocationLogs.insert(log);
+  log._id = _id;
+
+  if(log.type == "path"){
+    let nextSpeed = calculateEstimatedSpeed(machineId, log.pathId, log.createdAt);
+    if(nextSpeed !== undefined){
+      LocationLogs.update(_id, {
+        $set: { nextEstimatedSpeed: nextSpeed }
+      });
+      log.nextEstimatedSpeed = nextSpeed;
+    }
+  }
+
+  Machines.update({ machineId }, { $set: { lastLocationLog: log } });
 }
 
 if(Meteor.isServer){

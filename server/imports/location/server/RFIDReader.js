@@ -103,29 +103,8 @@ AGVMachineHandler.registerEventHandler({
       response.push(ResponseMap[value]);
     }
 
-    let offsetTime = 0;
-    let createdAtTime = new Date().getTime();
     response.forEach(resp => {
-      var newlog = _.extend({ createdAt: new Date(createdAtTime+offsetTime) },resp);
-      newlog.machineId = machineObj.machineId;
-
-      let _id = LocationLogs.insert(newlog);
-
-      if(newlog.type == "path"){
-        let nextSpeed = calculateEstimatedSpeed(machineObj.machineId, newlog.pathId, newlog.createdAt );
-        if(nextSpeed !== undefined){
-          LocationLogs.update(_id, {
-            $set: { nextEstimatedSpeed: nextSpeed
-            }
-          });
-          newlog.nextEstimatedSpeed = nextSpeed;
-        }
-      }
-
-      Machines.update({ machineId: machineObj.machineId }, { $set: { lastLocationLog: newlog } });
-
-      // To make sure later log comes later
-      offsetTime = offsetTime+1;
+      LocationLogs.safeInsert(machineObj.machineId, resp);
     });
   }
 });

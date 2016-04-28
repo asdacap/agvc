@@ -1,5 +1,6 @@
 import Readings from '../Readings';
 import Machines from '../../machine/Machines';
+import nextMachineTimestamp from '../../machine/nextMachineTimestamp';
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 import LocationLogs from '../../location/LocationLogs';
 import Map from '../../location/Map';
@@ -11,6 +12,7 @@ function callback(value, machineObj){
 
   let beforeTime = new Date(new Date().getTime()-1);
 
+  // Find the previous obstruction
   let lastOn = Readings["obstructed"].findOne({
     machineId: machineObj.machineId,
     value: true,
@@ -29,7 +31,8 @@ function callback(value, machineObj){
     return;
   }
 
-  let whatToLookFor = ["outOfCircuit", "manualMode"];
+  // Look for anything in between that may disturb the simulation
+  let whatToLookFor = ["outOfCircuit", "manualMode", "online"];
   let hasObstructed = false;
 
   whatToLookFor.forEach(reading => {
@@ -48,20 +51,13 @@ function callback(value, machineObj){
     return;
   }
 
-  let locationLog = LocationLogs.findOne({
-    machineId: machineObj.machineId,
-    type: "path",
-    createdAt: {
-      $lt: beforeTime
-    }
-  },{
-    sort: {
-      createdAt: -1
-    },
-    limit: 1
-  });
+  // Find the last locationLog
+  let locationLog = LocationLogs.getLastLog(machineObj.machineId, beforeTime);
 
-  if(locationLog === undefined) return;
+  // Not the kind we are looking for
+  if(locationLog === undefined || locationLog.type !== "path"){
+    return;
+  }
 
   let path = Map.getPath(locationLog.pathId);
   let length = path.length;
@@ -90,10 +86,11 @@ function callback(value, machineObj){
     progress = 0;
   }
 
-  let data = _.extend({}, _.pick(locationLog,"machineId", "type", "pointId", "pathId", "pathDirection", "nextEstimatedSpeed"), { createdAt: new Date(new Date()+10), pathProgress: progress});
+  let data = _.extend({},
+    _.pick(locationLog,"machineId", "type", "pointId", "pathId", "pathDirection", "nextEstimatedSpeed"),
+    { createdAt: nextMachineTimestamp(locationLog.machineId), pathProgress: progress});
 
-  data._id = LocationLogs.insert(data);
-  Machines.update(machineObj._id, { $set: { lastLocationLog: data } });
+  LocationLogs.safeInsert(locationLog.machineId, data);
 }
 AGVMachineHandler.registerEventHandler({
   event: "key:obstructed",
