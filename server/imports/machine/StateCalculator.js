@@ -34,6 +34,7 @@ function calculateLastInterruptedTime(locationLog, atTime){
         read.createdAt.getTime() <= atTime.getTime());
       readings.sort((rA, rB) => rB.createdAt.getTime() - rA.createdAt.getTime());
 
+      readingLog = readings[0];
     }else{
       readingLog = Readings[reading].findOne({
         machineId: locationLog.machineId,
