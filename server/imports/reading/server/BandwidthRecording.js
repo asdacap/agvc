@@ -27,11 +27,15 @@ AGVMachineHandler.registerEventHandler({
           console.warn("received data rate is NaN");
           receivedDataRate = 0;
         }
+        totalSentData = 0;
+        totalReceivedData = 0;
         Machines.setReading(machineId, 'sentDataRate', sentDataRate);
         Machines.setReading(machineId, 'receivedDataRate', receivedDataRate);
+      }else{
+        totalSentData = 0;
+        totalReceivedData = 0;
+        console.log("No measure");
       }
-      totalSentData = 0;
-      totalReceivedData = 0;
       startMeasurementAt = new Date().getTime();
     }, Settings.bandwidth_record_interval);
 
