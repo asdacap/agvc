@@ -11,6 +11,7 @@ Settings = {
   use_bigger_map: true,
   bandwidth_record_interval: 1000,
   master: true,
+  machine_interface_server: true,
   bypassCommandQueue: false,
   per_page_machine_count: 12,
   react_tracker_update_delay: 200,
@@ -21,6 +22,10 @@ Settings = {
 };
 
 Settings = _.extend(Settings, Meteor.settings);
+
+if(!Settings.machine_interface_server){
+  Settings.master = false;
+}
 
 if(process.env.TCP_LISTEN_PORT){
   Settings.tcp_listen_port = parseInt(process.env.TCP_LISTEN_PORT, 0);

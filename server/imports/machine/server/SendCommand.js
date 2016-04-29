@@ -9,7 +9,7 @@ Machines.sendCommand = function(machineId, command, droppable){
 
   let queue = CommandQueues.getForMachine(machineId, { _id: 1 });
 
-  if(Settings.bypassCommandQueue && Settings.master){
+  if(Settings.bypassCommandQueue && Settings.machine_interface_server){
     if(AGVMachineHandler.sendMessage(machineId, command)){
       return;
     }

@@ -11,12 +11,17 @@ import { startSerialListener } from '../arduino-configurator/server/SerialListen
 import { startOfflineSweeper } from '../machine-interface/server/AGVMachineHandler';
 import Settings from '../Settings';
 
-if(Settings.master){
+if(Settings.machine_interface_server){
   Meteor.startup(function(){
     startMachineTCPListener();
-    startSerialListener();
     startOfflineSweeper();
     startUDPListener();
     //startMachineWebSocketListener();
+  });
+}
+
+if(Settings.master){
+  Meteor.startup(function(){
+    startSerialListener();
   });
 }
