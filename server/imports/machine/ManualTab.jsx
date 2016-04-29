@@ -21,18 +21,17 @@ let styles = {
     marginTop: '100px',
     fontSize: '200%'
   },
-
   ContainerBox: {
     display: 'flex'
   },
   InnerBox: {
     position: 'absolute',
     left: '50%',
-    top: '50%',
-    marginTop: '-150px',
+    top: '1em',
+    marginTop: '0',
     marginLeft: '-150px',
     width: '300px',
-    height: '300px',
+    height: '400px',
     textAlign: 'center'
   },
   LeftBox: {
@@ -42,13 +41,21 @@ let styles = {
     flex: '1 0 auto',
     position: 'relative',
     width: '300px',
-    minHeight: '300px',
+    minHeight: '410px',
     backgroundColor: '#CCCCCC'
   },
 
   Buttons: {
+    TopGroup: {
+      marginTop: '1ex'
+    },
     ManualToggle: {
       marginTop: '1ex'
+    },
+    AnalogToggle: {
+      position: 'absolute',
+      top: '350px',
+      left: '100px',
     },
     Up: {
       position: 'absolute',
@@ -74,6 +81,11 @@ let styles = {
 };
 
 let AnalogCircle = React.createClass({
+  getInitialState(){
+    return {
+      beingPressed: false
+    }
+  },
   getCursorPosition(event) {
     let el = this.refs.svgEl;
     let rect = el.getBoundingClientRect();
@@ -81,15 +93,79 @@ let AnalogCircle = React.createClass({
     let y = event.clientY - rect.top;
     return { x, y };
   },
-  onMouseDownAndMove(e){
+  getTouchPosition(event){
+    let x = 0;
+    let y = 0;
+
+    let el = this.refs.svgEl;
+    let rect = el.getBoundingClientRect();
+    _.each(event.targetTouches,touch => {
+      x = x + touch.clientX - rect.left;
+      y = y + touch.clientY - rect.top;
+    });
+
+    x = x / event.targetTouches.length;
+    y = y / event.targetTouches.length;
+
+    return { x, y };
+  },
+  positionChanged(pos){
+    pos.x = pos.x - 150;
+    pos.y = pos.y - 150;
+    if(Math.sqrt(pos.x*pos.x + pos.y*pos.y) > 120){
+      let angle = Math.atan2(pos.y, pos.x);
+      pos.x = Math.cos(angle)*120;
+      pos.y = Math.sin(angle)*120;
+    }
+    pos.x = pos.x / 120;
+    pos.y = pos.y / 120;
+    this.props.setPos(pos);
+  },
+  onMouseMove(e){
+    if(this.state.beingPressed){
+      let pos = this.getCursorPosition(e);
+      this.positionChanged(pos);
+    }
+  },
+  onMouseDown(e){
     let pos = this.getCursorPosition(e);
-    console.log("button "+e.button);
-    console.log("mouse down "+pos.x+" "+pos.y);
+    this.setState({ beingPressed: true });
+    this.positionChanged(pos);
   },
   onMouseUp(e){
-    console.log("button "+e.button);
     let pos = this.getCursorPosition(e);
-    console.log("mouse up "+pos.x+" "+pos.y);
+    this.setState({ beingPressed: false });
+    this.positionChanged({ x: 150, y: 150 });
+  },
+  onTouchMove(e){
+    e.preventDefault();
+    if(this.state.beingPressed){
+      let pos = this.getTouchPosition(e);
+      this.positionChanged(pos);
+    }
+  },
+  onTouchStart(e){
+    e.preventDefault();
+    this.vibrate();
+    let pos = this.getTouchPosition(e);
+    this.setState({ beingPressed: true });
+    this.positionChanged(pos);
+  },
+  onTouchEnd(e){
+    e.preventDefault();
+    this.vibrate();
+    let pos = this.getTouchPosition(e);
+    this.setState({ beingPressed: false });
+    this.positionChanged({ x: 150, y: 150 });
+  },
+  vibrate(){
+    // enable vibration support
+    navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
+    if("vibrate" in navigator){
+      navigator.vibrate(50);
+    }
+    return false;
   },
   render(){
 
@@ -99,14 +175,22 @@ let AnalogCircle = React.createClass({
     centerX = centerX + 150;
     centerY = centerY + 150;
 
+    let centerFill = "#CCCCCC";
+    if(this.state.beingPressed){
+      centerFill = "#AAAAAA";
+    }
+
     return <svg width="300" height="300" ref="svgEl"
-        onMouseDown={this.onMouseDownAndMove}
-        onMouseMove={this.onMouseDownAndMove}
+        onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onTouchStart={this.onTouchStart}
+        onTouchMove={this.onTouchMove}
+        onTouchEnd={this.onTouchEnd}
         onMouseUp={this.onMouseUp}>
       <circle cx="150" cy="150" r="120"
         stroke="black"
         fill="#DDDDDD" />
-      <circle cx={centerX} cy={centerY} r="50" stroke="black" fill="#CCCCCC"/>
+      <circle cx={centerX} cy={centerY} r="50" stroke="black" fill={centerFill}/>
     </svg>;
   }
 });
@@ -168,8 +252,53 @@ export default ManualTab = React.createClass({
       Meteor.call('manualRight', this.props.machine.machineId);
     }, 500);
   },
+  calculateMotorValues(){
+    let baseSpeed = 150;
+
+    let forwardBack = baseSpeed;
+    forwardBack = forwardBack * -this.state.dirY;
+
+    let motorL = forwardBack;
+    let motorR = forwardBack;
+    motorL = motorL + this.state.dirX*baseSpeed;
+    motorR = motorR - this.state.dirX*baseSpeed;
+
+    motorL = Math.min(motorL, baseSpeed);
+    motorR = Math.min(motorR, baseSpeed);
+    motorL = Math.max(motorL, -baseSpeed);
+    motorR = Math.max(motorR, -baseSpeed);
+    motorL = Math.floor(motorL);
+    motorR = Math.floor(motorR);
+
+    return { motorL, motorR };
+  },
+  setPos(pos){
+    if(pos.x == 0 && pos.y == 0){
+      this.stop();
+      this.setState({ dirX: pos.x, dirY: pos.y });
+      return;
+    }
+
+    // Limit the call rate
+    if(this.lastCall !== undefined && new Date().getTime() - this.lastCall.getTime() < 50){
+      return;
+    }
+    this.lastCall = new Date();
+
+    if(this.commandHandle === undefined){
+      this.commandHandle = Meteor.setInterval(_ => {
+        Meteor.call('manualAnalog', this.props.machine.machineId, this.calculateMotorValues());
+      }, 500);
+    }
+
+    this.setState({ dirX: pos.x, dirY: pos.y }, _ => {
+      Meteor.call('manualAnalog', this.props.machine.machineId, this.calculateMotorValues());
+    });
+  },
   stop(e){
-    e.preventDefault();
+    if(e !== undefined){
+      e.preventDefault();
+    }
     if(this.commandHandle !== undefined){
       Meteor.clearInterval(this.commandHandle);
       this.commandHandle = undefined;
@@ -178,6 +307,7 @@ export default ManualTab = React.createClass({
   },
   getInitialState(){
     return {
+      analog: false,
       dirX: 0,
       dirY: 0
     }
@@ -205,6 +335,10 @@ export default ManualTab = React.createClass({
     this.stop(e);
     this.keyPressing = false;
   },
+  toggleAnalog(e){
+    e.preventDefault();
+    this.setState({ analog: !this.state.analog });
+  },
   componentDidMount(){
     document.addEventListener('keydown', this.handleKeyPress);
     document.addEventListener('keyup', this.handleKeyDepress);
@@ -224,40 +358,48 @@ export default ManualTab = React.createClass({
 
     let innerBox = null;
 
-    if(!this.props.machine.online && false){
+    if(!this.props.machine.online){
       innerBox = <div style={styles.InnerBox}>
         <div style={styles.OfflineNotice}>Machine is offline</div>
       </div>;
-    }else if(true){
-      innerBox = <div style={styles.InnerBox}>
-        <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
-        <AnalogCircle x={this.state.dirX} y={this.state.dirY}/>
-      </div>;
     }else if(manual){
-      innerBox = <div style={styles.InnerBox}>
-        <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual On' onTouchTap={this.exitManual} />
-        <VFloatingActionButton label='Up' style={styles.Buttons.Up}
-          onMouseDown={this.forward} onMouseUp={this.stop}
-          onTouchStart={this.forward} onTouchEnd={this.stop}>
-          <HardwareKeyboardArrowUp />
-        </VFloatingActionButton>
-        <VFloatingActionButton label='Down' style={styles.Buttons.Down}
-          onMouseDown={this.backward} onMouseUp={this.stop}
-          onTouchStart={this.backward} onTouchEnd={this.stop}>
-          <HardwareKeyboardArrowDown />
-        </VFloatingActionButton>
-        <VFloatingActionButton label='Right' style={styles.Buttons.Right}
-          onMouseDown={this.right} onMouseUp={this.stop}
-          onTouchStart={this.right} onTouchEnd={this.stop}>
-          <HardwareKeyboardArrowRight />
-        </VFloatingActionButton>
-        <VFloatingActionButton label='Left' style={styles.Buttons.Left}
-          onMouseDown={this.left} onMouseUp={this.stop}
-          onTouchStart={this.left} onTouchEnd={this.stop}>
-          <HardwareKeyboardArrowLeft />
-        </VFloatingActionButton>
-        <AnalogCircle />
-      </div>;
+      if(this.state.analog){
+        innerBox = <div style={styles.InnerBox}>
+          <div style={styles.Buttons.TopGroup}>
+            <VRaisedButton label='Manual On' onTouchTap={this.exitManual} />
+            <VRaisedButton label='Analog On' onTouchTap={this.toggleAnalog} />
+          </div>
+          <AnalogCircle x={this.state.dirX} y={this.state.dirY} setPos={this.setPos}/>
+        </div>;
+      }else{
+        innerBox = <div style={styles.InnerBox}>
+          <div style={styles.Buttons.TopGroup}>
+            <VRaisedButton label='Manual On' onTouchTap={this.exitManual} />
+            <VRaisedButton label='Analog Off' onTouchTap={this.toggleAnalog} />
+          </div>
+
+          <VFloatingActionButton label='Up' style={styles.Buttons.Up}
+            onMouseDown={this.forward} onMouseUp={this.stop}
+            onTouchStart={this.forward} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowUp />
+          </VFloatingActionButton>
+          <VFloatingActionButton label='Down' style={styles.Buttons.Down}
+            onMouseDown={this.backward} onMouseUp={this.stop}
+            onTouchStart={this.backward} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowDown />
+          </VFloatingActionButton>
+          <VFloatingActionButton label='Right' style={styles.Buttons.Right}
+            onMouseDown={this.right} onMouseUp={this.stop}
+            onTouchStart={this.right} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowRight />
+          </VFloatingActionButton>
+          <VFloatingActionButton label='Left' style={styles.Buttons.Left}
+            onMouseDown={this.left} onMouseUp={this.stop}
+            onTouchStart={this.left} onTouchEnd={this.stop}>
+            <HardwareKeyboardArrowLeft />
+          </VFloatingActionButton>
+        </div>;
+      }
     }else{
       innerBox = <div style={styles.InnerBox}>
         <VRaisedButton style={styles.Buttons.ManualToggle} label='Manual Off' onTouchTap={_ => Meteor.call('enterManualMode', machineId)} />

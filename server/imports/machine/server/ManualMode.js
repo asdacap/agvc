@@ -21,5 +21,9 @@ Meteor.methods({
   },
   manualStop(machineId){
     Machines.sendCommand(machineId, "manualStop");
+  },
+  manualAnalog(machineId, motorValue){
+    Machines.sendCommand(machineId, "manualMotorL:"+motorValue.motorL);
+    Machines.sendCommand(machineId, "manualMotorR:"+motorValue.motorR);
   }
 });

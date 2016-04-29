@@ -8,7 +8,8 @@
 namespace ManualMode{
   bool manualMode = false;
   long lastMoveCommand = 0;
-  int direction = 0;
+  int motorL = 0;
+  int motorR = 0;
 
   void sendManualModeStatus(){
     if(manualMode){
@@ -19,40 +20,57 @@ namespace ManualMode{
   }
 
   void enterManual(){
-    direction = 0;
+    motorL = 0;
+    motorR = 0;
     manualMode = true;
     sendManualModeStatus();
   }
 
   void exitManual(){
-    direction = 0;
+    motorL = 0;
+    motorR = 0;
     manualMode = false;
     sendManualModeStatus();
   }
 
   void forward(){
     lastMoveCommand = millis();
-    direction = 1;
+    motorL = 150;
+    motorR = 150;
   }
 
   void backward(){
     lastMoveCommand = millis();
-    direction = 2;
+    motorL = -150;
+    motorR = -150;
   }
 
   void left(){
     lastMoveCommand = millis();
-    direction = 3;
+    motorL = -150;
+    motorR = +150;
   }
 
   void right(){
     lastMoveCommand = millis();
-    direction = 4;
+    motorL = +150;
+    motorR = -150;
+  }
+
+  void manualLeft(int leftValue){
+    lastMoveCommand = millis();
+    motorL = leftValue;
+  }
+
+  void manualRight(int rightValue){
+    lastMoveCommand = millis();
+    motorR = rightValue;
   }
 
   void stop(){
     lastMoveCommand = millis();
-    direction = 0;
+    motorL = 0;
+    motorR = 0;
   }
 
   RateLimiter logger(1000);
@@ -61,24 +79,17 @@ namespace ManualMode{
 
     if(logger.isItOK()){
       Serial.print("Direction is ");
-      Serial.println(direction);
+      Serial.print(motorL);
+      Serial.print(":");
+      Serial.println(motorR);
     }
     // Stop it if no command in 1 second
     if(millis() - lastMoveCommand > 1000){
-      direction = 0;
+      motorL = 0;
+      motorR = 0;
     }
 
-    if(direction == 0){
-      MotorControl::SmarterForward(0,0);
-    }else if(direction == 1){
-      MotorControl::SmarterForward(150,150);
-    }else if(direction == 2){
-      MotorControl::SmarterForward(-150,-150);
-    }else if(direction == 3){
-      MotorControl::SmarterForward(-150,150);
-    }else if(direction == 4){
-      MotorControl::SmarterForward(150,-150);
-    }
+    MotorControl::SmarterForward(motorL,motorR);
   }
 
   void onConnect(){
@@ -108,6 +119,12 @@ namespace ManualMode{
         return true;
       }else if(command == F("manualBackward")){
         backward();
+        return true;
+      }else if(command.startsWith(F("manualMotorL:"))){
+        manualLeft(command.substring(13).toInt());
+        return true;
+      }else if(command.startsWith(F("manualMotorR:"))){
+        manualRight(command.substring(13).toInt());
         return true;
       }else if(command == F("manualStop")){
         stop();
