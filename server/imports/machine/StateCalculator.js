@@ -211,6 +211,19 @@ export default StateCalculator = {
     ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
     return ready;
   },
+  rollingSubscribe(machineId, atTime, subscribedAt){
+    atTime = new Date(atTime.getTime());
+
+    // Subscribe to the data required to calculate the machine state at the time
+    let ready = true;
+    if(!Meteor.subscribe("LocationLogs.rolling", machineId, atTime, subscribedAt).ready()){
+      ready = false;
+    }
+    if(!Meteor.subscribe("Readings.rolling", machineId, atTime, subscribedAt).ready()){
+      ready = false;
+    }
+    return ready;
+  },
   calculate(machineId, atTime, options){
 
     if(options === undefined){

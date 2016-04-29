@@ -183,7 +183,23 @@ export default MachineStatusTab = React.createClass({
         this.props.machine,
         _.extend({}, LiveStateCalculator.defaultCalculateStateOptions, { position: false }));
     }else{
-      machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+
+      let atTime = ViewTime.time;
+      if(ViewTime.playing){
+        // We will use rolling subscription
+        if(!this.rollingFrom){
+          this.rollingFrom = atTime;
+          this.subscribedAt = new Date();
+        }
+        ready = StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+      }else{
+        if(this.rollingFrom){
+          this.rollingFrom = undefined;
+          this.subscribedAt = undefined;
+        }
+        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+      }
+
       machineState = StateCalculator.calculate(
         this.props.machine.machineId,
         ViewTime.time,

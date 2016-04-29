@@ -3,7 +3,7 @@ import Machines from '../machine/Machines';
 import nextMachineTimestamp from '../machine/nextMachineTimestamp';
 import { calculateEstimatedSpeed } from '../machine/SpeedCalculator';
 
-export default LocationLogs = new Mongo.Collection("locations");
+export default LocationLogs = new Mongo.Collection("LocationLogs");
 LocationLogs.attachBehaviour('timestampable');
 
 var LocationLogSchema = {
@@ -95,6 +95,7 @@ LocationLogs.safeInsert = function(machineId, log){
 
 if(Meteor.isServer){
   Meteor.publish("LocationLogs.last", function(machineId, atTime, limit){
+    console.log("last subscribed");
     if(machineId === undefined || atTime === undefined){
       console.log("Location logs missing parameters");
       return null;
@@ -116,6 +117,63 @@ if(Meteor.isServer){
       machineId: machineId,
       createdAt: { $gte: startTime, $lte: endTime }
     });
+  });
+
+  // Rolling subscription will send reading starting from the startTime
+  // and periodically send more reading. Used for state calculator to prevent
+  // resubscribe
+  Meteor.publish("LocationLogs.rolling", function(machineId, startTime, subbedAt){
+    let subStartTime = new Date();
+    let duration = 3000;
+    let buffer = lastLog;
+
+    let results = [];
+    let intervalHandle = undefined;
+    let runNext = _ => {
+      let diff = new Date().getTime() - subStartTime.getTime();
+      let newStart = new Date(startTime.getTime()+diff);
+      let newEnd = new Date(newStart.getTime()+duration);
+
+      // Remove old data
+      while(results.length > 1 && results[0].createdAt.getTime()+buffer < newStart.getTime()){
+        this.removed("LocationLogs", results[0]._id);
+        results.shift();
+      }
+
+      // Add new one
+      let _results =  LocationLogs.find({
+        machineId: machineId,
+        createdAt: { $gte: newStart, $lte: newEnd }
+      }, { reactive: false }).fetch();
+
+      _results.forEach(result => {
+        results.push(result);
+        this.added("LocationLogs", result._id, result);
+      });
+    };
+
+    this.onStop(_ => {
+      Meteor.clearInterval(intervalHandle);
+    });
+
+    let lastLog = LocationLogs.getLastLog(machineId, startTime);
+    if(lastLog !== undefined){
+      results.push(lastLog);
+      this.added("LocationLogs", lastLog._id, lastLog);
+    }
+
+    LocationLogs.find({
+      machineId: machineId,
+      createdAt: { $gte: startTime, $lte: new Date(startTime.getTime() + duration) }
+    }).fetch().forEach(result => {
+      results.push(result);
+      this.added("LocationLogs", result._id, result);
+    });
+
+    this.ready();
+
+    // Start loop
+    intervalHandle = Meteor.setInterval(runNext, duration);
   });
 }
 

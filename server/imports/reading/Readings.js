@@ -201,6 +201,80 @@ if(Meteor.isServer){
       });
     }
   });
+
+  // Rolling subscription will send reading starting from the startTime
+  // and periodically send more reading. Used for state calculator to prevent
+  // resubscribe
+  Meteor.publish("Readings.rolling", function(machineId, startTime, subbedAt, reading){
+    let readings = Readings.availableReadings;
+    if(reading !== undefined && reading !== null) readings = [reading];
+
+    let subStartTime = new Date();
+    let duration = 3000;
+    let buffer = duration;
+
+    let resultMap = {};
+    readings.forEach(reading => {
+      resultMap[reading] = [];
+    });
+
+    let intervalHandle = undefined;
+    let runNext = _ => {
+      let diff = new Date().getTime() - subStartTime.getTime();
+      let newStart = new Date(startTime.getTime()+diff);
+      let newEnd = new Date(newStart.getTime()+duration);
+
+      readings.forEach(reading => {
+        // Remove old data
+        while(resultMap[reading].length > 1 && resultMap[reading][0].createdAt.getTime()+buffer < newStart.getTime()){
+          this.removed(reading+"Readings", resultMap[reading][0]._id);
+          resultMap[reading].shift();
+        }
+
+        // Add new one
+        let results = Readings[reading].find({
+          machineId: machineId,
+          createdAt: { $gte: newStart, $lte: newEnd }
+        }, { reactive: false }).fetch();
+
+        results.forEach(result => {
+          resultMap[reading].push(result);
+          this.added(reading+"Readings", result._id, result);
+        });
+
+      });
+
+      lastEnd = newEnd;
+    };
+
+    this.onStop(_ => {
+      Meteor.clearInterval(intervalHandle);
+    });
+
+    // Send initial query result
+    readings.forEach(reading => {
+      let last = Readings.getLastReadingLog(reading, machineId, startTime);
+      if(last !== undefined){
+        resultMap[reading].push(last);
+        this.added(reading+"Readings", last._id, last);
+      }
+
+      let results = Readings[reading].find({
+        machineId: machineId,
+        createdAt: { $gte: startTime, $lte: new Date(startTime.getTime() + duration) }
+      }, { reactive: false }).fetch();
+
+      results.forEach(result => {
+        resultMap[reading].push(result);
+        this.added(reading+"Readings", result._id, result);
+      });
+    });
+
+    this.ready();
+
+    // Start loop
+    intervalHandle = Meteor.setInterval(runNext, duration);
+  });
 }
 
 //// Attaching additional schemas to machine

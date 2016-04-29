@@ -233,7 +233,21 @@ export default MachineView = React.createClass({
     if(ViewTime.mode == "live"){
       this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
     }else{
-      ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+
+      if(ViewTime.playing){
+        // We will use rolling subscription
+        if(!this.rollingFrom){
+          this.rollingFrom = atTime;
+          this.subscribedAt = new Date();
+        }
+        ready = StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+      }else{
+        if(this.rollingFrom){
+          this.rollingFrom = undefined;
+          this.subscribedAt = undefined;
+        }
+        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+      }
 
       if(ready){
         this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
