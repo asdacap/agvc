@@ -113,27 +113,32 @@ if(Meteor.isServer){
 }
 
 _.extend(Machines, {
-  markOnline(query){
-    this.update(query, {
+  markOnline(machineId){
+    this.update({ machineId }, {
       $set: {
         online: true,
         onlineOnServer: process.pid,
         onlineAt: new Date()
       }
     });
-    Machines.find(query).fetch().forEach(machine => {
+    Machines.find({ machineId }).fetch().forEach(machine => {
       Machines.setReading(machine.machineId, "online", true);
     });
   },
-  markOffline(query){
-    this.update(query, {
+  markOffline(machineId, force){
+    let machine = Machines.findOne({ machineId });
+    if(machine.onlineOnServer != process.pid && !force){
+      // Outside our jurisdiction....
+      return;
+    }
+    this.update({ machineId }, {
       $set: {
         online: false,
         onlineOnServer: process.pid,
         onlineAt: new Date()
       }
     });
-    Machines.find(query).fetch().forEach(machine => {
+    Machines.find({ machineId }).fetch().forEach(machine => {
       Machines.setReading(machine.machineId, "online", false);
     });
   },

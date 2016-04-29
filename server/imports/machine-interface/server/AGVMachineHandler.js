@@ -110,6 +110,12 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   }
 
   registerMachineId(machineId){
+    this.machineObj = Machines.findOne({ machineId: machineId });
+    if(this.machineObj === undefined){
+      console.warn("Failed to find machine with id "+machineId);
+      return;
+    }
+
     if(machinesConnection[machineId] !== undefined){
       if(machinesConnection[machineId] === this){
         // Already registered. Don't register again
@@ -119,17 +125,27 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       machinesConnection[machineId].close();
     }
 
-    this.machineObj = Machines.findOne({ machineId: machineId });
-    if(this.machineObj === undefined){
-      console.warn("Failed to find machine with id "+machineId);
-      return;
-    }
-
     console.log("Registering connection for machine "+machineId);
     machinesConnection[machineId] = this;
 
-    this.startCommandQueueObservation();
+    Machines.markOnline(machineId);
     this.emit('register', this.machineObj.machineId, this);
+    this.startCommandQueueObservation();
+    this.startHostileTakeoverObservation();
+  }
+
+  // Here, it listen if the current onlineOnServer changed to other
+  // process.id, which means a new connection happened on another server
+  // We should close this connection then.
+  startHostileTakeoverObservation(){
+    this.machineObserver = Machines.find(this.machineObj._id).observe({
+      changed: (newDocument, oldDocument) => {
+        if(newDocument.onlineOnServer != process.pid){
+          console.warn("Some other process took control of "+this.machineObj.machineId+"'s connection...");
+          this.close();
+        }
+      }
+    });
   }
 
   // This is where it listen to new command from the machine commandQueue
@@ -168,6 +184,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
   close(){
     if(this.closed) return;
     this.driver.close();
+    this.onClose(); // Just to be sure
   }
 
   onClose(){
@@ -178,8 +195,12 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
       if(this.queueHandler !== undefined){
         this.queueHandler.stop();
       }
+      if(this.machineObserver !== undefined){
+        this.machineObserver.stop();
+      }
       machinesConnection[this.machineObj.machineId] = undefined;
       this.emit("unregister", this.machineObj.machineId, this);
+      Machines.markOffline(this.machineObj.machineId);
       this.machineObj = undefined;
     }
     this.emit("disconnect");
@@ -206,12 +227,15 @@ let startOfflineSweeper = function(){
     // Also cleanup machine whose pid is not running.
     // This assume the server cluster is on the same server.
     Machines.find({ online: true }).fetch().forEach(function(machine){
-      if(!running(machine.onlineOnServer)){
-        console.log("Cleanup not running pid "+machine.machineId);
-        Machines.markOffline(machine._id);
+      if(machine.onlineOnServer != process.pid && Settings.cleanup_other_offline_connection){
+        // It must update it at least for the ping.
+        if(new Date() - machine.updatedAt.getTime() > 10000){
+          console.log("Cleanup not running connection "+machine.machineId);
+          Machines.markOffline(machine.machineId, true);
+        }
       }else if(process.pid == machine.onlineOnServer && machinesConnection[machine.machineId] === undefined){
         console.log("Cleanup machinesConnection "+machine.machineId);
-        Machines.markOffline(machine._id);
+        Machines.markOffline(machine.machineId);
       }
     });
   }, 5000);

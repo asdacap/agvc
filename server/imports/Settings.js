@@ -18,6 +18,7 @@ Settings = {
   disable_client_machine_response_time: true,
   show_client_response_time: true,
   show_average_readings: true,
+  cleanup_other_offline_connection: true,
   machine_view_render_timeout: 33
 };
 
