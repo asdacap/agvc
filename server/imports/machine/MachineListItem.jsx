@@ -66,9 +66,27 @@ export default MachineListItem = React.createClass({
         machine = Machines.findOne({ machineId: this.props.machine.machineId });
         state = LiveStateCalculator.calculate(this.props.machine.machineId, machine, opts);
       }else{
-        StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+
+        let atTime = ViewTime.time;
+        if(ViewTime.playing){
+          // We will use rolling subscription
+          if(!this.rollingFrom){
+            this.rollingFrom = atTime;
+            this.subscribedAt = new Date();
+          }
+          StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+        }else{
+          if(this.rollingFrom){
+            this.rollingFrom = undefined;
+            this.subscribedAt = undefined;
+          }
+          StateCalculator.subscribe(this.props.machine.machineId, atTime);
+        }
+
         state = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts);
       }
+
+
     }, Settings.react_tracker_update_delay);
 
     return {
