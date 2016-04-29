@@ -145,6 +145,8 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   sendMessage(message){
     this.driver.sendMessage(message);
+    //console.log("send data "+command.command);
+    this.emit("commandSent", message, this.machineObj.machineId, this);
   }
 
   // Listen to new command from the commandQueue on the machine object
@@ -159,9 +161,7 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
         console.log("Droppable command "+command.command+" dropped");
         return;
       }
-      //console.log("send data "+command.command);
       self.sendMessage(command.command);
-      self.emit("commandSent", command.command, self.machineObj.machineId, this);
     });
   }
 
