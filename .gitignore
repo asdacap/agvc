@@ -1,1 +1,4 @@
 node_modules
+server/server/kadira.js
+configurations/bundle
+simulator/out.log

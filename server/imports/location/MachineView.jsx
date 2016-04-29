@@ -1,6 +1,10 @@
 import React from 'react';
 import StateCalculator from '../machine/StateCalculator';
+import LiveStateCalculator from '../machine/LiveStateCalculator';
 import NoRerenderContainer from '../components/NoRerenderContainer';
+import ViewTime from '../client/ViewTime';
+import Settings from '../Settings';
+import { FasterViewTime } from '../client/ViewTime';
 
 let styles = {
   container: {
@@ -68,47 +72,78 @@ let icons = {
 
 let RobotDrawing = React.createClass({
   render(){
+    let extraIcon = null; // Nothing
 
-    let robotStyle = _.extend({}, styles.AGVStyle);
-    if(this.props.fill !== undefined){
-      robotStyle.fill = this.props.fill;
+    if(this.props.status != "normal"){
+      let icon = null;
+      if(this.props.status == "offline"){
+        icon = icons.offline;
+      }else if(this.props.status == "outOfCircuit"){
+        icon = icons.outOfCircuit;
+      }else if(this.props.status == "obstructed"){
+        icon = icons.obstructed;
+      }else if(this.props.status == "manualMode"){
+        icon = icons.manualMode;
+      }
+
+      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.status]}>
+        {icon}
+      </g>;
     }
 
-    return <g>
-      <rect
-        style={ robotStyle }
-        id="rect4181"
-        width="12.678572"
-        height="23.035715"
-        x="21.964285"
-        y="-11.477083" />
-      <circle
-        style={ robotStyle }
-        id="path4138"
-        cx="-11.492928"
-        cy="25"
-        r="10" />
-      <circle
-        style={ robotStyle }
-        id="path4138-9"
-        cx="11.964286"
-        cy="25"
-        r="10" />
-      <rect
-        style={ robotStyle }
-        id="rect3336"
-        width="50"
-        height="50"
-        x="-25"
-        y="-25" />
-      <path
-        style={ robotStyle }
-        d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
-        id="path4138-9-2" />
-    </g>; // Something
+    let robotFill = styles.AGVStyle.fill;
+    let blinkingColor = styles.BlinkingColor[this.props.status];
+    if(blinkingColor !== undefined){
+      if(this.props.blinkShow){
+        robotFill = blinkingColor;
+      }
+    }
 
+    let robotStyle = _.extend({}, styles.AGVStyle);
+    robotStyle.fill = robotFill;
+
+    return <g>
+
+      <g>
+        <rect
+          style={ robotStyle }
+          id="rect4181"
+          width="12.678572"
+          height="23.035715"
+          x="21.964285"
+          y="-11.477083" />
+        <circle
+          style={ robotStyle }
+          id="path4138"
+          cx="-11.492928"
+          cy="25"
+          r="10" />
+        <circle
+          style={ robotStyle }
+          id="path4138-9"
+          cx="11.964286"
+          cy="25"
+          r="10" />
+        <rect
+          style={ robotStyle }
+          id="rect3336"
+          width="50"
+          height="50"
+          x="-25"
+          y="-25" />
+        <path
+          style={ robotStyle }
+          d="m 30.223216,-16.730847 c 8.942189,0 16.191265,7.4289614 16.191265,16.59304994 0,9.16408816 -7.249076,16.59305006 -16.191265,16.59305006 z"
+          id="path4138-9-2" />
+      </g>
+
+      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.status]} textAnchor="middle">{this.props.machine.machineId}</text>
+      {extraIcon}
+    </g>; // Something
   }
 });
+
+RobotDrawing = NoRerenderContainer(RobotDrawing, false, [], ["status", "blinkShow"]);
 
 let MachineViewAnimator = React.createClass({
   propTypes: {
@@ -143,14 +178,7 @@ let MachineViewAnimator = React.createClass({
 
     if(this.oldPosition !== undefined){
       let elapsed = new Date().getTime() - this.updatedAt.getTime();
-      let duration = 200.0;
-      if(this.previousUpdateAt !== undefined){
-        // Smoother duration
-        duration = this.updatedAt.getTime() - this.previousUpdateAt.getTime();
-        if(duration > 500){
-          duration = 500;
-        }
-      }
+      let duration = Settings.machineview_update_interval;
       let progress = elapsed/duration;
       if(progress > 1) progress = 1;
       let newX = this.oldPosition.x + (this.props.machineState.position.x - this.oldPosition.x)*progress;
@@ -167,59 +195,31 @@ let MachineViewAnimator = React.createClass({
   },
   componentWillReceiveProps(){
     this.oldPosition = this.calculatePosition();
-    this.previousUpdateAt = this.updatedAt;
     this.updatedAt = new Date();
   },
   render(){
 
     let position = this.calculatePosition();
-    let extraIcon = null; // Nothing
-
-    if(this.props.machineState.status != "normal"){
-      let icon = null;
-      if(this.props.machineState.status == "offline"){
-        icon = icons.offline;
-      }else if(this.props.machineState.status == "outOfCircuit"){
-        icon = icons.outOfCircuit;
-      }else if(this.props.machineState.status == "obstructed"){
-        icon = icons.obstructed;
-      }else if(this.props.machineState.status == "manualMode"){
-        icon = icons.manualMode;
-      }
-
-      extraIcon = <g transform="scale(2,2),translate(-10,-40)" style={styles.StatusIcon[this.props.machineState.status]}>
-        {icon}
-      </g>;
-    }
-
-    let robotFill = undefined;
-    let blinkingColor = styles.BlinkingColor[this.props.machineState.status];
-    if(blinkingColor !== undefined){
-      if(Math.floor(new Date().getTime()/1000)%2){
-        robotFill = blinkingColor;
-      }
-    }
+    let blinkShow = Math.floor(new Date().getTime()/1000)%2;
 
     return <g style={styles.container}
       ref="container"
       transform={ "translate("+position.x+","+position.y+"), scale("+this.props.scale+","+this.props.scale+")" }>
-      <NoRerenderContainer fill={robotFill}>
-        <RobotDrawing/>
-      </NoRerenderContainer>
-
-      <text fontFamily="Arial" fontSize="30" y="65" style={styles.MachineName[this.props.machineState.status]} textAnchor="middle">{this.props.machine.machineId}</text>
-      {extraIcon}
+      <RobotDrawing blinkShow={blinkShow}
+        status={this.props.machineState.status}
+        machine={this.props.machine} />
     </g>; // Something
 
   }
 });
 
+let fasterRefresh = new FasterViewTime(Settings.machineview_update_interval);
+
 export default MachineView = React.createClass({
   mixins: [ReactMeteorData],
   propTypes: {
     machine: React.PropTypes.object.isRequired,
-    scale: React.PropTypes.number,
-    atTime: React.PropTypes.any.isRequired // Actually date. But can't seems to find react type for it
+    scale: React.PropTypes.number
   },
   getDefaultProps(){
     return {
@@ -227,10 +227,31 @@ export default MachineView = React.createClass({
     };
   },
   getMeteorData(){
-    let ready = StateCalculator.subscribe(this.props.machine.machineId, this.props.atTime);
+    let ready = false;
 
-    if(ready){
-      this.machineState = StateCalculator.calculate(this.props.machine.machineId, this.props.atTime);
+    let atTime = fasterRefresh.time;
+    if(ViewTime.mode == "live"){
+      this.machineState = LiveStateCalculator.calculate(this.props.machine.machineId, undefined, { status: true, position: true });
+    }else{
+
+      if(ViewTime.playing){
+        // We will use rolling subscription
+        if(!this.rollingFrom){
+          this.rollingFrom = atTime;
+          this.subscribedAt = new Date();
+        }
+        ready = StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+      }else{
+        if(this.rollingFrom){
+          this.rollingFrom = undefined;
+          this.subscribedAt = undefined;
+        }
+        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+      }
+
+      if(ready){
+        this.machineState = StateCalculator.calculate(this.props.machine.machineId, atTime, { status: true, position: true });
+      }
     }
 
     return {
@@ -238,14 +259,18 @@ export default MachineView = React.createClass({
       state: this.machineState
     }
   },
+  openMachinePage(e){
+    e.preventDefault();
+    FlowRouter.go('machine', {machineId: this.props.machine.machineId});
+  },
   render(){
 
     if(this.machineState === undefined || this.machineState.position === undefined){
       return <g></g>; // Nothing
     }else{
-      return <MachineViewAnimator machine={this.props.machine}
+      return <g onTouchTap={this.openMachinePage} style={{ cursor: "pointer" }}><MachineViewAnimator machine={this.props.machine}
               machineState={this.data.state}
-              scale={this.props.scale} />
+              scale={this.props.scale} /></g>;
     }
   }
 });

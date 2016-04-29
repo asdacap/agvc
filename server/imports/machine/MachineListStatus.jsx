@@ -3,6 +3,7 @@ import ContentAdd from 'material-ui/lib/svg-icons/content/add';
 import { CreateMachineForm } from './MachineForm';
 import MachineListItem from './MachineListItem';
 import Machines from './Machines';
+import Settings from '../Settings';
 
 import {
   Dialog,
@@ -45,7 +46,13 @@ export default MachineListStatus = React.createClass({
   getMeteorData(){
     var handle = Meteor.subscribe("Machines");
     return {
-      machines: Machines.find({}).fetch(),
+      ready: handle.ready(),
+      machines: Machines.find({}, {
+        skip: this.props.page*Settings.per_page_machine_count,
+        limit: Settings.per_page_machine_count,
+        reactive: false
+      }).fetch(),
+      count: Machines.find({}).count(),
       openForm: this.state.openForm.get()
     }
   },
@@ -56,9 +63,21 @@ export default MachineListStatus = React.createClass({
     FlowRouter.go("dashboardChart")
   },
   render(){
+
+    let pages = [];
+    for(let i = 0;i*Settings.per_page_machine_count<this.data.count;i++){
+      pages.push(i);
+    }
+
     return <div className="machine-lists">
       <div style={styles.MachineListPanel}>
-        <RaisedButton label="Reading Charts" onTouchTap={this.goToCharts}/>
+        <RaisedButton label="Reading Charts" style={{ marginRight: "1ex" }} onTouchTap={this.goToCharts}/>
+        {pages.map(page_num => {
+          return <RaisedButton label={"Page "+(page_num+1)}
+            disabled={this.props.page == page_num}
+            key={page_num}
+            onTouchTap={_ => FlowRouter.go("dashboard", {}, {page: page_num}) }/>
+        })}
       </div>
       <div style={styles.MachineListBox}>
         <div className="machines row">
@@ -68,7 +87,7 @@ export default MachineListStatus = React.createClass({
             </div>;
           }) }
         </div>
-        <FloatingActionButton onClick={this.toggleForm} style={styles.AddMachineFloatingButton}>
+        <FloatingActionButton onTouchTap={this.toggleForm} style={styles.AddMachineFloatingButton}>
           <ContentAdd />
         </FloatingActionButton>
       </div>

@@ -2,26 +2,10 @@
 var Machines = new Mongo.Collection("machines");
 Machines.attachBehaviour("timestampable");
 
-var MachineCommandSchema = new SimpleSchema({
-  command: {
-    type: String,
-    optional: false
-  },
-  droppable: {
-    type: Boolean,
-    optional: true
-  },
-  createdAt: {
-    type: Date,
-    optional: false
-  }
-});
-
 var MachineSchema = {
   machineId: {
     type: String,
     optional: false,
-    index: true,
     unique: true
   },
   online: {
@@ -44,7 +28,12 @@ var MachineSchema = {
     type: Number,
     optional: false
   },
-  motorPIDMultiplier: {
+  motorPIDMultiplierRatio: {
+    type: Number,
+    decimal: true,
+    optional: false
+  },
+  motorVoltageCompensation: {
     type: Number,
     optional: false
   },
@@ -67,8 +56,10 @@ var MachineSchema = {
     decimal: true,
     optional: false
   },
-  commandQueue: {
-    type: [MachineCommandSchema]
+  lastLocationLog: {
+    type: Object,
+    blackbox: true,
+    optional: true
   }
 };
 
@@ -76,9 +67,9 @@ var MachineSchema = new SimpleSchema(MachineSchema);
 Machines.attachSchema(MachineSchema);
 
 Machines.defaultValue = {
-  commandQueue: [],
   motorBaseSpeed: 200,
-  motorPIDMultiplier: 80,
+  motorPIDMultiplierRatio: 0.3,
+  motorVoltageCompensation: 30,
   motorDiffRange: 200,
   motorLROffset: 0,
   PID_Kp: 0.95,
@@ -89,10 +80,14 @@ Machines.defaultValue = {
   onlineAt: new Date(0)
 }
 
+Machines.addMachine = function(props){
+  _.extend(props, Machines.defaultValue);
+  Machines.insert(props);
+}
+
 Meteor.methods({
   addMachine(props){
-    _.extend(props, Machines.defaultValue);
-    Machines.insert(props);
+    Machines.addMachine(props);
   },
   deleteMachine(machineId){
     Machines.remove({machineId: machineId});
@@ -112,6 +107,9 @@ if(Meteor.isServer){
   Meteor.publish("Machine", function(machineId){
     return Machines.find({ machineId });
   });
+
+  Machines.rawCollection().ensureIndex({ machineId: 1, online: 1 }, {}, _ => _);
+  Machines.rawCollection().ensureIndex({ online: 1 }, {}, _ => _);
 }
 
 _.extend(Machines, {
@@ -139,18 +137,6 @@ _.extend(Machines, {
       Machines.setReading(machine.machineId, "online", false);
     });
   },
-  sendCommand(machineId, command, droppable){
-    if(droppable === undefined){
-      droppable = false;
-    }
-    var machine = Machines.findOne({machineId: machineId});
-
-    Machines.update(machine._id, { $push: { commandQueue: {
-      command: command,
-      droppable: droppable,
-      createdAt: new Date()
-    } } } );
-  }
 });
 
 export default Machines;

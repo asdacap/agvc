@@ -42,6 +42,9 @@ if(Meteor.isServer){
   Meteor.publish("MessageLogs.forMachine", function(machineId, limit){
     return MessageLogs.find({ fromMachineId: machineId }, { limit, sort: { createdAt: -1 } });
   });
+
+  MessageLogs.rawCollection().ensureIndex({ machineId: 1, createdAt: -1 }, {}, _ => _);
+  MessageLogs.rawCollection().ensureIndex({ createdAt: -1 }, {}, _ => _);
 }
 
 export default MessageLogs;

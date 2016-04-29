@@ -1,6 +1,7 @@
 // This file needs to be loaded first
 
 import Machines from '../machine/Machines';
+import nextMachineTimestamp from '../machine/nextMachineTimestamp';
 import d3 from 'd3';
 
 export default Readings = {};
@@ -87,6 +88,7 @@ Readings.meta = {
   loopInterval: {
     title: "Loop Interval",
     defaultValue: 0,
+    badHigh: 50,
     unit: "ms",
     type: Number
   },
@@ -199,11 +201,93 @@ if(Meteor.isServer){
       });
     }
   });
+
+  // Rolling subscription will send reading starting from the startTime
+  // and periodically send more reading. Used for state calculator to prevent
+  // resubscribe
+  Meteor.publish("Readings.rolling", function(machineId, startTime, subbedAt, reading){
+    let readings = Readings.availableReadings;
+    if(reading !== undefined && reading !== null) readings = [reading];
+
+    let subStartTime = new Date();
+    let duration = 3000;
+    let buffer = duration;
+
+    let resultMap = {};
+    readings.forEach(reading => {
+      resultMap[reading] = [];
+    });
+
+    let intervalHandle = undefined;
+    let runNext = _ => {
+      let diff = new Date().getTime() - subStartTime.getTime();
+      let newStart = new Date(startTime.getTime()+diff);
+      let newEnd = new Date(newStart.getTime()+duration);
+
+      readings.forEach(reading => {
+        // Remove old data
+        while(resultMap[reading].length > 1 && resultMap[reading][0].createdAt.getTime()+buffer < newStart.getTime()){
+          this.removed(reading+"Readings", resultMap[reading][0]._id);
+          resultMap[reading].shift();
+        }
+
+        // Add new one
+        let results = Readings[reading].find({
+          machineId: machineId,
+          createdAt: { $gte: newStart, $lte: newEnd }
+        }, { reactive: false }).fetch();
+
+        results.forEach(result => {
+          resultMap[reading].push(result);
+          this.added(reading+"Readings", result._id, result);
+        });
+
+      });
+
+      lastEnd = newEnd;
+    };
+
+    this.onStop(_ => {
+      Meteor.clearInterval(intervalHandle);
+    });
+
+    // Send initial query result
+    readings.forEach(reading => {
+      let last = Readings.getLastReadingLog(reading, machineId, startTime);
+      if(last !== undefined){
+        resultMap[reading].push(last);
+        this.added(reading+"Readings", last._id, last);
+      }
+
+      let results = Readings[reading].find({
+        machineId: machineId,
+        createdAt: { $gte: startTime, $lte: new Date(startTime.getTime() + duration) }
+      }, { reactive: false }).fetch();
+
+      results.forEach(result => {
+        resultMap[reading].push(result);
+        this.added(reading+"Readings", result._id, result);
+      });
+    });
+
+    this.ready();
+
+    // Start loop
+    intervalHandle = Meteor.setInterval(runNext, duration);
+  });
 }
 
 //// Attaching additional schemas to machine
 var MachineSchema = {}
 Readings.availableReadings.forEach(function(reading){
+  MachineSchema[reading+"UpdatedAt"] = {
+    type: Date,
+    optional: true
+  };
+  MachineSchema[reading+"StartUpdatedAt"] = {
+    type: Date,
+    optional: true
+  };
   if(Readings.meta[reading].type == Boolean){
     MachineSchema[reading] = {
       type: Boolean,
@@ -226,31 +310,67 @@ Readings.availableReadings.forEach(function(reading){
 
 //// Utility function to set readings
 Machines.setReading = function(machineId, reading, value){
-  var toSet = {};
-  toSet[reading] = value;
-  Machines.update({ machineId: machineId }, { $set: toSet } );
+  let atTime = nextMachineTimestamp(machineId);
 
   // Check duplicated reading
   let previousTwo = Readings[reading].find({
     machineId: machineId,
-    createdAt: { $lte: new Date() }
+    createdAt: { $lte: atTime }
   },{
+    reactive: false,
+    fields: { value: 1 },
     sort: { createdAt: -1 },
     limit: 2
   }).fetch();
 
   if(previousTwo.length == 2 && previousTwo[0].value == previousTwo[1].value && previousTwo[0].value == value){
     // Update the first one with current time
-    Readings[reading].update({ _id_: previousTwo[0]._id }, { $set: { createdAt: new Date() } });
+    Readings[reading].update({ _id: previousTwo[0]._id }, { $set: { createdAt: atTime } });
+    let toSet = {};
+    toSet[reading] = value;
+    toSet[reading+"UpdatedAt"] = atTime;
+    Machines.update({ machineId: machineId }, { $set: toSet });
   }else{
     // Make another record
-    Readings[reading].insert({ machineId: machineId, value: value });
+    Readings[reading].insert({ machineId: machineId, value: value, createdAt: atTime });
+    let toSet = {};
+    toSet[reading] = value;
+    toSet[reading+"UpdatedAt"] = atTime;
+    toSet[reading+"StartUpdatedAt"] = atTime;
+    Machines.update({ machineId: machineId }, { $set: toSet });
   }
 }
 
+//// Override addMachine so that initial reading is created
+let oldAddMachine = Machines.addMachine;
+Machines.addMachine = function(props){
+  oldAddMachine(props);
+  Readings.availableReadings.forEach(reading => {
+    Machines.setReading(props.machineId, reading, Readings.meta[reading].defaultValue);
+  });
+}
 
 //// Utility function to get reading
 Readings.getLastReadingLog = function(reading, machineId, atTime){
+
+  if(Meteor.isClient){
+    // It is possible that getting all readings, then sorting it would
+    // be faster in client
+    let readings = Readings[reading].find({
+      machineId: machineId
+    }, { reactive: false, fields: { createdAt: 1, value: 1 } }).fetch();
+
+    readings = readings.filter(read => read.createdAt.getTime() <= atTime.getTime());
+    readings.sort((rA, rB) => rA.createdAt.getTime() - rB.createdAt.getTime());
+
+    if(readings.length == 0){
+      return undefined;
+    }else{
+      let result = readings[readings.length-1];
+      result.machineId = machineId;
+      return result;
+    }
+  }
   return Readings[reading].findOne({
     machineId: machineId,
     createdAt: { $lte: atTime }

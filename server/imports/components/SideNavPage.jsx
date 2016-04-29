@@ -24,6 +24,7 @@ var SideNavPage = React.createClass({
           onRequestChange={open => this.setState({open})}
           open={this.state.open}>
           <MenuItem onTouchTap={ _ => FlowRouter.go("dashboard") }>Dashboard</MenuItem>
+          <MenuItem onTouchTap={ _ => FlowRouter.go("allMachineMap") }>Map</MenuItem>
           <MenuItem onTouchTap={ _ => FlowRouter.go("message_logs") }>Message Logs</MenuItem>
           <MenuItem onTouchTap={ _ => FlowRouter.go("configurations") }>Configurations</MenuItem>
         </LeftNav>

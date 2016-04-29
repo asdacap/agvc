@@ -5,14 +5,14 @@
 
 namespace LineFollowing{
 
+  int BATTERY_SENSOR = 0;
+
   int pin_1   = A1;
   int pin_2   = A2;
   int pin_3   = A3;
   int pin_4   = A4;
   int pin_5   = A5;
   int pin_cal = 8;  //pin initialization for sensors
-
-  int OBSTACLE_SENSOR = 24;
 
   int DS_1 = 0;
   int DS_2 = 0;
@@ -38,20 +38,13 @@ namespace LineFollowing{
   double outDir = 0;
   double neutral = 0;
   PID directionPID(&curDir, &outDir, &neutral, 0.95, 0.2, 0.03, DIRECT);
-
-  bool obstructed = false;
-  RateLimiter obstacleLimiter(1000);
+  float voltageAverage = 7.0;
 
   void followline(){
 
-    if(digitalRead(OBSTACLE_SENSOR) == LOW){
-      States::setObstructed();
-      obstructed = true;
+    if(States::obstructed){
       MotorControl::SmarterForward(0,0);
       return;
-    }else if(obstructed){
-      States::clearObstructed();
-      obstructed = false;
     }
 
     if (DS_1 == 1 && DS_2 == 0 && DS_3 == 0 && DS_4 == 0 && DS_5 == 0){       // 1  0  0  0  0
@@ -109,18 +102,28 @@ namespace LineFollowing{
     directionPID.SetTunings(Settings.PID_Kp, Settings.PID_Ki, Settings.PID_Kd);
     directionPID.Compute();
 
+    int baseSpeed = Settings.motorBaseSpeed;
 
-    int baseL = Settings.motorBaseSpeed;
-    int baseR = Settings.motorBaseSpeed;
+    float batteryValue = analogRead(BATTERY_SENSOR);
+    batteryValue = batteryValue*(25.0/1024.0);
+    if(batteryValue > 8) batteryValue = 8;
+    if(batteryValue < 6) batteryValue = 6;
+    voltageAverage = (voltageAverage+batteryValue*0.1)/1.1;
+    float batteryOffset = 7-voltageAverage; // Assume 7 is the base voltage
+    if(batteryOffset > 1) batteryOffset = 1;
+    if(batteryOffset < -1) batteryOffset = -1;
+    baseSpeed += batteryOffset*Settings.motorVoltageCompensation;
 
-    int multiplier = Settings.motorPIDMultiplier;
+    int baseL = baseSpeed;
+    int baseR = baseSpeed;
+
     int diffRange = Settings.motorDiffRange; // Maximum difference in motor speed
 
     if(outDir < 0){
-      baseL += outDir*multiplier;
+      baseL += outDir*Settings.motorPIDMultiplierRatio*baseL;
       baseR = min(baseR, baseL+diffRange);
     }else{
-      baseR -= outDir*multiplier;
+      baseR -= outDir*Settings.motorPIDMultiplierRatio*baseR;
       baseL = min(baseL, baseR+diffRange);
     }
 
@@ -140,8 +143,6 @@ namespace LineFollowing{
     directionPID.SetMode(AUTOMATIC);
     directionPID.SetSampleTime(25);
     directionPID.SetOutputLimits(-5,5);
-
-    pinMode(OBSTACLE_SENSOR, INPUT);
   }
 
   void loop()

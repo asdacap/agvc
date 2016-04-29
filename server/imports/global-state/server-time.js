@@ -1,9 +1,10 @@
 import GlobalStates from '../global-state/GlobalStates'
+import Settings from '../Settings';
 
 // Needed to syncronize time on client and server
 
 // Periodically set the server time
-if(Meteor.isServer){
+if(Meteor.isServer && Settings.machine_interface_server){
   if(GlobalStates.find({ name: "serverTime" }).count() === 0){
     GlobalStates.insert({ name: "serverTime", serverTime: new Date() });
   }

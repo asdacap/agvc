@@ -20,16 +20,16 @@ void configureWifly(T &wifiSerial){
   wifiSerial.setTimeout(300);
   Serial.println(wifiSerial.readString());
 
-  sendAndPrintResult("set sys iofunc 0x00 ", wifiSerial);
-  //sendAndPrintResult("set sys iofunc 0x50 ", wifiSerial);
-  sendAndPrintResult("set ip protocol 2", wifiSerial);
+  sendAndPrintResult("set u m 1", wifiSerial);
+  sendAndPrintResult("set sys printlvl 0", wifiSerial);
   sendAndPrintResult("set comm remote 0", wifiSerial);
+  sendAndPrintResult("set ip protocol 2", wifiSerial);
   sendAndPrintResult("set sys sleep 0", wifiSerial);
   sendAndPrintResult("set comm idle 0", wifiSerial);
   sendAndPrintResult("set ip dhcp 1", wifiSerial);
   sendAndPrintResult("set wlan ssid " + String(Settings.wifiSSID), wifiSerial);
   sendAndPrintResult("set wlan phrase " + String(Settings.wifiPassphrase), wifiSerial);
-  sendAndPrintResult("set wlan auth 4", wifiSerial);
+  sendAndPrintResult("set wlan auth 3", wifiSerial);
   sendAndPrintResult("set wlan join 1", wifiSerial);
   sendAndPrintResult("set ip host " + String(Settings.serverHost), wifiSerial);
   sendAndPrintResult("set ip remote " + String(Settings.serverPort), wifiSerial);

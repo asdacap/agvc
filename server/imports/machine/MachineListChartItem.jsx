@@ -72,7 +72,7 @@ export default MachineListChartItem = React.createClass({
         <ReadingHistoryChart machine={this.props.machine} reading={this.props.reading} range={this.props.range}/>
       </CardText>
       <CardActions>
-        <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
+        <RaisedButton label="Open" onTouchTap={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
       </CardActions>
     </Card>;
   }

@@ -3,6 +3,7 @@ import running from 'is-running';
 import { EventEmitter } from 'events';
 import util from 'util';
 import Machines from '../../machine/Machines';
+import CommandQueues from '../../machine/CommandQueues';
 import MessageLogs from '../../message-log/MessageLogs';
 import Settings from '../../Settings';
 
@@ -133,29 +134,34 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 
   // This is where it listen to new command from the machine commandQueue
   startCommandQueueObservation(){
-    this.queueHandler = Machines.find({ machineId: this.machineObj.machineId }, {}).observe({
-      changed: this.onMachineChanged
+    let queue = CommandQueues.getForMachine(this.machineObj.machineId);
+    this.queueHandler = CommandQueues.find({ machineId: this.machineObj.machineId }, {}).observe({
+      changed: this.onCommandQueueChanged
     });
 
     // Send previous command.
-    this.onMachineChanged(this.machineObj);
+    this.onCommandQueueChanged(queue);
+  }
+
+  sendMessage(message){
+    this.driver.sendMessage(message);
+    //console.log("send data "+command.command);
+    this.emit("commandSent", message, this.machineObj.machineId, this);
   }
 
   // Listen to new command from the commandQueue on the machine object
-  onMachineChanged(newDocument, oldDocument){
+  onCommandQueueChanged(newDocument, oldDocument){
     var self = this;
     if(newDocument.commandQueue.length === 0) return;
     var commands = newDocument.commandQueue;
-    Machines.update(this.machineObj._id, { $set: { commandQueue: [] } });
+    CommandQueues.update(newDocument._id, { $set: { commandQueue: [] } });
 
     commands.forEach(function(command){
       if(command.droppable && (new Date() - command.createdAt) > Settings.dropppable_command_timeout){
         console.log("Droppable command "+command.command+" dropped");
         return;
       }
-      //console.log("send data "+command.command);
-      self.driver.sendMessage(command.command);
-      self.emit("commandSent", command.command, self.machineObj.machineId, this);
+      self.sendMessage(command.command);
     });
   }
 
@@ -185,6 +191,14 @@ var AGVMachineHandler = class AGVMachineHandler extends EventEmitter{
 AGVMachineHandler.registerEventHandler = function(evObj){
   eventRegistrations.push(evObj);
 };
+
+AGVMachineHandler.sendMessage = function(machineId, message){
+  if(machinesConnection[machineId] !== undefined){
+    machinesConnection[machineId].sendMessage(message);
+    return true;
+  }
+  return false;
+}
 
 let startOfflineSweeper = function(){
   Meteor.setInterval(function(){

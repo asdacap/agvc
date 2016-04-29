@@ -28,6 +28,7 @@ namespace States{
 
 
   bool obstructed = false;
+  int OBSTACLE_SENSOR = 24;
 
   Debounce<String> obstructedDebouncer(ConnectionManager::sendData, 10000);
   void sendObstructedStatus(){
@@ -48,9 +49,27 @@ namespace States{
     sendObstructedStatus();
   }
 
+  void loopObstacleSensor(){
+    if(digitalRead(OBSTACLE_SENSOR) == LOW){
+      States::setObstructed();
+      obstructed = true;
+    }else if(obstructed){
+      States::clearObstructed();
+      obstructed = false;
+    }
+  }
+
   void onConnect(){
     sendOutOfCircuitStatus();
     sendObstructedStatus();
+  }
+
+  void loop(){
+    loopObstacleSensor();
+  }
+
+  void setup(){
+    pinMode(OBSTACLE_SENSOR, INPUT);
   }
 }
 

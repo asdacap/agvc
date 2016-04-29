@@ -3,17 +3,20 @@ import ClientResponseTimeLogs from '../ClientResponseTimeLogs';
 import ClientResponseTimes from '../ClientResponseTimes';
 
 // Periodically create a log that the client will have to send back
-Meteor.onConnection(function(connection){
-  console.log("Starting client point to client "+connection.id);
-  // The thing that ping
-  let intervalHandle = Meteor.setInterval(function(){
-    ClientResponseTimeLogs.insert({ connectionId: connection.id });
-  }, Settings.client_ping_interval);
 
-  connection.onClose(_ => {
-    Meteor.clearInterval(intervalHandle);
+if(Settings.show_client_response_time){
+  Meteor.onConnection(function(connection){
+    console.log("Starting client point to client "+connection.id);
+    // The thing that ping
+    let intervalHandle = Meteor.setInterval(function(){
+      ClientResponseTimeLogs.insert({ connectionId: connection.id });
+    }, Settings.client_ping_interval);
+
+    connection.onClose(_ => {
+      Meteor.clearInterval(intervalHandle);
+    });
   });
-});
+}
 
 Meteor.methods({
   responseTimeLogPing(logId){

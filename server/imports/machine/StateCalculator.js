@@ -4,6 +4,7 @@ import LocationLogs from '../location/LocationLogs';
 import Map from '../location/Map';
 import Point from 'point-at-length';
 import moment from 'moment';
+import { calculateEstimatedSpeed } from './SpeedCalculator';
 
 
 // Calculate the last time this locationLog is interrupted
@@ -21,18 +22,32 @@ function calculateLastInterruptedTime(locationLog, atTime){
     let reading = readingVal[0];
     let value = readingVal[1];
 
-    // Check the first time it is out of circuit
-    let readingLog = Readings[reading].findOne({
-      machineId: locationLog.machineId,
-      value: value,
-      createdAt: {
-        $gte: locationLog.createdAt,
-        $lte: atTime
-      }
-    }, {
-      sort: { createdAt: 1 },
-      limit: 1
-    });
+    let readingLog = undefined;
+    if(Meteor.isClient){
+      let readings = Readings[reading].find({
+        machineId: locationLog.machineId,
+        value: value
+      }).fetch();
+
+      readings = readings.filter(read =>
+        read.createdAt.getTime() >= locationLog.createdAt.getTime() &&
+        read.createdAt.getTime() <= atTime.getTime());
+      readings.sort((rA, rB) => rB.createdAt.getTime() - rA.createdAt.getTime());
+
+      readingLog = readings[0];
+    }else{
+      readingLog = Readings[reading].findOne({
+        machineId: locationLog.machineId,
+        value: value,
+        createdAt: {
+          $gte: locationLog.createdAt,
+          $lte: atTime
+        }
+      }, {
+        sort: { createdAt: 1 },
+        limit: 1
+      });
+    }
 
     if(readingLog !== undefined && readingLog.createdAt.getTime() < finalTime.getTime()){
       finalTime = readingLog.createdAt;
@@ -40,64 +55,6 @@ function calculateLastInterruptedTime(locationLog, atTime){
   });
 
   return finalTime;
-}
-
-// Check if there any interruption to the AVG during the time duration
-function findInterruptionWithinTime(machineId, fromTime, toTime){
-  let interruptionReading = ["obstructed", "outOfCircuit", "manualMode"];
-  let interrupted = false;
-  interruptionReading.forEach(reading => {
-    if(interrupted) return;
-
-    let readingLog = Readings[reading].findOne({
-      machineId: machineId,
-      createdAt: {
-        $gte: fromTime,
-        $lte: toTime
-      }
-    });
-    if(readingLog !== undefined) interrupted = true;
-  });
-  return interrupted;
-}
-
-// attempt to estimate speed by considering previously recorded speed
-function calculateEstimatedSpeed(machineId, atPath, atTime){
-  let locationLogs = LocationLogs.find({
-    machineId: machineId,
-    type: "path",
-    createdAt: {
-      $lte: atTime
-    }
-  }, {
-    sort: { createdAt: -1 },
-    limit: 20
-  }).fetch();
-
-  let speeds = [];
-
-  for(let i=0;i<locationLogs.length-1;i++){
-    let log1 = locationLogs[i];
-    let log2 = locationLogs[i+1];
-    if(log1.pathId != atPath) continue;
-    if(log1.pathId !== log2.pathId) continue;
-    if(findInterruptionWithinTime(log2.createdAt, log1.createdAt)) continue;
-
-    let diff = Math.abs(log1.pathProgress - log2.pathProgress);
-    let timediff = (log1.createdAt.getTime() - log2.createdAt.getTime())/1000;
-
-    // Probably just sits there
-    if(diff == 0) continue;
-
-    speeds.push(diff/timediff);
-  }
-
-  if(speeds.length == 0) return undefined;
-
-  let total = 0;
-  speeds.forEach(speed => total = total+speed);
-
-  return total/speeds.length;
 }
 
 // Attempt to calculate the state of a machine
@@ -130,13 +87,8 @@ function calculateLocationPoint(locationLog, atTime){
       var pts = Point(path.svgPathD);
     }
 
-    if(Meteor.isClient){
-      var length = pathEl.getTotalLength();
-    }else{
-      var length = pts.length();
-    }
-
-    var speed = calculateEstimatedSpeed(locationLog.machineId, locationLog.pathId, atTime)
+    let length = path.length;
+    let speed = locationLog.nextEstimatedSpeed;
     if(speed == undefined){
       speed = path.machineSpeed/length;
     }
@@ -171,7 +123,7 @@ function calculateLocationPoint(locationLog, atTime){
       var parr = pts.at(length*progress);
       var point = {
         x: parr[0],
-        x: parr[1]
+        y: parr[1]
       };
     }
 
@@ -235,59 +187,85 @@ function calculateStatus(machineId, atTime){
   return cStatus;
 };
 
+let defaultCalculateStateOptions = {
+  status: true,
+  position: true
+};
+Readings.availableReadings.forEach(reading => defaultCalculateStateOptions[reading] = true);
+
 export default StateCalculator = {
+  defaultCalculateStateOptions,
   subscribe(machineId, atTime){
 
     // Subscribing only the last one is inefficent
     // We are subscribing record for the whole minute
     atTime = new Date(atTime.getTime());
-    atTime.setSeconds(0,0);
-    let toTime = moment(new Date(atTime.getTime())).add(1, 'minutes').toDate();
+    atTime.setSeconds(Math.floor(atTime.getSeconds()/5)*5,0);
+    let toTime = moment(new Date(atTime.getTime())).add(10, 'seconds').toDate();
 
     // Subscribe to the data required to calculate the machine state at the time
     let ready = true;
-    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime, 20).ready();
+    ready = ready && Meteor.subscribe("LocationLogs.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("LocationLogs.createdAtRange", machineId, atTime, toTime).ready();
     ready = ready && Meteor.subscribe("Readings.last", machineId, atTime).ready();
     ready = ready && Meteor.subscribe("Readings.createdAtRange", machineId, atTime, toTime).ready();
     return ready;
   },
-  calculate(machineId, atTime){
+  rollingSubscribe(machineId, atTime, subscribedAt){
+    atTime = new Date(atTime.getTime());
+
+    // Subscribe to the data required to calculate the machine state at the time
+    let ready = true;
+    if(!Meteor.subscribe("LocationLogs.rolling", machineId, atTime, subscribedAt).ready()){
+      ready = false;
+    }
+    if(!Meteor.subscribe("Readings.rolling", machineId, atTime, subscribedAt).ready()){
+      ready = false;
+    }
+    return ready;
+  },
+  calculate(machineId, atTime, options){
+
+    if(options === undefined){
+      options = defaultCalculateStateOptions;
+    }
+
     // Attempt to calculate the state of the machine at the time
     let state = {};
 
     // First, the easy one. The readings.
     Readings.availableReadings.forEach(reading => {
 
-      // Fetch the last one
-      var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
-      if(readingValue !== undefined){
-        readingValue = readingValue.value;
+      if(options[reading]){
+        // Fetch the last one
+        var readingValue = Readings.getLastReadingLog(reading, machineId, atTime);
+        if(readingValue !== undefined){
+          readingValue = readingValue.value;
+        }else{
+          readingValue = Readings.meta[reading].defaultValue;
+        }
+
+        state[reading] = readingValue;
+      }
+    });
+
+
+    if(options.position){
+      // Then, the hard one, the position
+      let lastLocation = LocationLogs.getLastLog(machineId, atTime);
+
+      if(lastLocation === undefined){
+        state.position = undefined;
       }else{
-        readingValue = Readings.meta[reading].defaultValue;
+        state.position = calculateLocationPoint(lastLocation, atTime);
       }
 
-      state[reading] = readingValue;
-    });
-
-
-    // Then, the hard one, the position
-    let lastLocation = LocationLogs.findOne({
-      machineId: machineId,
-      createdAt: { $lte: atTime }
-    }, {
-      sort: { createdAt: -1 },
-      limit: 1
-    });
-
-    if(lastLocation === undefined){
-      state.position = undefined;
-    }else{
-      state.position = calculateLocationPoint(lastLocation, atTime);
     }
 
-    // Then, the status one
-    state.status = calculateStatus(machineId, atTime);
+    if(options.status){
+      // Then, the status one
+      state.status = calculateStatus(machineId, atTime);
+    }
 
     return state;
   }

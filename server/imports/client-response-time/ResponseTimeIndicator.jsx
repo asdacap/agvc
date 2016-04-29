@@ -1,13 +1,24 @@
 import React from 'react';
 import ClientResponseTimes from './ClientResponseTimes';
+import ViewTime from '../client/ViewTime';
+import Settings from '../Settings';
+
+let styles = {
+  Indicator: {
+    position: "fixed",
+    top: 3,
+    left: 3,
+    zIndex: 1200,
+    pointerEvents: "none"
+  }
+}
 
 export default ResponseTimeIndicator = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
     let responseTime = 0;
 
-    Chronos.liveUpdate(1000);
-
+    ViewTime.time; // Just for live update
     Meteor.subscribe("ClientResponseTimes", Meteor.connection._lastSessionId);
 
     let record = ClientResponseTimes.findOne({ connectionId: Meteor.connection._lastSessionId });
@@ -20,6 +31,10 @@ export default ResponseTimeIndicator = React.createClass({
     }
   },
   render(){
-    return <span style={{ position: "fixed", bottom: 3, left: 3 }}>{this.data.responseTime}</span>;
+    if(Settings.show_client_response_time){
+      return <span style={styles.Indicator}>{this.data.responseTime}</span>;
+    }else{
+      return <span></span>;
+    }
   }
 });

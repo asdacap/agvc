@@ -11,7 +11,7 @@ var MapView = function(){
   }
 
   return <g>
-    <g>{ Map.paths.map((p,idx) => <path d={p.svgPathD} stroke="black" strokeWidth="5" fill="none" key={idx} />) }</g>
+    <g>{ Map.paths.map((p,idx) => <path d={p.svgPathD} stroke="black" strokeWidth="2" fill="none" key={idx} />) }</g>
     <g dangerouslySetInnerHTML={{ __html: extra }} ></g>
   </g>;
 };

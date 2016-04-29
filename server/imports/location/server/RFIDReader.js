@@ -1,6 +1,8 @@
 import AGVMachineHandler from '../../machine-interface/server/AGVMachineHandler';
 import LocationLogs from '../LocationLogs';
+import Machines from '../../machine/Machines';
 import Settings from '../../Settings';
+import { calculateEstimatedSpeed } from '../../machine/SpeedCalculator';
 
 // This file handlers the mapping between RFID string read from the machine
 // into a location log. It also handle the rudimentary scheduling, ie predicting
@@ -101,16 +103,8 @@ AGVMachineHandler.registerEventHandler({
       response.push(ResponseMap[value]);
     }
 
-    let offsetTime = 0;
-    let createdAtTime = new Date().getTime();
     response.forEach(resp => {
-      var newlog = _.extend({ createdAt: new Date(createdAtTime+offsetTime) },resp);
-      newlog.machineId = machineObj.machineId;
-
-      LocationLogs.insert(newlog);
-
-      // To make sure later log comes later
-      offsetTime = offsetTime+1;
+      LocationLogs.safeInsert(machineObj.machineId, resp);
     });
   }
 });

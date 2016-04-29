@@ -23,6 +23,16 @@ import {
 import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
 import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import NoRerenderContainer from '../components/NoRerenderContainer';
+import StateCalculator from './StateCalculator';
+import LiveStateCalculator from './LiveStateCalculator';
+import Machines from './Machines';
+import TrackerUpdateLimiter from '../utils/TrackerUpdateLimiter';
+import Settings from '../Settings';
+
+let NTableRow = NoRerenderContainer(TableRow, false, ["style"]);
+let NCardTitle = NoRerenderContainer(CardTitle, false, ["style"]);
+let NCardActions = NoRerenderContainer(CardActions, true);
 
 var styles = {
   MachineListItem: {
@@ -33,7 +43,7 @@ var styles = {
     height: "400px"
   },
   CardHeaderBackgroundOnStatus: {
-    offline: "#ffdd29",
+    offline: "#fc3b3b",
     outOfCircuit: "#ffdd29",
     obstructed: "#ffdd29",
     manualMode: "#299fff",
@@ -44,9 +54,45 @@ var styles = {
 export default MachineListItem = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
+    let state = null;
+    let machine = null;
+
+    TrackerUpdateLimiter(none =>{
+      // Position is not needed
+      let opts = _.extend({}, StateCalculator.defaultCalculateStateOptions, { position: false });
+
+      if(ViewTime.mode == "live"){
+        // Should be subscribed by the parent
+        machine = Machines.findOne({ machineId: this.props.machine.machineId });
+        state = LiveStateCalculator.calculate(this.props.machine.machineId, machine, opts);
+      }else{
+
+        let atTime = ViewTime.time;
+        if(ViewTime.playing){
+          // We will use rolling subscription
+          if(!this.rollingFrom){
+            this.rollingFrom = atTime;
+            this.subscribedAt = new Date();
+          }
+          StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+        }else{
+          if(this.rollingFrom){
+            this.rollingFrom = undefined;
+            this.subscribedAt = undefined;
+          }
+          StateCalculator.subscribe(this.props.machine.machineId, atTime);
+        }
+
+        state = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time, opts);
+      }
+
+
+    }, Settings.react_tracker_update_delay);
+
     return {
-      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
+      state
     }
+
   },
   render(){
     let self = this;
@@ -60,12 +106,12 @@ export default MachineListItem = React.createClass({
     }
 
     return <Card style={styles.MachineListItem} initiallyExpanded={true}>
-      <CardTitle title={this.props.machine.machineId}
+      <NCardTitle title={this.props.machine.machineId}
          subtitle={this.data.state.status}
          actAsExpander={true}
          style={titleStyle}
          showExpandableButton={true}/>
-       <CardText expandable={true}>
+      <CardText expandable={true}>
         <Table selectable={false} height={ styles.Table.height }>
           <TableBody displayRowCheckbox={false}>
             { Readings.availableReadings.map(function(reading){
@@ -89,17 +135,18 @@ export default MachineListItem = React.createClass({
                 style.backgroundColor = styles.badValueColor;
               }
 
-              return <TableRow key={reading} style={style}>
+              // Value is just to prevent it from rerendering
+              return <NTableRow key={reading} style={style} value={value}>
                 <TableRowColumn>{Readings.meta[reading].title}</TableRowColumn>
                 <TableRowColumn>{value}</TableRowColumn>
-              </TableRow>;
+              </NTableRow>;
               }) }
           </TableBody>
         </Table>
       </CardText>
-      <CardActions>
-        <RaisedButton label="Open" onClick={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
-      </CardActions>
+      <NCardActions>
+        <RaisedButton label="Open" onTouchTap={_ => FlowRouter.go('machine', {machineId: this.props.machine.machineId})} icon={<ArrowForward />}/>
+      </NCardActions>
     </Card>;
   }
 });

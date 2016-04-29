@@ -22,7 +22,8 @@ let ViewTimeToolbar = React.createClass({
     return {
       mode: ViewTime.mode,
       playing: ViewTime.playing,
-      viewTime: ViewTime.time
+      viewTime: ViewTime.time,
+      status: Meteor.status()
     }
   },
   toggleMode(){
@@ -143,7 +144,11 @@ let ViewTimeToolbar = React.createClass({
     let rightGroup = null;
     let styles = this.getStyles();
 
-    if(this.data.mode == "live"){
+    if(!this.data.status.connected){
+      rightGroup = <ToolbarGroup float="right">
+        <RaisedButton label="Disconnected" style={styles.ToolbarButton} disabled={true} primary={true}/>
+      </ToolbarGroup>;
+    }else if(this.data.mode == "live"){
       rightGroup = <ToolbarGroup float="right">
         <ToolbarTitle text={moment(this.data.viewTime).format('l LTS')} />
         <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton} primary={true}/>

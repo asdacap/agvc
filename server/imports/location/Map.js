@@ -1,3 +1,5 @@
+import Resources from '../Resources';
+import Point from 'point-at-length';
 
 // This map represent how to transfer the location representation to visual cuues
 // on the screen. Point is represented by a coordinate. Path is represented by
@@ -49,13 +51,7 @@ if(Settings.use_bigger_map){
     ]
   };
 
-  if(Meteor.isServer){
-    Map.extraSVG = Assets.getText("map_extra.svg");
-  }else if(Meteor.isClient){
-    HTTP.get("/map_extra.svg", {}, function(e, result){
-      Map.extraSVG = result.content;
-    });
-  }
+  Map.extraSVG = Resources.map_extra;
 
 };
 
@@ -66,5 +62,16 @@ Map.getPath = function(pathId){
 Map.getPoint = function(pointId){
   return _.find(Map.points, p => p.id == pointId);
 }
+
+Map.paths.forEach(path => {
+  if(Meteor.isClient){
+    var pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathEl.setAttribute("d", path.svgPathD);
+    path.length = pathEl.getTotalLength();
+  }else{
+    var pts = Point(path.svgPathD);
+    path.length = pts.length;
+  }
+});
 
 export default Map

@@ -3,3 +3,5 @@ import './ReadingUpdateHook';
 import './ResponseTimeRecording';
 import './MachineOnlineDetector';
 import './BandwidthRecording';
+import './InterruptionReadingHook';
+import './ObstacleLiftedHook';

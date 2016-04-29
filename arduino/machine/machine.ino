@@ -34,6 +34,7 @@ void setup() {
   LineFollowing::setup();
   MotorControl::setup();
   Sensors::setup();
+  States::setup();
 }
 
 void reconfigure(){
@@ -86,6 +87,7 @@ void loop() {
   }
   Setting::loopCommand();
   Sensors::loop();
+  States::loop();
   calculateLoopInterval();
 }
 

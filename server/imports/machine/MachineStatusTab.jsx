@@ -12,8 +12,13 @@ import { EditMachineForm } from './MachineForm'
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 import ViewTime from '../client/ViewTime';
 import SingleMachineMap from '../location/SingleMachineMap';
+import Settings from '../Settings';
 import MediaQuery from 'react-responsive';
 import Readings from '../reading/Readings'
+import ClientMachineResponseTime from '../client-machine-response-time/client/ClientMachineResponseTime';
+import NoRerenderContainer from '../components/NoRerenderContainer';
+import StateCalculator from '../machine/StateCalculator';
+import LiveStateCalculator from '../machine/LiveStateCalculator';
 
 var styles = {
   ButtonWithMargin: {
@@ -48,6 +53,8 @@ var styles = {
   },
   badValueColor: "#ffdd29"
 }
+
+let NListItem = NoRerenderContainer(ListItem, false, [], ["secondaryText"]);
 
 let ReadingChartListItem = React.createClass({
   getInitialState(){
@@ -89,11 +96,11 @@ let ReadingChartListItem = React.createClass({
 
     if(this.state.open){
       return <div style={styles.Expanded}>
-        <ListItem primaryText={Readings.meta[reading].title}
+        <NListItem primaryText={Readings.meta[reading].title}
           style={listItemStyle}
           secondaryText={secondaryText}
           onTouchTap={this.toggle} >
-        </ListItem>
+        </NListItem>
         <div style={styles.ChartContainerStyle}>
           <SelectField value={this.state.range}
             floatingLabelText="Readng period"
@@ -107,11 +114,11 @@ let ReadingChartListItem = React.createClass({
         </div>
       </div>;
     }else{
-      return <ListItem primaryText={Readings.meta[reading].title}
+      return <NListItem primaryText={Readings.meta[reading].title}
         style={listItemStyle}
         secondaryText={secondaryText}
         onTouchTap={this.toggle} >
-      </ListItem>;
+      </NListItem>;
 
     }
   }
@@ -120,10 +127,19 @@ let ReadingChartListItem = React.createClass({
 let ReadingList = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData(){
-    StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
-    return {
-      state: StateCalculator.calculate(this.props.machine.machineId, ViewTime.time)
+
+    let machineStateReady = undefined;
+    let machineState = undefined;
+
+    if(this.props.machineState !== undefined){
+      machineStateReady = this.props.machineStateReady;
+      machineState = this.props.machineState;
+    }else{
+      machineStateReady = StateCalculator.subscribe(this.props.machine.machineId, ViewTime.time);
+      machineState = StateCalculator.calculate(this.props.machine.machineId, ViewTime.time);
     }
+
+    return { machineStateReady, machineState };
   },
   getDefaultProps(){
     return {
@@ -135,9 +151,10 @@ let ReadingList = React.createClass({
     var listItems = Readings.availableReadings.map(function(reading){
       return <ReadingChartListItem
         machine={self.props.machine}
+        machineState={self.props.machineState}
         reading={reading}
         expandable={self.props.expandable}
-        value={self.data.state[reading]}
+        value={self.data.machineState[reading]}
         key={reading}/>;
     });
     return <List>
@@ -147,9 +164,58 @@ let ReadingList = React.createClass({
 });
 
 export default MachineStatusTab = React.createClass({
+  mixins: [ReactMeteorData],
+  getMeteorData(){
+    let clientMachineResponseTime = 0;
+
+    let record = ClientMachineResponseTime.findOne({machineId: this.props.machine.machineId});
+    if(record !== undefined){
+      clientMachineResponseTime = record.responseTime;
+    }
+
+    let machineStateReady = false;
+    let machineState = undefined;
+    if(ViewTime.mode == "live"){
+      ViewTime.time; // For the update
+      machineStateReady = true;
+      machineState = LiveStateCalculator.calculate(
+        this.props.machine.machineId,
+        this.props.machine,
+        _.extend({}, LiveStateCalculator.defaultCalculateStateOptions, { position: false }));
+    }else{
+
+      let atTime = ViewTime.time;
+      if(ViewTime.playing){
+        // We will use rolling subscription
+        if(!this.rollingFrom){
+          this.rollingFrom = atTime;
+          this.subscribedAt = new Date();
+        }
+        ready = StateCalculator.rollingSubscribe(this.props.machine.machineId, this.rollingFrom, this.subscribedAt);
+      }else{
+        if(this.rollingFrom){
+          this.rollingFrom = undefined;
+          this.subscribedAt = undefined;
+        }
+        ready = StateCalculator.subscribe(this.props.machine.machineId, atTime);
+      }
+
+      machineState = StateCalculator.calculate(
+        this.props.machine.machineId,
+        ViewTime.time,
+        _.extend({}, LiveStateCalculator.defaultCalculateStateOptions, { position: false }));
+    }
+
+    return {
+      clientMachineResponseTime,
+      machineStateReady,
+      machineState
+    }
+  },
   getInitialState(){
     return {
-      openForm: false
+      openForm: false,
+      showMap: true
     };
   },
   delete(){
@@ -158,34 +224,43 @@ export default MachineStatusTab = React.createClass({
       FlowRouter.go('dashboard');
     }
   },
+  toggleAllMachineMap(){
+    this.setState({ showMap: !this.state.showMap });
+  },
   edit(){
     this.setState({ openForm: true });
   },
   closeEdit(){
     this.setState({ openForm: false });
   },
-  sendSetting(){
-    Meteor.call("sendMachineSetting", this.props.machine.machineId);
-  },
   render(){
     var self = this;
     return <div style={styles.TopContainer}>
-      <MediaQuery query='(min-width: 700px)'>
-        <div style={styles.MapContainerLeft}>
-          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}/>
-        </div>
-      </MediaQuery>
+      {
+        this.state.showMap ? <MediaQuery query='(min-width: 700px)'>
+          <div style={styles.MapContainerLeft} onTouchTap={this.toggleAllMachineMap}>
+            <SingleMachineMap machineId={this.props.machine.machineId} style={styles.LeftMap}
+              machineState={this.data.machineState} machineStateReady={this.data.machineStateReady}/>
+          </div>
+        </MediaQuery> : <span></span>
+      }
       <div style={styles.StatusContainer}>
-        <MediaQuery query='(max-width: 700px)'>
-          <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}/>
-        </MediaQuery>
-        <RaisedButton style={styles.ButtonWithMargin} label="Send Setting" onClick={this.sendSetting} disabled={!this.props.machine.online}/>
-        <RaisedButton style={styles.ButtonWithMargin} label="Delete" onClick={this.delete}/>
-        <RaisedButton style={styles.ButtonWithMargin} label="Edit" onClick={this.edit}/>
+        {
+          this.state.showMap ? <div onTouchTap={this.toggleAllMachineMap}>
+            <MediaQuery query='(max-width: 700px)'>
+              <SingleMachineMap machineId={this.props.machine.machineId} style={styles.TopMap}
+              machineState={this.data.machineState} machineStateReady={this.data.machineStateReady}/>
+            </MediaQuery>
+          </div> : <RaisedButton style={styles.ButtonWithMargin} label="Show Map"
+          onTouchTap={this.toggleAllMachineMap}/>
+        }
+        <RaisedButton style={styles.ButtonWithMargin} label="Delete" onTouchTap={this.delete}/>
+        <RaisedButton style={styles.ButtonWithMargin} label="Edit" onTouchTap={this.edit}/>
         <List>
           <ListItem primaryText="Machine Id" secondaryText={this.props.machine.machineId} />
+          <ListItem primaryText="Client-Machine response time" secondaryText={this.data.clientMachineResponseTime} />
         </List>
-        <ReadingList machine={this.props.machine} />
+        <ReadingList machine={this.props.machine} machineState={this.data.machineState} machineStateReady={this.data.machineStateReady} />
         <EditMachineForm machine={this.props.machine} open={this.state.openForm} close={this.closeEdit}/>
       </div>
     </div>;

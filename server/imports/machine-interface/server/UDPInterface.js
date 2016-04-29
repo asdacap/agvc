@@ -39,7 +39,6 @@ class UDPHandler {
 
   sendMessage(message){
     message = new Buffer(message+"\n");
-    console.log("Send message "+message.toString());
     if(socketAvailable){
       socket.send(message, 0, message.length, this.port, this.address);
     }else{

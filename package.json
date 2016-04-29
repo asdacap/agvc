@@ -1,0 +1,21 @@
+{
+  "name": "fyp",
+  "version": "0.0.0",
+  "description": "Helper from grunt",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "~3.8.11"
+  },
+  "devDependencies": {
+    "gulp-js-text-inject": "~1.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://asdacap@bitbucket.org/asdacap/fyp.git"
+  },
+  "author": "",
+  "license": ""
+}
