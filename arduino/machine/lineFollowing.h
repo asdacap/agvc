@@ -103,14 +103,13 @@ namespace LineFollowing{
     int baseL = Settings.motorBaseSpeed;
     int baseR = Settings.motorBaseSpeed;
 
-    int multiplier = Settings.motorPIDMultiplier;
     int diffRange = Settings.motorDiffRange; // Maximum difference in motor speed
 
     if(outDir < 0){
-      baseL += outDir*multiplier;
+      baseL += outDir*Settings.motorPIDMultiplierRatio*baseL;
       baseR = min(baseR, baseL+diffRange);
     }else{
-      baseR -= outDir*multiplier;
+      baseR -= outDir*Settings.motorPIDMultiplierRatio*baseR;
       baseL = min(baseL, baseR+diffRange);
     }
 

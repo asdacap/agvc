@@ -28,7 +28,12 @@ var MachineSchema = {
     type: Number,
     optional: false
   },
-  motorPIDMultiplier: {
+  motorPIDMultiplierRatio: {
+    type: Number,
+    decimal: true,
+    optional: false
+  },
+  motorVoltageCompensation: {
     type: Number,
     optional: false
   },
@@ -63,7 +68,8 @@ Machines.attachSchema(MachineSchema);
 
 Machines.defaultValue = {
   motorBaseSpeed: 200,
-  motorPIDMultiplier: 80,
+  motorPIDMultiplierRatio: 0.3,
+  motorVoltageCompensation: 30,
   motorDiffRange: 200,
   motorLROffset: 0,
   PID_Kp: 0.95,

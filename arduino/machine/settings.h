@@ -28,7 +28,8 @@
     int tcpConnectDelay;
     int motorBaseSpeed;
     int motorLROffset;
-    int motorPIDMultiplier;
+    float motorPIDMultiplierRatio;
+    int motorVoltageCompensation;
     int motorDiffRange;
     double PID_Kp;
     double PID_Ki;
@@ -60,13 +61,14 @@ namespace Setting{
       strcpy(Settings.machineId, "ABC");
       Settings.serverPort = 10000;
       Settings.tcpConnectDelay = 5;
-      Settings.motorBaseSpeed = 200;
+      Settings.motorBaseSpeed = 100;
       Settings.motorLROffset = 0;
-      Settings.motorPIDMultiplier = 80;
+      Settings.motorPIDMultiplierRatio = 0.3;
+      Settings.motorVoltageCompensation = 30;
       Settings.motorDiffRange = 200;
       Settings.PID_Kp = 0.95;
-      Settings.PID_Ki = 0.3;
-      Settings.PID_Kd = 0.03;
+      Settings.PID_Ki = 0.1;
+      Settings.PID_Kd = 0.05;
       Settings.version = MAGIC_VERSION;
       saveSettings();
     }
@@ -93,7 +95,8 @@ namespace Setting{
 
       Serial.println(String(F("motorBaseSpeed:")) + String(Settings.motorBaseSpeed));
       Serial.println(String(F("motorLROffset:")) + String(Settings.motorLROffset));
-      Serial.println(String(F("motorPIDMultiplier:")) + String(Settings.motorPIDMultiplier));
+      Serial.println(String(F("motorPIDMultiplierRatio:")) + String(Settings.motorPIDMultiplierRatio));
+      Serial.println(String(F("motorVoltageCompensation:")) + String(Settings.motorVoltageCompensation));
       Serial.println(String(F("motorDiffRange:")) + String(Settings.motorDiffRange));
       Serial.println(String(F("PID_Kp:")) + String(Settings.PID_Kp));
       Serial.println(String(F("PID_Ki:")) + String(Settings.PID_Ki));
@@ -137,8 +140,11 @@ namespace Setting{
     }else if(command.startsWith(F("motorLROffset:"))){
       Settings.motorLROffset = command.substring(14).toInt();
       return true;
-    }else if(command.startsWith(F("motorPIDMultiplier:"))){
-      Settings.motorPIDMultiplier = command.substring(19).toInt();
+    }else if(command.startsWith(F("motorPIDMultiplierRatio:"))){
+      Settings.motorPIDMultiplierRatio = command.substring(24).toFloat();
+      return true;
+    }else if(command.startsWith(F("motorVoltageCompensation:"))){
+      Settings.motorVoltageCompensation = command.substring(25).toInt();
       return true;
     }else if(command.startsWith(F("motorDiffRange:"))){
       Settings.motorDiffRange = command.substring(15).toInt();

@@ -62,10 +62,14 @@ var MachineFormCommon = {
             onChange={this.onFieldChange("motorLROffset")}
             errorText={this.validationContext.keyErrorMessage("motorLROffset")}
             floatingLabelText="Motor Left Right Offset"/><br />
-          <TextField value={this.state.motorPIDMultiplier}
-            onChange={this.onFieldChange("motorPIDMultiplier")}
-            errorText={this.validationContext.keyErrorMessage("motorPIDMultiplier")}
+          <TextField value={this.state.motorPIDMultiplierRatio}
+            onChange={this.onFieldChange("motorPIDMultiplierRatio")}
+            errorText={this.validationContext.keyErrorMessage("motorPIDMultiplierRatio")}
             floatingLabelText="Motor PID Multiplier"/><br />
+          <TextField value={this.state.motorVoltageCompensation}
+            onChange={this.onFieldChange("motorVoltageCompensation")}
+            errorText={this.validationContext.keyErrorMessage("motorVoltageCompensation")}
+            floatingLabelText="Motor Voltage Compensation"/><br />
         </div>
         <div className="col-sm-12 col-md-6">
           <TextField value={this.state.motorDiffRange}
@@ -129,7 +133,9 @@ var EditMachineForm = React.createClass(_.extend({
       _id: this.props.machine._id
     };
 
-    ["machineId", "motorBaseSpeed", "motorLROffset", "motorPIDMultiplier", "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+    ["machineId", "motorBaseSpeed", "motorLROffset",
+    "motorPIDMultiplierRatio", "motorVoltageCompensation",
+    "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
       props[field] = this.state[field];
     });
 
@@ -156,7 +162,9 @@ var CreateMachineForm = React.createClass(_.extend({
 
     let props = {};
 
-    ["machineId", "motorBaseSpeed", "motorLROffset", "motorPIDMultiplier", "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
+    ["machineId", "motorBaseSpeed", "motorLROffset",
+    "motorPIDMultiplierRatio", "motorVoltageCompensation",
+    "motorDiffRange", "PID_Kp", "PID_Ki", "PID_Kd"].forEach(field => {
       props[field] = this.state[field];
     });
 
