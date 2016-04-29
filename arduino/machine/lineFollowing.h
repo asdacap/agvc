@@ -5,6 +5,8 @@
 
 namespace LineFollowing{
 
+  int BATTERY_SENSOR = 0;
+
   int pin_1   = A1;
   int pin_2   = A2;
   int pin_3   = A3;
@@ -36,6 +38,7 @@ namespace LineFollowing{
   double outDir = 0;
   double neutral = 0;
   PID directionPID(&curDir, &outDir, &neutral, 0.95, 0.2, 0.03, DIRECT);
+  float voltageAverage = 7.0;
 
   void followline(){
 
@@ -99,9 +102,20 @@ namespace LineFollowing{
     directionPID.SetTunings(Settings.PID_Kp, Settings.PID_Ki, Settings.PID_Kd);
     directionPID.Compute();
 
+    int baseSpeed = Settings.motorBaseSpeed;
 
-    int baseL = Settings.motorBaseSpeed;
-    int baseR = Settings.motorBaseSpeed;
+    float batteryValue = analogRead(BATTERY_SENSOR);
+    batteryValue = batteryValue*(25.0/1024.0);
+    if(batteryValue > 8) batteryValue = 8;
+    if(batteryValue < 6) batteryValue = 6;
+    voltageAverage = (voltageAverage+batteryValue*0.1)/1.1;
+    float batteryOffset = 7-voltageAverage; // Assume 7 is the base voltage
+    if(batteryOffset > 1) batteryOffset = 1;
+    if(batteryOffset < -1) batteryOffset = -1;
+    baseSpeed += batteryOffset*Settings.motorVoltageCompensation;
+
+    int baseL = baseSpeed;
+    int baseR = baseSpeed;
 
     int diffRange = Settings.motorDiffRange; // Maximum difference in motor speed
 
