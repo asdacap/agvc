@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Subheader,
   CircularProgress,
   Table,
   TableHeader,
@@ -65,7 +66,7 @@ export default MachineMessageLogTab = React.createClass({
   render(){
     return (
       <div>
-        { this.data.commandQueue.length > 0 ? "Command Queue" : "" }
+        { this.data.commandQueue.length > 0 ? <Subheader>Command Queue</Subheader> : "" }
         <Table selectable={false}>
           <TableBody displayRowCheckbox={false}>
             { this.data.commandQueue.map(function(command, idx){
@@ -75,6 +76,7 @@ export default MachineMessageLogTab = React.createClass({
             }) }
           </TableBody>
         </Table>
+        <Subheader>Message Logs</Subheader>
         <FlatButton onTouchTap={this.clearMessageLog} label="Clear" />&nbsp;
         <FlatButton onTouchTap={this.addMessageLog} label="Click to add" />&nbsp;
         <Table>
