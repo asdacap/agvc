@@ -5,6 +5,7 @@ import Map from '../location/Map';
 import Point from 'point-at-length';
 import moment from 'moment';
 import { calculateEstimatedSpeed } from './SpeedCalculator';
+import GlobalStates from '../global-state/GlobalStates';
 
 /**
  * This file is used as a more efficient StateCalculator
@@ -15,7 +16,7 @@ import { calculateEstimatedSpeed } from './SpeedCalculator';
 // Calculate the last time this locationLog is interrupted
 // Used by calculateLocationPoint to know if the path ended prematurely
 function calculateLastInterruptedTime(locationLog, machineObj, startTime){
-  let finalTime = new Date();
+  let finalTime = GlobalStates.getServerTime();
 
   if(locationLog.firstInterruption !== undefined){
     if(locationLog.firstInterruption < finalTime){
@@ -175,10 +176,10 @@ export default LiveStateCalculator = {
         machineObj[reading] = Readings.meta[reading].defaultValue;
       }
       if(machineObj[reading+"UpdatedAt"] === undefined){
-        machineObj[reading+"UpdatedAt"] = new Date();
+        machineObj[reading+"UpdatedAt"] = GlobalStates.getServerTime();
       }
       if(machineObj[reading+"StartUpdatedAt"] === undefined){
-        machineObj[reading+"StartUpdatedAt"] = new Date();
+        machineObj[reading+"StartUpdatedAt"] = GlobalStates.getServerTime();
       }
     });
 
