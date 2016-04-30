@@ -151,7 +151,7 @@ let ViewTimeToolbar = React.createClass({
     }else if(this.data.mode == "live"){
       rightGroup = <ToolbarGroup float="right">
         <ToolbarTitle text={moment(this.data.viewTime).format('l LTS')} />
-        <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton} primary={true}/>
+        <RaisedButton label={this.data.mode} onTouchTap={this.toggleMode} style={styles.ToolbarButton} secondary={true}/>
       </ToolbarGroup>;
     }else{
       if(this.data.playing){
@@ -174,8 +174,9 @@ let ViewTimeToolbar = React.createClass({
             style={styles.PickerRoot}
             onChange={this.setTime}
             textFieldStyle={styles.TimeTextField}
-            defaultTime={this.data.viewTime} />
+            value={this.data.viewTime} />
           <TextField
+            id="second"
             style={styles.SecondPickerTextField}
             onChange={this.setSecond}
             value={moment(this.data.viewTime).second()} />
