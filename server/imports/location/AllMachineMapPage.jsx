@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppCanvas,
+import {
    AppBar,
    FlatButton,
    RaisedButton,
@@ -10,6 +10,8 @@ import { AppCanvas,
    ToolbarTitle,
    ToolbarGroup
   } from 'material-ui';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SideNavPage from '../components/SideNavPage';
 import AllMachineMap from './AllMachineMap';
 import ViewTime from '../client/ViewTime';
@@ -49,7 +51,7 @@ let AllMachineMapPage = React.createClass({
       flex: "1 0 400px"
     };
 
-    return <AppCanvas>
+    return <MuiThemeProvider muiTheme={getMuiTheme()}>
         <SideNavPage ref="navPage">
           <div style={containerStyle}>
             <ViewTimeToolbar title="Map" toggleNav={this.toggleNav} />
@@ -57,7 +59,7 @@ let AllMachineMapPage = React.createClass({
             <ResponseTimeIndicator />
           </div>
         </SideNavPage>
-      </AppCanvas>;
+      </MuiThemeProvider>;
   }
 });
 

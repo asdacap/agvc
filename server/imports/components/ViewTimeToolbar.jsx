@@ -10,9 +10,9 @@ import {
   ToolbarTitle,
   ToolbarGroup
 } from 'material-ui';
-import MenuIcon from 'material-ui/lib/svg-icons/navigation/menu';
-import PlayIcon from 'material-ui/lib/svg-icons/av/play-arrow';
-import PauseIcon from 'material-ui/lib/svg-icons/av/pause';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ViewTime from '../client/ViewTime';
 import moment from 'moment';
 

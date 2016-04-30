@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppCanvas,
+import {
   AppBar,
   Tabs,
   Tab,
@@ -12,7 +12,9 @@ import { AppCanvas,
   TextField,
   CircularProgress,
   SelectField
- } from 'material-ui';
+} from 'material-ui';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SideNavPage from '../components/SideNavPage';
 import SystemConfiguration from './ServerConfiguration';
 import SerialList from '../arduino-configurator/SerialList';
@@ -228,7 +230,7 @@ export default ConfigurationPage = React.createClass({
   },
   render() {
     let self = this;
-    return <AppCanvas>
+    return <MuiThemeProvider muiTheme={getMuiTheme()}>
         <SideNavPage ref="navPage">
           <div>
             <AppBar title="Configuration" onLeftIconButtonTouchTap={this.toggleNav}/>
@@ -259,6 +261,6 @@ export default ConfigurationPage = React.createClass({
             <ResponseTimeIndicator />
           </div>
         </SideNavPage>
-      </AppCanvas>;
+      </MuiThemeProvider>;
   }
 });

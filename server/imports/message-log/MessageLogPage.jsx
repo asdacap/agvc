@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AppCanvas,
   AppBar,
   FlatButton,
   Table,
@@ -10,6 +9,8 @@ import {
   TableBody,
   TableRowColumn
 } from 'material-ui';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SideNavPage from '../components/SideNavPage';
 import moment from 'moment';
 import MessageLogs from './MessageLogs';
@@ -59,7 +60,7 @@ export default MessageLogPage = React.createClass({
   },
   render(){
     return (
-      <AppCanvas>
+      <MuiThemeProvider muiTheme={getMuiTheme()}>
         <SideNavPage ref="navPage">
           <div>
             <AppBar title="Message Logs" onLeftIconButtonTouchTap={this.toggleNav} style={styles.AppBar}/>
@@ -93,7 +94,7 @@ export default MessageLogPage = React.createClass({
             <ResponseTimeIndicator />
           </div>
         </SideNavPage>
-      </AppCanvas>
+      </MuiThemeProvider>
     );
   }
 });

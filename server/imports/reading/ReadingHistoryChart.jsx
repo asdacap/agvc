@@ -1,21 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AppCanvas,
-    AppBar,
-    Tabs,
-    Tab,
-    CircularProgress,
-    Table,
-    TableHeader,
-    TableHeaderColumn,
-    TableRow,
-    TableBody,
-    TableRowColumn,
-    List,
-    ListItem,
-    FlatButton,
-    RaisedButton
-  } from 'material-ui';
+import {
+  Tabs,
+  Tab,
+  CircularProgress,
+  Table,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableBody,
+  TableRowColumn,
+  List,
+  ListItem,
+  FlatButton,
+  RaisedButton
+} from 'material-ui';
 import d3 from 'd3';
 import moment from 'moment';
 import Dimensions from 'react-dimensions';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LeftNav, MenuItem } from 'material-ui';
+import { Drawer, MenuItem } from 'material-ui';
 
 var SideNavPage = React.createClass({
   propTypes: {
@@ -19,7 +19,7 @@ var SideNavPage = React.createClass({
   render: function(){
     return (
       <div>
-        <LeftNav
+        <Drawer
           docked={false}
           onRequestChange={open => this.setState({open})}
           open={this.state.open}>
@@ -27,7 +27,7 @@ var SideNavPage = React.createClass({
           <MenuItem onTouchTap={ _ => FlowRouter.go("allMachineMap") }>Map</MenuItem>
           <MenuItem onTouchTap={ _ => FlowRouter.go("message_logs") }>Message Logs</MenuItem>
           <MenuItem onTouchTap={ _ => FlowRouter.go("configurations") }>Configurations</MenuItem>
-        </LeftNav>
+        </Drawer>
         {React.cloneElement(this.props.children, { toggleNav: this.toggleNav })}
       </div>
     );

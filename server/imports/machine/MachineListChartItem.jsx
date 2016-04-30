@@ -22,7 +22,7 @@ import {
 } from 'material-ui';
 import { EditMachineForm } from './MachineForm';
 import ViewTime from '../client/ViewTime';
-import ArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
 import ReadingHistoryChart from '../reading/ReadingHistoryChart';
 
 var styles = {

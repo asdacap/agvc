@@ -1,5 +1,5 @@
 import React from 'react';
-import ContentAdd from 'material-ui/lib/svg-icons/content/add';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 import { CreateMachineForm } from './MachineForm';
 import MachineListItem from './MachineListItem';
 import Machines from './Machines';

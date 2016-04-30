@@ -8,10 +8,10 @@ import { ReadingList } from './MachineStatusTab';
 import MediaQuery from 'react-responsive';
 import VibrateOnTouch from '../components/VibrateOnTouch';
 
-import HardwareKeyboardArrowDown from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-down';
-import HardwareKeyboardArrowUp from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-up';
-import HardwareKeyboardArrowLeft from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-left';
-import HardwareKeyboardArrowRight from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-right';
+import HardwareKeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
+import HardwareKeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
+import HardwareKeyboardArrowLeft from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+import HardwareKeyboardArrowRight from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 
 let VRaisedButton = VibrateOnTouch(RaisedButton);
 let VFloatingActionButton = VibrateOnTouch(FloatingActionButton, true);

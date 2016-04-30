@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AppCanvas,
   AppBar,
   Tabs,
   Tab,
@@ -16,6 +15,8 @@ import {
   FlatButton,
   RaisedButton,
 } from 'material-ui';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SideNavPage from '../components/SideNavPage';
 import { MachineOnlineText } from './common'
 import Machines from './Machines';
@@ -73,7 +74,7 @@ export default MachinePage = React.createClass({
       }
     }
 
-    return <AppCanvas>
+    return <MuiThemeProvider muiTheme={getMuiTheme()}>
         <SideNavPage ref="navPage">
           <div>
             <NViewTimeToolbar title={this.props.machineId} toggleNav={this.toggleNav} />
@@ -92,6 +93,6 @@ export default MachinePage = React.createClass({
             <ResponseTimeIndicator />
           </div>
         </SideNavPage>
-      </AppCanvas>;
+      </MuiThemeProvider>;
   }
 });

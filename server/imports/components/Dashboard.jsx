@@ -1,17 +1,18 @@
 import React from 'react';
-import { AppCanvas,
-   AppBar,
-   FlatButton,
-   RaisedButton,
-   TextField,
-   TimePicker,
-   DatePicker,
-   Toolbar,
-   ToolbarTitle,
-   ToolbarGroup
-  } from 'material-ui';
+import {
+  FlatButton,
+  RaisedButton,
+  TextField,
+  TimePicker,
+  DatePicker,
+  Toolbar,
+  ToolbarTitle,
+  ToolbarGroup
+} from 'material-ui';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SideNavPage from './SideNavPage';
-import MenuIcon from 'material-ui/lib/svg-icons/navigation/menu';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
 import MachineListStatus from '../machine/MachineListStatus';
 import MachineListChart from '../machine/MachineListChart';
 import AllMachineMap from '../location/AllMachineMap';
@@ -32,8 +33,7 @@ Dashboard = React.createClass({
     };
   },
   render() {
-
-    return <AppCanvas>
+    return <MuiThemeProvider muiTheme={getMuiTheme()}>
         <SideNavPage ref="navPage">
           <div>
             <ViewTimeToolbar title="Dashboard" toggleNav={this.toggleNav} />
@@ -43,7 +43,7 @@ Dashboard = React.createClass({
             <AverageReadingIndicator />
           </div>
         </SideNavPage>
-      </AppCanvas>;
+      </MuiThemeProvider>;
   }
 });
 
