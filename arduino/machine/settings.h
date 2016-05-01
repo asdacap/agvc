@@ -64,7 +64,7 @@ namespace Setting{
       Settings.motorBaseSpeed = 100;
       Settings.motorLROffset = 0;
       Settings.motorPIDMultiplierRatio = 0.3;
-      Settings.motorVoltageCompensation = 30;
+      Settings.motorVoltageCompensation = 15;
       Settings.motorDiffRange = 200;
       Settings.PID_Kp = 0.95;
       Settings.PID_Ki = 0.1;
