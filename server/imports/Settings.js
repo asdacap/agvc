@@ -17,12 +17,13 @@ Settings = {
   react_tracker_update_delay: 200,
   disable_client_machine_response_time: true,
   show_client_response_time: true,
-  show_average_readings: true,
+  show_average_readings: false,
   cleanup_other_offline_connection: true,
   machine_view_render_timeout: 33
 };
 
 Settings = _.extend(Settings, Meteor.settings);
+Settings = _.extend(Settings, Settings.public);
 
 if(!Settings.machine_interface_server){
   Settings.master = false;
