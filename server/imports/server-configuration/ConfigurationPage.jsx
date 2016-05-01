@@ -136,7 +136,7 @@ let ConfigureArduinoDialog = React.createClass({
   getMeteorData(){
     Meteor.subscribe("Machines");
     return {
-      machines: Machines.find({}).fetch()
+      machines: Machines.find({}, {fields: { machineId: true }}).fetch()
     }
   },
   close(){
