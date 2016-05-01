@@ -18,8 +18,8 @@ namespace RFID{
     mfrc522.PCD_Init();		// Init MFRC522
 
     // Reduce timeout
-    mfrc522.PCD_WriteRegister(mfrc522.TReloadRegH, 0x01);
-    mfrc522.PCD_WriteRegister(mfrc522.TReloadRegL, 0xF4);
+    //mfrc522.PCD_WriteRegister(mfrc522.TReloadRegH, 0x01);
+    //mfrc522.PCD_WriteRegister(mfrc522.TReloadRegL, 0xF4);
   }
 
   /**
