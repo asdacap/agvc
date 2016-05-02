@@ -46,7 +46,7 @@ function calculateLocationPoint(locationLog, machineObj){
   }else if(locationLog.type === 'path'){
     let path = Map.getPath(locationLog.pathId);
     if(path === undefined){
-      console.error("Error path "+locationLog.pathId+" is not defined");
+      //console.warn("Error path "+locationLog.pathId+" is not defined");
       return undefined;
     }
 
