@@ -52,10 +52,8 @@ namespace States{
   void loopObstacleSensor(){
     if(digitalRead(OBSTACLE_SENSOR) == LOW){
       States::setObstructed();
-      obstructed = true;
     }else if(obstructed){
       States::clearObstructed();
-      obstructed = false;
     }
   }
 
